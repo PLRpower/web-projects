@@ -1,0 +1,225 @@
+@base()
+
+@slot('title')
+CESI Premium - L'outil indispensable pour CESI - Inscription
+@end
+
+@slot('description')
+Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à CESI, école d'ingénieurs. De la recherche de CCTL à l'accès aux Livrables, CESI Premium est l'allié indispensable pour réussir vos études.
+@end
+
+@slot('page')
+6112c19d59487e4d73184fd6
+@end
+
+@slot('stripe')
+@end
+
+@slot('content')
+  @include('layouts/navbar')
+  <section class="section contact-hero">
+    <div class="container-small-552px contact-hero">
+      <div class="bg-gradient-blur-wrapper contact-hero" style="height: 400px; width: 1000px">
+        <div class="bg-gradient-blur-circle-3 pink top"></div>
+        <div class="bg-gradient-blur-circle-2 blue"></div>
+        <div class="bg-gradient-blur-circle-1 purple"></div>
+      </div>
+    </div>
+  </section>
+  <section class="section contact" style="padding-bottom: 184px">
+    <div class="container-default w-container">
+      <div class="contact-wrapper">
+        <div data-w-id="59a930ba-1041-e0d0-2ddc-248a7c44a57b" style="opacity:0" class="split-content contact-form">
+          <div class="card contact-form">
+            <div id="w-node-_13235370-6615-b8f7-1966-ee3fe42ff50a-73184fd6" class="contact-form-block w-form">
+              <div class="container-small-552px contact-hero">
+                <h1 data-w-id="dc363e27-9952-4db8-7f54-6dda2f29d433" style="-webkit-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="title contact-hero">Inscription</h1>
+                <p data-w-id="0d3d1e09-c689-ed04-7a44-ab232f295d90" style="-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="paragraph contact-hero">
+                  Créez votre compte gratuitement, et boostez votre productivité au CESI dès aujourd'hui.
+                </p>
+              </div>
+              <form method="POST" action="{{ route('inscription.post') }}" class="card-contact-form">
+                {{ csrfField() }}
+                <div class="input-wrapper">
+                  <a href="" class="button-primary button-white w-button google-button"><img src="{{ asset('public/img/google.svg') }}" alt="Google" style="width: 30px; height: 30px; margin-right: 10px;">S'inscrire avec Google</a>
+                </div>
+                <div class="input-wrapper">
+                  <button class="button-primary button-white w-button google-button"><img src="{{ asset('public/img/facebook.svg') }}" alt="Facebook" style="width: 30px; height: 30px; margin-right: 10px;">S'inscrire avec Facebook</button>
+                </div>
+                <div class="separator input-full">ou</div>
+                <!--
+                @if(flashMessages.has(('inputErrorsBag')))
+                  <div class="error-message input-full">
+                    @each(message in flashMessages.get('inputErrorsBag'))
+                      <div>{{ message }}</div>
+                    @end
+                  </div>
+                @end
+                -->
+                <div class="input-wrapper">
+                  <label for="prenom">Prénom</label>
+                  <input class="input w-input" maxlength="256" name="prenom" data-name="prenom" placeholder="Olivier" type="text" id="prenom" required autocomplete="given-name" />
+                  @inputError('prenom')
+                    @each(message in $messages)
+                      <p class="input-error">Le prénom {{ message }}</p>
+                    @end
+                  @end
+                </div>
+                <div class="input-wrapper">
+                  <label for="nom">Nom</label>
+                  <input class="input w-input" maxlength="256" name="nom" data-name="nom" placeholder="Sandel" type="text" id="nom" required autocomplete="family-name" />
+                  @inputError('nom')
+                    @each(message in $messages)
+                      <p class="input-error">Le nom {{ message }}</p>
+                    @end
+                  @end
+                </div>
+                <div class="input-wrapper">
+                  <label for="email">Email</label>
+                  <input class="input w-input" maxlength="256" name="email" data-name="email" placeholder="olivier.sandel@viacesi.fr" type="email" id="email" required autocomplete="email" />
+                  @inputError('email')
+                    @each(message in $messages)
+                      @if(message == "The adresse email has already been taken")
+                        <p class="input-error">Cette email est déjà utilisée.</p>
+                      @else
+                        <p class="input-error">L'adresse email {{ message }}</p>
+                      @end
+                    @end
+                  @end
+                </div>
+                <div class="input-wrapper">
+                  <label for="campus">Votre campus</label>
+                  <select class="input w-input" name="campus" data-name="campus" id="campus" required>
+                    <option value="">-- Séléctionner --</option>
+                    <option value="Angoulême">Angoulême</option>
+                    <option value="Arras">Arras</option>
+                    <option value="Aix-en-Provence">Aix-en-Provence</option>
+                    <option value="Bordeaux">Bordeaux</option>
+                    <option value="Brest">Brest</option>
+                    <option value="Caen">Caen</option>
+                    <option value="Châteauroux">Châteauroux</option>
+                    <option value="Dijon">Dijon</option>
+                    <option value="Grenoble">Grenoble</option>
+                    <option value="La Rochelle">La Rochelle</option>
+                    <option value="Le Mans">Le Mans</option>
+                    <option value="Lille">Lille</option>
+                    <option value="Lyon">Lyon</option>
+                    <option value="Montpellier">Montpellier</option>
+                    <option value="Nancy">Nancy</option>
+                    <option value="Nantes">Nantes</option>
+                    <option value="Nice">Nice</option>
+                    <option value="Orléans">Orléans</option>
+                    <option value="Paris Nanterre">Paris Nanterre</option>
+                    <option value="Pau">Pau</option>
+                    <option value="Reims">Reims</option>
+                    <option value="Rouen">Rouen</option>
+                    <option value="Saint-Nazaire">Saint-Nazaire</option>
+                    <option value="Strasbourg">Strasbourg</option>
+                    <option value="Toulouse">Toulouse</option>
+                  </select>
+                  @inputError('campus')
+                    @each(message in $messages)
+                      <p class="input-error">Le campus {{ message }}</p>
+                    @end
+                  @end
+                </div>
+                <div class="input-wrapper input-full">
+                  <label for="promotion">Votre promotion</label>
+                  <select class="input w-input" name="promotion" data-name="promotion" id="promotion" required>
+                    <option value="">-- Séléctionner --</option>
+                    <option value="A1">CPI A1</option>
+                    <option value="A2G">CPI A2 - Mineure généraliste</option>
+                    <option value="A2B">CPI A2 - Mineure BTP</option>
+                    <option value="A2I">CPI A2 - Mineure informatique</option>
+                    <option value="A2S">CPI A2 - Mineure systèmes embarqués</option>
+                    <option value="A3G">CPI A3 - Majeure généraliste</option>
+                    <option value="A3B">CPI A3 - Majeure BTP</option>
+                    <option value="A3I">CPI A3 - Majeure informatique</option>
+                    <option value="A3S">CPI A3 - Majeure systèmes embarqués</option>
+                    <option value="A4G">CPI A4 - Majeure généraliste</option>
+                    <option value="A4B">CPI A4 - Majeure BTP</option>
+                    <option value="A4I">CPI A4 - Majeure informatique</option>
+                    <option value="A4S">CPI A4 - Majeure systèmes embarqués</option>
+                    <option value="A5G">CPI A5 - Majeure généraliste</option>
+                    <option value="A5B">CPI A5 - Majeure BTP</option>
+                    <option value="A5I">CPI A5 - Majeure informatique</option>
+                    <option value="A5S">CPI A5 - Majeure systèmes embarqués</option>
+                  </select>
+                    @inputError('promotion')
+                     @each(message in $messages)
+                       <p class="input-error">La promotion {{ message }}</p>
+                     @end
+                   @end
+                </div>
+
+                <div class="input-wrapper">
+                  <label for="password">Mot de passe</label>
+                  <input class="input w-input" maxlength="256" name="password" data-name="password" placeholder="**********" type="password" id="password" required autocomplete="new-password" />
+                  @inputError('password')
+                    @each(message in $messages)
+                      <p class="input-error">Le mot de passe {{ message }}</p>
+                    @end
+                  @end
+                  <p id="message"></p>
+                  <div id="strength-bar-under" style="width: 100%; height: 3px; background-color: #3f332c; border-radius: 10px; z-index: -1; display: none; transition: .3s;"></div>
+                  <div id="strength-bar" style="width: 0%; height: 3px; transition: .3s; border-radius: 10px; margin-top:-3px; display: none"></div>
+                  </div>
+                <div class="input-wrapper">
+                  <label for="password_confirmation">Mot de passe</label>
+                  <input class="input w-input" maxlength="256" name="password_confirmation" data-name="password_confirmation" placeholder="**********" type="password" id="password_confirmation" required autocomplete="new-password" />
+                </div>
+                <div class="contact-form input-full">
+                  <input type="submit" data-wait="Patientez ..." class="button-primary button-white w-button" value="S'inscrire" />
+                </div>
+              </form>
+              <div class="flex center center-horizontal">
+                <a href="{{ route('connexion') }}" style="margin-top: 20px">Vous avez déjà un compte ?</a>
+              </div>
+            </div>
+          </div>
+          <div class="card-contact-form-gradient-blur"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+  function updateStrength() {
+    const password = document.getElementById("password").value;
+    const progressBar = document.getElementById("strength-bar");
+    const underBar = document.getElementById("strength-bar-under");
+    progressBar.style.display = "block";
+    underBar.style.display = "block";
+
+    const percentage = getStrength(password);
+    progressBar.style.width = percentage + "%";
+
+    if (percentage < 20) {
+      progressBar.style.backgroundColor = "red";
+    } else if (percentage < 40) {
+      progressBar.style.backgroundColor = "red";
+    } else if (percentage < 60) {
+      progressBar.style.backgroundColor = "orange";
+    } else if (percentage < 80) {
+      progressBar.style.backgroundColor = "lightgreen";
+    } else {
+      progressBar.style.backgroundColor = "green";
+    }
+  }
+
+  function getStrength(password) {
+    let strength = 0;
+    if (password.length >= 6) {strength++;}
+    if (password.length > 10) {strength++;}
+    if (/\d/.test(password)) {strength++;}
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) {strength++;}
+    if (/[!@#$%^&*(),.?":;{}|<>]/.test(password)) {strength++;}
+    return (strength / 5) * 100;
+  }
+
+  document.getElementById("password").addEventListener("input", updateStrength);
+  document.getElementById("password_confirmation").addEventListener("input", updateStrength);
+
+</script>
+  @include('layouts/footer')
+  @end
+@end

@@ -1,0 +1,46 @@
+@base()
+
+@slot('title')
+CESI Premium - 404 - Page introuvable
+@end
+
+@slot('description')
+Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à CESI, école d'ingénieurs. De la recherche de CCTL à l'accès aux Livrables, CESI Premium est l'allié indispensable pour réussir vos études.
+@end
+
+@slot('page')
+61113c4e9f23df5d3255410b
+@end
+
+@slot('content')
+  @include('pages/layouts/navbar')
+    <section class="utility-page-wrap">
+      <div class="utility-page-content-404 w-form">
+        <div data-w-id="91131790-1442-fb7d-dba1-4b738f5237d2" style="-webkit-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="_404-number">404</div>
+        <h1 data-w-id="5e86adabd2a28d2afbf80eae00000000000d" style="-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="title not-found">
+          <span class="text-no-wrap">Page introuvable !</span>
+        </h1>
+        <p data-w-id="Paragraph" style="-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="paragraph not-found">
+        Oups, une erreur est survenue ! La page que vous essayez de chercher n'existe pas ou n'existe plus. Retourner à la page d'accueil <span class="text-no-wrap">avec le bouton ci-dessous.</span>
+        </p>
+        <div data-w-id="3c27412e-0a27-f599-cb96-423780539163" style="-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0">
+          <div class="button-primary-gradient">
+            <a href="{{ route('accueil') }}" class="button-primary w-button">Retourner à l'accueil</a>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gradient-blur-wrapper not-found-1">
+        <div class="bg-gradient-blur-circle-3 pink top"></div>
+        <div class="bg-gradient-blur-circle-2 blue-2"></div>
+        <div class="bg-gradient-blur-circle-1 purple"></div>
+      </div>
+      <div class="bg-gradient-blur-wrapper not-found-2">
+        <div class="bg-gradient-blur-circle-3 not-found"></div>
+        <div class="bg-gradient-blur-circle-2"></div>
+        <div class="bg-gradient-blur-circle-1 blue"></div>
+      </div>
+    </section>
+
+  @include('pages/layouts/footer')
+@end
+@end

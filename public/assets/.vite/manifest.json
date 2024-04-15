@@ -1,0 +1,40 @@
+{
+  "public/fonts/THICCCBOI-Bold.ttf": {
+    "file": "THICCCBOI-Bold-Dcbuz-rs.ttf",
+    "src": "public/fonts/THICCCBOI-Bold.ttf"
+  },
+  "public/fonts/THICCCBOI-Medium.ttf": {
+    "file": "THICCCBOI-Medium-D4uiajDS.ttf",
+    "src": "public/fonts/THICCCBOI-Medium.ttf"
+  },
+  "public/fonts/THICCCBOI-SemiBold.ttf": {
+    "file": "THICCCBOI-SemiBold-CTlOPxX0.ttf",
+    "src": "public/fonts/THICCCBOI-SemiBold.ttf"
+  },
+  "public/fonts/filled-icon-font.woff2": {
+    "file": "filled-icon-font-DqE7ciSk.woff2",
+    "src": "public/fonts/filled-icon-font.woff2"
+  },
+  "public/fonts/icons-dark-template.woff2": {
+    "file": "icons-dark-template-Dm19j0Dd.woff2",
+    "src": "public/fonts/icons-dark-template.woff2"
+  },
+  "public/fonts/line-rounded-icon-font.woff2": {
+    "file": "line-rounded-icon-font-Bx1kgbL9.woff2",
+    "src": "public/fonts/line-rounded-icon-font.woff2"
+  },
+  "public/fonts/line-square-icon-font.woff2": {
+    "file": "line-square-icon-font-C86i44v1.woff2",
+    "src": "public/fonts/line-square-icon-font.woff2"
+  },
+  "resources/css/app.css": {
+    "file": "app-Cj6f5s-s.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "app-CG1PxsD0.js",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}

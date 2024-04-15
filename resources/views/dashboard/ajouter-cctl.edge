@@ -1,0 +1,60 @@
+@base()
+
+@slot('title')
+CESI Premium - L'outil indispensable pour CESI - Inscription
+@end
+
+@slot('description')
+Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à CESI, école d'ingénieurs. De la recherche de CCTL à l'accès aux Livrables, CESI Premium est l'allié indispensable pour réussir vos études.
+@end
+
+@slot('page')
+6112c19d59487e4d73184fd6
+@end
+
+@slot('content')
+  @include('pages/layouts/navbar')
+  <section class="section contact-hero">
+    <div class="container-small-552px contact-hero">
+      <div class="bg-gradient-blur-wrapper contact-hero" style="height: 400px; width: 1000px">
+        <div class="bg-gradient-blur-circle-3 pink top"></div>
+        <div class="bg-gradient-blur-circle-2 blue"></div>
+        <div class="bg-gradient-blur-circle-1 purple"></div>
+      </div>
+    </div>
+  </section>
+  <section class="section contact" style="padding-bottom: 184px">
+    <div class="container-default w-container">
+      <div class="contact-wrapper">
+        <div data-w-id="59a930ba-1041-e0d0-2ddc-248a7c44a57b" style="opacity:0" class="split-content contact-form">
+          <div class="card contact-form">
+            <div id="w-node-_13235370-6615-b8f7-1966-ee3fe42ff50a-73184fd6" class="contact-form-block w-form">
+              <div class="container-small-552px contact-hero">
+                <h1 data-w-id="dc363e27-9952-4db8-7f54-6dda2f29d433" style="-webkit-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="title contact-hero">Ajouter un CCTL</h1>
+                <p data-w-id="0d3d1e09-c689-ed04-7a44-ab232f295d90" style="-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="paragraph contact-hero">
+                  Créez votre compte gratuitement, et boostez votre productivité au CESI dès aujourd'hui.
+                </p>
+              </div>
+              <form method="POST" action="{{ route('add.cctl.post') }}" class="card-contact-form" enctype="multipart/form-data">
+                {{ csrfField() }}
+                <div class="input-wrapper input-full">
+                  <label for="file">Ajouter le fichier PDF</label>
+                  <input type="file" class="input w-input" id="file" name="file" required>
+                </div>
+                <div class="contact-form input-full">
+                  <input type="submit" data-wait="Patientez ..." class="button-primary button-white w-button" value="Envoyer" />
+                </div>
+              </form>
+              <div class="error-message w-form-fail">
+                <div>Oops! Something went wrong.</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-contact-form-gradient-blur"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  @include('pages/layouts/footer')
+  @end
+@end

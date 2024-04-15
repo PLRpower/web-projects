@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html data-cp-page="{{{ await $slots.page() }}}" data-cp-site="61113c4e9f23df1e7f554117" data-cp-status="1" lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>{{{ await $slots.title() }}}</title>
+    <meta content="{{{ await $slots.description() }}}" name="description" />
+    <meta content="{{{ await $slots.title() }}}" property="og:title" />
+    <meta content="{{{ await $slots.description() }}}" property="og:description" />
+    <meta content="https://assets-global.website-files.com/61113c4e9f23df1e7f554117/6116f87a2ba0ad7e5947b25e_featured-image-dark-template.png" property="og:image" />
+    <meta content="{{{ await $slots.title() }}}" property="twitter:title" />
+    <meta content="{{{ await $slots.description() }}}" property="twitter:description" />
+    <meta content="https://assets-global.website-files.com/61113c4e9f23df1e7f554117/6116f87a2ba0ad7e5947b25e_featured-image-dark-template.png" property="twitter:image" />
+    <meta property="og:type" content="website" />
+    <meta content="summary_large_image" name="twitter:card" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    {{{ await $slots.stripe() }}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <link href="./img/favicon.svg" rel="shortcut icon" type="image/x-icon" />
+    <link href="./img/webclip.svg" rel="apple-touch-icon" />
+  </head>
+  <body class="bg-neutral-800">
+    <div style="opacity:0" class="page-wrapper overflow-hidden">
+      {{{ await $slots.content() }}}
+    </div>
+    <script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=61113c4e9f23df1e7f554117" type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  </body>
+</html>

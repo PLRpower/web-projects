@@ -1,0 +1,96 @@
+@base()
+
+@slot('title')
+CESI Premium - L'outil indispensable pour CESI
+@end
+
+@slot('description')
+Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à CESI, école d'ingénieurs. De la recherche de CCTL à l'accès aux Livrables, CESI Premium est l'allié indispensable pour réussir vos études.
+@end
+
+@slot('page')
+6111a973630c0a0e2b15851e
+@end
+
+@slot('stripe')
+<script src="https://js.stripe.com/v3/"></script>
+@end
+
+@slot('content')
+  @include('layouts/navbar')
+  <section class="section team">
+    <div class="container-medium-785px">
+      <div class="team-content-top">
+        <div data-w-id="11ad11e1-ebaa-8fb0-671d-12d32fcc87b3" style="-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="card team">
+          <div class="image-wrapper card-team">
+            <img src="https://assets-global.website-files.com/61113c4e9f23df7a39554118/6111b51f60d0e2081bbedad0_image-cover-team-dark-template.jpg" loading="eager" alt="" sizes="(max-width: 479px) 93vw, (max-width: 991px) 94vw, 737px" srcset="https://assets-global.website-files.com/61113c4e9f23df7a39554118/6111b51f60d0e2081bbedad0_image-cover-team-dark-template-p-500.jpeg 500w, https://assets-global.website-files.com/61113c4e9f23df7a39554118/6111b51f60d0e2081bbedad0_image-cover-team-dark-template-p-800.jpeg 800w, https://assets-global.website-files.com/61113c4e9f23df7a39554118/6111b51f60d0e2081bbedad0_image-cover-team-dark-template.jpg 1475w" class="image card-team" />
+          </div>
+          <div class="card-team-content">
+            <div class="card-team-content-top">
+              <div class="split-content card-team-content-top-left">
+                <div class="image-wrapper card-team-profile-picture">
+                  <img src="https://assets-global.website-files.com/61113c4e9f23df7a39554118/61142d014d1e8c8ef6463535_image-1-team-dark-template.jpg" loading="eager" alt="John Carter" class="image card-team-profile-picture" />
+                </div>
+                <div class="card-team-name-wrapper">
+                  <h1 id="message" class="title h3-size card-team-name"></h1>
+                  <div class="card-team-rol">CEO and Founder</div>
+                </div>
+              </div>
+              <div class="social-media-wrapper card-team">
+                <a href="https://www.facebook.com/" target="_blank" class="social-media-link"></a>
+                <a href="https://twitter.com/" target="_blank" class="social-media-link icon-size-13px"></a>
+                <a href="https://www.instagram.com/" target="_blank" class="social-media-link icon-size-15px"></a>
+                <a href="https://www.linkedin.com/" target="_blank" class="social-media-link icon-size-13px"></a>
+              </div>
+            </div>
+            <p class="paragraph card-team">Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua it amet volutpat consequat mauris nunc congue nisi vitae suscipit t netus et malesuada fames ac turpis egestas onsectetur.</p>
+            <div class="social-media-wrapper card-team-mobile">
+              <a href="https://www.facebook.com/" target="_blank" class="social-media-link"></a>
+              <a href="https://twitter.com/" target="_blank" class="social-media-link icon-size-13px"></a>
+              <a href="https://www.instagram.com/" target="_blank" class="social-media-link icon-size-15px"></a>
+              <a href="https://www.linkedin.com/" target="_blank" class="social-media-link icon-size-13px"></a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gradient-blur-wrapper team">
+          <div class="bg-gradient-blur-circle-3 pink team"></div>
+          <div class="bg-gradient-blur-circle-2 blue team"></div>
+          <div class="bg-gradient-blur-circle-1 purple team"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  @include('layouts/footer')
+  <script>
+    const stripe = Stripe('pk_test_51Oxu6yKu99Wj7F5n0SIzMnM6AlUszfIUagdoGLZHUBC4vz1S8otp2r5zDhpXY0t8iZsVUknRMwD9wizDTlm9rxu700Zk8MKhCv');
+
+    const clientSecret = new URLSearchParams(window.location.search).get(
+      'payment_intent_client_secret'
+    );
+
+    stripe.retrievePaymentIntent(clientSecret).then(({paymentIntent}) => {
+      const message = document.querySelector('#message')
+
+      switch (paymentIntent.status) {
+        case 'succeeded':
+          message.innerText = 'Success! Payment received.';
+          break;
+
+        case 'processing':
+          message.innerText = "Payment processing. We'll update you when payment is received.";
+          break;
+
+        case 'requires_payment_method':
+          message.innerText = 'Payment failed. Please try another payment method.';
+          // Redirect your user back to your payment page to attempt collecting
+          // payment again
+          break;
+
+        default:
+          message.innerText = 'Something went wrong.';
+          break;
+      }
+    });
+  </script>
+@end
+@end

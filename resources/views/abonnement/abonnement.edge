@@ -1,0 +1,200 @@
+@base()
+
+@slot('title')
+CESI Premium - L'outil indispensable pour CESI - Inscription
+@end
+
+@slot('description')
+Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à CESI, école d'ingénieurs. De la recherche de CCTL à l'accès aux Livrables, CESI Premium est l'allié indispensable pour réussir vos études.
+@end
+
+@slot('page')
+6112c186dffd61ce23a6d710
+@end
+
+@slot('stripe')
+@end
+
+@slot('content')
+  @include('layouts/navbar-simplified')
+  <section class="section pricing">
+    <div class="container-medium-669px pricing mg-bottom-100px">
+      <h1 data-w-id="421cdd75-997d-4914-747c-6710591816a4" style="-webkit-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="title pricing text-center">Passez votre compte <span class="text-color-accent">au niveau supérieur</span></h1>
+      <p data-w-id="6429b458-c4f6-6657-4a67-82a0faff99d6" style="-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="paragraph pricing text-center">Ajoutez des superpouvoirs à votre compte, et <span class="text-no-wrap">boostez votre productivité au CESI.</span>
+      </p>
+    </div>
+    <div class="container-default pricing w-container">
+      <div data-w-id="5b7b798c-3bee-f3c0-046b-659a4d9fefe2" style="-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="pricing-collection-list-wrapper w-dyn-list">
+        <div role="list" class="pricing-wrapper w-dyn-items">
+          <div role="listitem" class="pricing-plan-item w-dyn-item">
+            <div class="card-plan-item-popular-gradient-blur"></div>
+            <a href="{{ route('abonnement.annuel') }}" class="card plan-item w-inline-block">
+              <div class="card-plan-item-content">
+                <div class="card-plan-item-content-top">
+                  <div class="card-plan-item-icon-content">
+                    <div class="image-wrapper card-plan-item-icon">
+                      <img alt="Advanced" loading="eager" data-wf-sku-bindings="%5B%7B%22from%22%3A%22f_main_image_4dr%22%2C%22to%22%3A%22src%22%7D%5D" src="{{ asset('public/assets/img/abonnement-annuel.png') }}" class="image card-plan-item-icon" />
+                    </div>
+                    <div class="card-plan-item-popular-tag-wrapper">
+                      <div class="card-plan-item-popular-tag-blur"></div>
+                      <div class="card-plan-item-popular-tag-text">Le plus économique</div>
+                    </div>
+                  </div>
+                  <div class="card-plan-item-title-wrapper">
+                    <h2 class="title h3-size card-plan-item">Annuel</h2>
+                    <p class="paragraph card-plan-item-summary">Abonnement annuel de 31,99 €, soit </p>
+                  </div>
+                </div>
+                <div class="card-plan-item-content-bottom">
+                  <div data-wf-sku-bindings="%5B%7B%22from%22%3A%22f_price_%22%2C%22to%22%3A%22innerHTML%22%7D%5D" class="card-plan-item-price">2,66 € <span class="fs-small">/ mois</span></div>
+                  <div class="card-plan-item-button-wrapper">
+                    <div class="button-primary-gradient full-width plan">
+                      <div class="button-primary small">S'abonner à CESI Premium</div>
+                    </div>
+                    <div class="paragraph-small card-plan-item-content-bottom-small-print" style="visibility: hidden">Facturation récurrente. Vous pouvez résilier à tout moment.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="card plan-item-popular"></div>
+            </a>
+          </div>
+          <div role="listitem" class="pricing-plan-item w-dyn-item">
+            <div class="card-plan-item-popular-gradient-blur w-condition-invisible"></div>
+            <a href="/product/basic" class="card plan-item w-inline-block">
+              <div class="card-plan-item-content">
+                <div class="card-plan-item-content-top">
+                  <div class="card-plan-item-icon-content">
+                    <div class="image-wrapper card-plan-item-icon">
+                      <img alt="Basic" loading="eager" data-wf-sku-bindings="%5B%7B%22from%22%3A%22f_main_image_4dr%22%2C%22to%22%3A%22src%22%7D%5D" src="{{ asset('public/assets/img/abonnement-mensuel.png') }}" class="image card-plan-item-icon" />
+                    </div>
+                    <div class="card-plan-item-popular-tag-wrapper w-condition-invisible">
+                      <div class="card-plan-item-popular-tag-blur"></div>
+                      <div class="card-plan-item-popular-tag-text">Popular</div>
+                    </div>
+                  </div>
+                  <div class="card-plan-item-title-wrapper">
+                    <h2 class="title h3-size card-plan-item">Mensuel</h2>
+                    <p class="paragraph card-plan-item-summary">Facturé aujourd'hui au prix de</p>
+                  </div>
+                </div>
+                <div class="card-plan-item-content-bottom">
+                  <div data-wf-sku-bindings="%5B%7B%22from%22%3A%22f_price_%22%2C%22to%22%3A%22innerHTML%22%7D%5D" class="card-plan-item-price">6,99 € <span class="fs-small">/ mois</span></div>
+                  <div class="card-plan-item-button-wrapper">
+                    <div class="button-secondary small plan">S'abonner à CESI Premium</div>
+                    <div class="paragraph-small card-plan-item-content-bottom-small-print">Facturation récurrente. Vous pouvez résilier à tout moment.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="card plan-item-popular w-condition-invisible"></div>
+            </a>
+            <div class="space card-plan-item-popular w-condition-invisible"></div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gradient-blur-wrapper pricing">
+        <div class="bg-gradient-blur-circle-3 pink top"></div>
+        <div class="bg-gradient-blur-circle-2 purple"></div>
+        <div class="bg-gradient-blur-circle-1 purple"></div>
+      </div>
+    </div>
+  </section>
+  <section class="section plan-features">
+    <div data-w-id="3be3dd98-05cf-247d-c1b8-0a1e55935649" style="-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="container-small-590px plan-features">
+      <h2>Découvrez les avantages de l'abonnement Premium</h2>
+      <p class="paragraph plan-features">Accédez à tout les meilleurs outils pour vous simplifier la vie au CESI à partir de <span class="text-no-wrap">seulement 2,66€ par mois.</span>
+      </p>
+    </div>
+    <div class="container-default plan-features w-container">
+      <div data-w-id="c104a05a-04e8-92a6-7e3f-987f3034e9b4" style="-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="card plan-features">
+        <div class="card-feature-comparison-content-top">
+          <div class="w-layout-grid feature-comparison-grid">
+            <div class="feature-comparison-plan-wrapper">
+              <div class="feature-comparison-plan-name">Plan basique</div>
+              <div class="feature-comparison-plan-price">0,00 €</div>
+            </div>
+            <div class="feature-comparison-plan-wrapper">
+              <div class="feature-comparison-plan-name">Abonnement Premium</div>
+              <div class="feature-comparison-plan-price">2,66 € <span class="fs-small">/ mois</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="feature-comparison-wrapper">
+          <div class="feature-comparison-header">
+            <h3 class="title feature-comparison-name">Fonctionnalités</h3>
+          </div>
+          <div class="feature-comparison-row-wrapper">
+            <div class="feature-comparison-text">Accès aux CCTL corrigés</div>
+            <div class="w-layout-grid feature-comparison-grid">
+              <img src="{{ asset('public/assets/img/check.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon" />
+              <img src="{{ asset('public/assets/img/check-gradient.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon" />
+            </div>
+          </div>
+          <div class="feature-comparison-row-wrapper">
+            <div class="feature-comparison-text">Accès au canal de votre promo</div>
+            <div class="w-layout-grid feature-comparison-grid">
+              <img src="{{ asset('public/assets/img/check.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon" />
+              <img src="{{ asset('public/assets/img/check-gradient.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon" />
+            </div>
+          </div>
+          <div class="feature-comparison-row-wrapper">
+            <div class="feature-comparison-text">Création de Prosits</div>
+            <div class="w-layout-grid feature-comparison-grid">
+              <img src="{{ asset('public/assets/img/check.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon" />
+              <img src="{{ asset('public/assets/img/check-gradient.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon" />
+            </div>
+          </div>
+          <div class="feature-comparison-row-wrapper">
+            <div class="feature-comparison-text">CCTL version interactifs</div>
+            <div class="w-layout-grid feature-comparison-grid">
+              <img src="{{ asset('public/assets/img/check.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon hidden" />
+              <img src="{{ asset('public/assets/img/check-gradient.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon" />
+            </div>
+          </div>
+          <div class="feature-comparison-row-wrapper">
+            <div class="feature-comparison-text">Outils de révisions basés sur l'IA</div>
+            <div class="w-layout-grid feature-comparison-grid">
+              <img src="{{ asset('public/assets/img/check.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon hidden" />
+              <img src="{{ asset('public/assets/img/check-gradient.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon" />
+            </div>
+          </div>
+          <div class="feature-comparison-row-wrapper">
+            <div class="feature-comparison-text">QCM automatiques</div>
+            <div class="w-layout-grid feature-comparison-grid">
+              <img src="{{ asset('public/assets/img/check.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon hidden" />
+              <img src="{{ asset('public/assets/img/check-gradient.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon" />
+            </div>
+          </div>
+          <div class="feature-comparison-row-wrapper">
+            <div class="feature-comparison-text">Travail hors-ligne</div>
+            <div class="w-layout-grid feature-comparison-grid">
+              <img src="{{ asset('public/assets/img/check.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon hidden" />
+              <img src="{{ asset('public/assets/img/check-gradient.svg') }}" loading="eager" alt="Check Icon - Dark X Webflow Template" class="image feature-comparison-check-icon" />
+            </div>
+          </div>
+          <div class="feature-comparison-row-wrapper">
+            <div class="feature-comparison-text">Accès gratuit aux Prosits</div>
+            <div class="w-layout-grid feature-comparison-grid">
+              <div class="feature-comparison-result-text">2 / mois</div>
+              <div class="feature-comparison-result-text">10 / mois</div>
+            </div>
+          </div>
+          <div class="feature-comparison-row-wrapper">
+            <div class="feature-comparison-text">Accès gratuit aux Livrables</div>
+            <div class="w-layout-grid feature-comparison-grid">
+              <div class="feature-comparison-result-text">0 / mois</div>
+              <div class="feature-comparison-result-text">3 / mois</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gradient-blur-wrapper plan-features">
+        <div class="bg-gradient-blur-circle-3 pink top"></div>
+        <div class="bg-gradient-blur-circle-2 blue"></div>
+        <div class="bg-gradient-blur-circle-1 purple"></div>
+      </div>
+    </div>
+  </section>
+  @include('layouts/footer')
+  @end
+
+ @end

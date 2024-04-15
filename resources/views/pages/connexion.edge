@@ -1,0 +1,94 @@
+@base()
+
+@slot('title')
+CESI Premium - L'outil indispensable pour CESI - Connexion
+@end
+
+@slot('description')
+Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à CESI, école d'ingénieurs. De la recherche de CCTL à l'accès aux Livrables, CESI Premium est l'allié indispensable pour réussir vos études.
+@end
+
+@slot('page')
+6112c19d59487e4d73184fd6
+@end
+
+@slot('stripe')
+@end
+
+@slot('content')
+  @include('layouts/navbar')
+  <section class="section contact-hero">
+    <div class="container-small-552px contact-hero">
+      <div class="bg-gradient-blur-wrapper contact-hero" style="height: 400px; width: 1000px">
+        <div class="bg-gradient-blur-circle-3 pink top"></div>
+        <div class="bg-gradient-blur-circle-2 blue"></div>
+        <div class="bg-gradient-blur-circle-1 purple"></div>
+      </div>
+    </div>
+  </section>
+  <section class="section contact" style="padding-bottom: 184px">
+    <div class="container-default w-container">
+      <div class="contact-wrapper">
+        <div data-w-id="59a930ba-1041-e0d0-2ddc-248a7c44a57b" style="opacity:0" class="split-content contact-form">
+          <div class="card contact-form">
+            <div id="w-node-_13235370-6615-b8f7-1966-ee3fe42ff50a-73184fd6" class="contact-form-block w-form">
+              <div class="container-small-552px contact-hero">
+                <h1 data-w-id="dc363e27-9952-4db8-7f54-6dda2f29d433" style="-webkit-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="title contact-hero">Connexion</h1>
+                <p data-w-id="0d3d1e09-c689-ed04-7a44-ab232f295d90" style="-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="paragraph contact-hero">
+                  Connectez-vous à votre compte CESI Premium pour accéder à l'ensemble des fonctionnalités de la plateforme.
+                </p>
+              </div>
+              <form method="POST" action="{{ route('connexion.post') }}" class="card-contact-form">
+                {{ csrfField() }}
+                <div class="input-wrapper">
+                  <a href="" class="button-primary button-white w-button google-button"><img src="{{ asset('public/img/google.svg') }}" alt="Google" style="width: 30px; height: 30px; margin-right: 10px;">S'inscrire avec Google</a>
+                </div>
+                <div class="input-wrapper">
+                  <button class="button-primary button-white w-button google-button"><img src="{{ asset('public/img/facebook.svg') }}" alt="Facebook" style="width: 30px; height: 30px; margin-right: 10px;">S'inscrire avec Facebook</button>
+                </div>
+                <div class="separator input-full">ou</div>
+                @if(flashMessages.has('errorsBag'))
+                  <div class="error-message input-full">
+                      <div>Les identifiants fournis sont incorrects.</div>
+                  </div>
+                @end
+                <div class="input-wrapper input-full">
+                  <label for="email">Email</label>
+                  <input class="input w-input" maxlength="256" name="email" data-name="email" placeholder="olivier.sandel@viacesi.fr" type="email" id="email" required autocomplete="email" />
+                  @inputError('email')
+                    @each(message in $messages)
+                      <p class="input-error">L'adresse email {{ message }}</p>
+                    @end
+                  @end
+                </div>
+                <div class="input-wrapper input-full">
+                  <label for="password">Mot de passe</label>
+                  <input class="input w-input" maxlength="256" name="password" data-name="password" placeholder="**********" type="password" id="password" required autocomplete="current-password" />
+                  @inputError('password')
+                    @each(message in $messages)
+                      <p class="input-error">Le mot de passe {{ message }}</p>
+                    @end
+                  @end
+                </div>
+                <div class="contact-form input-full">
+                  <input type="submit" data-wait="Patientez ..." class="button-primary button-white w-button" value="Connexion" />
+                </div>
+              </form>
+              @error('email')
+              <div class="error-message">
+                <div>Oops! Something went wrong.</div>
+              </div>
+              @end
+              <div class="flex center center-horizontal">
+                <a href="{{ route('inscription') }}" style="margin-top: 20px">Vous n'avez pas de compte ?</a>
+              </div>
+            </div>
+          </div>
+          <div class="card-contact-form-gradient-blur"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  @include('layouts/footer')
+  @end
+@end
