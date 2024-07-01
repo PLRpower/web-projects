@@ -29,7 +29,13 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare promotion: string
 
   @column()
-  declare password: string
+  declare password: string | null
+
+  @column()
+  declare social: boolean
+
+  @column()
+  declare pdp: string | null
 
   @column()
   declare stripeId: string | null

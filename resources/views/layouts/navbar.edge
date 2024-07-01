@@ -160,7 +160,11 @@
                         <ul role="list" class="dropdown-nav">
                           <li class="dropdown-nav-item">
                             <div class="flex center-horizontal" style="gap: 20px;">
-                              <img src="./img/profile-picture.png" class="profile-picture">
+                              @if(auth.user.pdp)
+                                <img src="{{ auth.user.pdp }}" class="profile-picture">
+                              @else
+                                <img src="./img/profile-picture.png" class="profile-picture">
+                              @endif
                               <div>
                                 <div class="title dropdown" style="margin-bottom: 10px">
                                   {{ auth.user.prenom }} {{ auth.user.nom }}
@@ -234,7 +238,11 @@
                     <ul role="list" class="dropdown-nav">
                       <li class="dropdown-nav-item">
                         <div class="flex center-horizontal" style="gap: 20px;">
-                          <img src="./img/profile-picture.png" class="profile-picture">
+                          @if(auth.user.pdp)
+                            <img src="{{ auth.user.pdp }}" class="profile-picture">
+                          @else
+                            <img src="./img/profile-picture.png" class="profile-picture">
+                          @endif
                           <div>
                             <div class="title dropdown" style="margin-bottom: 10px">
                               {{ auth.user.prenom }} {{ auth.user.nom }}

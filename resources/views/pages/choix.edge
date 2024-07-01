@@ -16,7 +16,6 @@ Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à C
 @end
 
 @slot('content')
-  @include('layouts/navbar')
   <section class="section contact-hero">
     <div class="container-small-552px contact-hero">
       <div class="bg-gradient-blur-wrapper contact-hero" style="height: 400px; width: 1000px">
@@ -33,61 +32,26 @@ Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à C
           <div class="card contact-form">
             <div id="w-node-_13235370-6615-b8f7-1966-ee3fe42ff50a-73184fd6" class="contact-form-block w-form">
               <div class="container-small-552px contact-hero">
-                <h1 data-w-id="dc363e27-9952-4db8-7f54-6dda2f29d433" style="-webkit-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="title contact-hero">Inscription</h1>
+                <h1 data-w-id="dc363e27-9952-4db8-7f54-6dda2f29d433" style="-webkit-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40%, 0) scale3d(0.8, 0.8, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="title contact-hero">Quelques infos</h1>
                 <p data-w-id="0d3d1e09-c689-ed04-7a44-ab232f295d90" style="-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="paragraph contact-hero">
-                  Créez votre compte gratuitement, et boostez votre productivité au CESI dès aujourd'hui.
+                  Saissisez votre campus ainsi que votre promotion pour pouvoir bénéficier de toutes les fonctionnalités.
                 </p>
               </div>
-              <form method="POST" action="{{ route('inscription.post') }}" class="card-contact-form">
+              <form method="POST" action="{{ route('choix.post') }}" class="card-contact-form">
                 {{ csrfField() }}
-                <div class="input-wrapper">
-                  <a href="{{ route('google.redirect') }}" class="button-primary button-white w-button google-button"><img src="{{ asset('public/img/google.svg') }}" alt="Google" style="width: 30px; height: 30px; margin-right: 10px;">S'inscrire avec Google</a>
-                </div>
-                <div class="input-wrapper">
-                  <button class="button-primary button-white w-button google-button"><img src="{{ asset('public/img/facebook.svg') }}" alt="Facebook" style="width: 30px; height: 30px; margin-right: 10px;">S'inscrire avec Facebook</button>
-                </div>
-                <div class="separator input-full">ou</div>
-                <!--
-                @if(flashMessages.has(('inputErrorsBag')))
-                  <div class="error-message input-full">
-                    @each(message in flashMessages.get('inputErrorsBag'))
-                      <div>{{ message }}</div>
-                    @end
-                  </div>
-                @end
-                -->
-                <div class="input-wrapper">
+                <div class="input-wrapper display-none">
                   <label for="prenom">Prénom</label>
-                  <input class="input w-input" maxlength="256" name="prenom" data-name="prenom" placeholder="Olivier" type="text" id="prenom" required autocomplete="given-name" />
-                  @inputError('prenom')
-                    @each(message in $messages)
-                      <p class="input-error">Le prénom {{ message }}</p>
-                    @end
-                  @end
+                  <input class="input w-input" maxlength="256" name="prenom" data-name="prenom" type="text" id="prenom" required value="{{ session.get('infos').prenom }}" />
                 </div>
-                <div class="input-wrapper">
+                <div class="input-wrapper display-none">
                   <label for="nom">Nom</label>
-                  <input class="input w-input" maxlength="256" name="nom" data-name="nom" placeholder="Sandel" type="text" id="nom" required autocomplete="family-name" />
-                  @inputError('nom')
-                    @each(message in $messages)
-                      <p class="input-error">Le nom {{ message }}</p>
-                    @end
-                  @end
+                  <input class="input w-input" maxlength="256" name="nom" data-name="nom" type="text" id="nom" required value="{{ session.get('infos').nom }}" />
                 </div>
-                <div class="input-wrapper">
+                <div class="input-wrapper display-none">
                   <label for="email">Email</label>
-                  <input class="input w-input" maxlength="256" name="email" data-name="email" placeholder="olivier.sandel@viacesi.fr" type="email" id="email" required autocomplete="email" />
-                  @inputError('email')
-                    @each(message in $messages)
-                      @if(message == "The adresse email has already been taken")
-                        <p class="input-error">Cette email est déjà utilisée.</p>
-                      @else
-                        <p class="input-error">L'adresse email {{ message }}</p>
-                      @end
-                    @end
-                  @end
+                  <input class="input w-input" maxlength="256" name="email" data-name="email" type="email" id="email" required value="{{ session.get('infos').email }}" />
                 </div>
-                <div class="input-wrapper">
+                <div class="input-wrapper input-full">
                   <label for="campus">Votre campus</label>
                   <select class="input w-input" name="campus" data-name="campus" id="campus" required>
                     <option value="">-- Séléctionner --</option>
@@ -151,30 +115,18 @@ Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à C
                      @end
                    @end
                 </div>
-
-                <div class="input-wrapper">
+                 <div class="input-wrapper display-none">
                   <label for="password">Mot de passe</label>
-                  <input class="input w-input" maxlength="256" name="password" data-name="password" placeholder="**********" type="password" id="password" required autocomplete="new-password" />
-                  @inputError('password')
-                    @each(message in $messages)
-                      <p class="input-error">Le mot de passe {{ message }}</p>
-                    @end
-                  @end
-                  <p id="message"></p>
-                  <div id="strength-bar-under" style="width: 100%; height: 3px; background-color: #3f332c; border-radius: 10px; z-index: -1; display: none; transition: .3s;"></div>
-                  <div id="strength-bar" style="width: 0%; height: 3px; transition: .3s; border-radius: 10px; margin-top:-3px; display: none"></div>
+                  <input class="input w-input" maxlength="256" name="password" data-name="password" type="password" id="password" required value="google" />
                 </div>
-                <div class="input-wrapper">
+                <div class="input-wrapper display-none">
                   <label for="password_confirmation">Mot de passe</label>
-                  <input class="input w-input" maxlength="256" name="password_confirmation" data-name="password_confirmation" placeholder="**********" type="password" id="password_confirmation" required autocomplete="new-password" />
+                  <input class="input w-input" maxlength="256" name="password_confirmation" data-name="password_confirmation" type="password" id="password_confirmation" required value="google" />
                 </div>
                 <div class="contact-form input-full">
-                  <input type="submit" data-wait="Patientez ..." class="button-primary button-white w-button" value="S'inscrire" />
+                  <input type="submit" data-wait="Patientez ..." class="button-primary button-white w-button" value="Valider" />
                 </div>
               </form>
-              <div class="flex center center-horizontal">
-                <a href="{{ route('connexion') }}" style="margin-top: 20px">Vous avez déjà un compte ?</a>
-              </div>
             </div>
           </div>
           <div class="card-contact-form-gradient-blur"></div>
@@ -182,44 +134,6 @@ Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à C
       </div>
     </div>
   </section>
-  <script>
-  function updateStrength() {
-    const password = document.getElementById("password").value;
-    const progressBar = document.getElementById("strength-bar");
-    const underBar = document.getElementById("strength-bar-under");
-    progressBar.style.display = "block";
-    underBar.style.display = "block";
-
-    const percentage = getStrength(password);
-    progressBar.style.width = percentage + "%";
-
-    if (percentage < 20) {
-      progressBar.style.backgroundColor = "red";
-    } else if (percentage < 40) {
-      progressBar.style.backgroundColor = "red";
-    } else if (percentage < 60) {
-      progressBar.style.backgroundColor = "orange";
-    } else if (percentage < 80) {
-      progressBar.style.backgroundColor = "lightgreen";
-    } else {
-      progressBar.style.backgroundColor = "green";
-    }
-  }
-
-  function getStrength(password) {
-    let strength = 0;
-    if (password.length >= 6) {strength++;}
-    if (password.length > 10) {strength++;}
-    if (/\d/.test(password)) {strength++;}
-    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) {strength++;}
-    if (/[!@#$%^&*(),.?":;{}|<>]/.test(password)) {strength++;}
-    return (strength / 5) * 100;
-  }
-
-  document.getElementById("password").addEventListener("input", updateStrength);
-  document.getElementById("password_confirmation").addEventListener("input", updateStrength);
-
-</script>
   @include('layouts/footer')
   @end
 @end
