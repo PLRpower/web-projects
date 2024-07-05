@@ -12,6 +12,7 @@ import { middleware } from '#start/kernel'
 const UsersController = () => import('#controllers/users_controller')
 const PaymentsController = () => import('#controllers/payments_controller')
 const CCTLsController = () => import('#controllers/cctls_controller')
+const CardsController = () => import('#controllers/cards_controller')
 import User from '#models/user'
 
 /* Publique */
@@ -29,15 +30,30 @@ router
     router.on('/').render('dashboard/dashboard').as('dashboard').use(middleware.auth())
     router.get('/utilisateur/:id', [UsersController, 'profile']).as('utilisateur')
     router.on('/mon-compte').render('dashboard/compte').as('compte').use(middleware.auth())
-    router.on('/abonnement').render('abonnement/abonnement').as('abonnement').use(middleware.auth())
-    router.on('/abonnement/confirmation').render('abonnement/paiement-confirmation').as('abonnement.confirmation').use(middleware.auth())
-    router.get('/abonnement/annuel', [PaymentsController, 'createPaymentAnnual']).as('abonnement.annuel').use(middleware.auth())
-    router.get('/abonnement/mensuel', [PaymentsController, 'createPaymentMonthly']).as('abonnement.mensuel').use(middleware.auth())
-    router.on('/cctl/ajouter').render('dashboard/ajouter-cctl').as('add.cctl').use(middleware.auth())
-    router.get('/cctl/:id', [CCTLsController, 'render']).as('cctl').use(middleware.auth())
-    router.get('/cctl/', [CCTLsController, 'renderAll']).as('cctls').use(middleware.auth())
     router.on('/auto-prosit').render('dashboard/autoprosit').as('autoprosit').use(middleware.auth())
     router.on('/diagramme').render('dashboard/diagramme').as('diagramme').use(middleware.auth())
+    router
+      .group(() => {
+        router.get('/', [CCTLsController, 'renderAll']).as('cctls').use(middleware.auth())
+        router.on('/ajouter').render('dashboard/ajouter-cctl').as('add.cctl').use(middleware.auth())
+        router.get('/:id', [CCTLsController, 'render']).as('cctl').use(middleware.auth())
+      })
+      .prefix('/cctl')
+    router
+      .group(() => {
+        router.on('/').render('abonnement/abonnement').as('abonnement').use(middleware.auth())
+        router.on('/confirmation').render('abonnement/paiement-confirmation').as('abonnement.confirmation').use(middleware.auth())
+        router.get('/annuel', [PaymentsController, 'createPaymentAnnual']).as('abonnement.annuel').use(middleware.auth())
+        router.get('/mensuel', [PaymentsController, 'createPaymentMonthly']).as('abonnement.mensuel').use(middleware.auth())
+      })
+      .prefix('/abonnement')
+    router
+      .group(() => {
+        router.get('/', [CardsController, 'renderAll']).as('flashcards').use(middleware.auth())
+        router.on('/ajouter').render('dashboard/ajouter-deck').as('add.flashcard').use(middleware.auth())
+        router.get('/:id', [CardsController, 'render']).as('flashcard').use(middleware.auth())
+      })
+      .prefix('/flashcards')
   })
   .prefix('/dashboard')
 
@@ -47,6 +63,7 @@ router.post('/connexion', [UsersController, 'login']).as('connexion.post')
 router.post('/deconnexion', [UsersController, 'logout']).as('deconnexion.post')
 router.post('/cctl/ajouter', [CCTLsController, 'post']).as('add.cctl.post')
 router.post('/choix', [UsersController, 'choix']).as('choix.post')
+router.post('/flashcards/ajouter', [CardsController, 'store']).as('flashcard.post')
 
 /* API */
 router.post('/api/stripe', [PaymentsController, 'webhook']).as('api.stripe')

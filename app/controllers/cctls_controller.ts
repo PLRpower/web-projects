@@ -10,16 +10,12 @@ import { DateTime } from 'luxon'
 
 export default class CctlsController {
   async render({ view, params }: HttpContext) {
-    // Obtenir l'identifiant
     const cctl = await CCTL.findOrFail(params.id)
-
     return view.render('dashboard/cctl', { cctl: cctl })
   }
 
   async renderAll({ view }: HttpContext) {
-    // Obtenir l'identifiant
     const cctls = await CCTL.all()
-
     return view.render('dashboard/cctls', { cctls: cctls })
   }
 
