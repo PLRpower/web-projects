@@ -9,7 +9,7 @@ export default class extends BaseSchema {
 
       table.string('texte', 5000).nullable()
       table.string('correction', 5000).notNullable()
-      table.integer('cctl_question_id').unsigned().references('id').inTable('cctl_questions').notNullable();
+      table.integer('cctl_question_id').unsigned().references('id').inTable('cctl_questions').notNullable().onDelete('CASCADE');
 
       table.timestamp('created_at')
       table.timestamp('updated_at')

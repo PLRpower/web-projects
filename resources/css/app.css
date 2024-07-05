@@ -14220,6 +14220,64 @@ input[type=file]::file-selector-button:hover {
   position: fixed;
   height: 100%;
   background-color: var(--secondary-5);
-  border: solid 10px var(--neutral-800);
-  border-radius: 30px;
+}
+
+.link-sidemenu {
+  text-decoration: none;
+  transition: all .2s ease-in-out;
+  display: inline-block;
+}
+
+.link-sidemenu:hover {
+  opacity: 0.50;
+  translate: 0 -2px;
+  color: white;
+  cursor: pointer;
+}
+
+.link-sidemenu img {
+  width: 22px
+}
+
+.form-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.input-wrapper {
+  flex: 1;
+  min-width: 200px;
+}
+
+.input-full {
+  width: 100%;
+}
+
+@media (max-width: 800px) {
+  .input-wrapper {
+    flex: 1 1 100%;
+  }
+
+  .input-wrapper:nth-child(1) {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 500px) {
+  .input-wrapper {
+    min-width: 100%;
+  }
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
 }

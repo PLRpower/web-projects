@@ -1,4 +1,4 @@
-@base()
+@dashboard()
 
 @slot('title')
 CESI Premium - L'outil indispensable pour CESI
@@ -12,12 +12,15 @@ Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à C
 611472adf8c3d1ee8343074a
 @end
 
+@slot('mathjax')
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+@end
+
 @slot('content')
-  @include('pages/layouts/navbar')
-  <section class="section career">
-    <div class="container-default career w-container">
+  <section class="section" style="padding-top: 50px">
+    <div class="container-default w-container">
       <div data-w-id="4f9c1cdb-0cb6-513f-c148-a47ee791c608" style="opacity:0" class="backlink-main-wrapper">
-        <a data-w-id="863456df-df07-80cb-8c9a-d062b27aee10" href="{{ route('parcourir-cctl') }}" class="backlink w-inline-block">
+        <a data-w-id="863456df-df07-80cb-8c9a-d062b27aee10" href="{{ route('cctls') }}" class="backlink w-inline-block">
           <div class="backlink-arrow"></div>
           <div>Retour aux CCTls</div>
         </a>
@@ -130,7 +133,7 @@ Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à C
         <div class="bg-gradient-blur-circle-1 purple"></div>
       </div>
     </div>
-
+  </div>
   </section>
   <div class="container-default career-divider w-container">
     <div class="divider"></div>
@@ -213,7 +216,6 @@ Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à C
       </div>
     </div>
   </section>
-  @include('pages/layouts/footer')
-  @end
+@end
 @end
 

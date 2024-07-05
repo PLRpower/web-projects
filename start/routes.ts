@@ -24,16 +24,22 @@ router.on('/connexion').render('pages/connexion').as('connexion').use(middleware
 router.on('/choix').render('pages/choix').as('choix').use(middleware.guest())
 
 /* Uniquement utilisateurs */
-router.on('/dashboard').render('dashboard/dashboard').as('dashboard').use(middleware.auth())
-router.get('/utilisateur/:id', [UsersController, 'profile']).as('utilisateur')
-router.on('/cctl/ajouter').render('dashboard/ajouter-cctl').as('add.cctl').use(middleware.auth())
-router.on('/mon-compte').render('dashboard/compte').as('compte').use(middleware.auth())
-router.on('/abonnement').render('abonnement/abonnement').as('abonnement').use(middleware.auth())
-router.on('/abonnement/confirmation').render('abonnement/paiement-confirmation').as('abonnement.confirmation').use(middleware.auth())
-router.get('/abonnement/annuel', [PaymentsController, 'createPaymentAnnual']).as('abonnement.annuel').use(middleware.auth())
-router.get('/abonnement/mensuel', [PaymentsController, 'createPaymentMonthly']).as('abonnement.mensuel').use(middleware.auth())
-router.get('/cctl/:id', [CCTLsController, 'render']).as('cctl').use(middleware.auth())
-router.get('/cctl/', [CCTLsController, 'renderAll']).as('parcourir-cctl').use(middleware.auth())
+router
+  .group(() => {
+    router.on('/').render('dashboard/dashboard').as('dashboard').use(middleware.auth())
+    router.get('/utilisateur/:id', [UsersController, 'profile']).as('utilisateur')
+    router.on('/mon-compte').render('dashboard/compte').as('compte').use(middleware.auth())
+    router.on('/abonnement').render('abonnement/abonnement').as('abonnement').use(middleware.auth())
+    router.on('/abonnement/confirmation').render('abonnement/paiement-confirmation').as('abonnement.confirmation').use(middleware.auth())
+    router.get('/abonnement/annuel', [PaymentsController, 'createPaymentAnnual']).as('abonnement.annuel').use(middleware.auth())
+    router.get('/abonnement/mensuel', [PaymentsController, 'createPaymentMonthly']).as('abonnement.mensuel').use(middleware.auth())
+    router.on('/cctl/ajouter').render('dashboard/ajouter-cctl').as('add.cctl').use(middleware.auth())
+    router.get('/cctl/:id', [CCTLsController, 'render']).as('cctl').use(middleware.auth())
+    router.get('/cctl/', [CCTLsController, 'renderAll']).as('cctls').use(middleware.auth())
+    router.on('/auto-prosit').render('dashboard/autoprosit').as('autoprosit').use(middleware.auth())
+    router.on('/diagramme').render('dashboard/diagramme').as('diagramme').use(middleware.auth())
+  })
+  .prefix('/dashboard')
 
 /* Post */
 router.post('/inscription', [UsersController, 'register']).as('inscription.post')

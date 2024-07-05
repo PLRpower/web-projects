@@ -1,4 +1,4 @@
-@base()
+@dashboard()
 
 @slot('title')
 CESI Premium - L'outil indispensable pour CESI
@@ -12,12 +12,15 @@ Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à C
 6112c150899a270eb43c54cb
 @end
 
+@slot('mathjax')
+@end
+
 @slot('content')
-  @include('pages/layouts/navbar')
-  <section id="open-positions" class="section open-positions" style="margin-top: 200px">
-    <div data-w-id="023b0b94-76ae-348e-bb71-607ef294f204" style="opacity:0" class="container-medium-651px open-positions">
-      <h2>Parcourir le CCTLs</h2>
-      <p class="paragraph open-positions">Découvrez tout les CCTLs publiés par <span class="text-no-wrap">la communautée CESI Premium.</span>
+  <section id="open-positions" class="section open-positions" style="margin-top: 100px">
+    <div class="container-default w-container">
+      <h2>Parcourir les CCTLs</h2>
+      <p class="paragraph open-positions" style="margin-bottom: 30px">
+        Découvrez tout les CCTLs publiés par <span class="text-no-wrap">la communautée CESI Premium.</span>
       </p>
     </div>
     <div class="container-default w-container">
@@ -63,6 +66,5 @@ Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à C
       </div>
     </div>
   </section>
-  @include('pages/layouts/footer')
 @end
 @end

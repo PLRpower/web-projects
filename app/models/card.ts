@@ -1,23 +1,24 @@
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
-import CCTLQuestion from '#models/cctl_question'
+import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { belongsTo } from '@adonisjs/lucid/orm'
+import Deck from '#models/deck'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
-export default class CctlAnswer extends BaseModel {
+export default class Card extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
   @column()
-  declare texte: string | null
+  declare terme: string
 
   @column()
-  declare correction: string
+  declare definition: string
 
   @column()
-  declare cctlQuestionId: number
+  declare deckId: number
 
-  @belongsTo(() => CCTLQuestion)
-  declare cctlQuestion: BelongsTo<typeof CCTLQuestion>
+  @belongsTo(() => Deck)
+  declare deck: BelongsTo<typeof Deck>
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

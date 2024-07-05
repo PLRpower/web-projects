@@ -1,8 +1,8 @@
 import { DateTime } from 'luxon'
 import CCTL from '#models/cctl'
 import CCTLAnswer from '#models/cctl_answer'
-import {BaseModel, column, belongsTo, hasMany} from '@adonisjs/lucid/orm'
-import type {BelongsTo, HasMany} from "@adonisjs/lucid/types/relations";
+import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 
 export default class CctlQuestion extends BaseModel {
   @column({ isPrimary: true })

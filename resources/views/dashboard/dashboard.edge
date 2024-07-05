@@ -1,3 +1,5 @@
+@eval(await auth.check())
+
 @dashboard()
 
 @slot('title')
@@ -13,17 +15,12 @@ Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à C
 @end
 
 @slot('mathjax')
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 @end
 
 @slot('content')
-  @include('layouts/navbar')
-  <section class="section home-features" style="margin-top: 100px">
-    <div data-w-id="62f6c10d-ee2c-bcd9-13a2-11c6d148edf6" style="opacity:0" class="container-medium-756px home-features">
-      <h2>Découvrez une panoplie de fonctionnalités <span class="text-no-wrap">pour vos études</span>
-      </h2>
-    </div>
-    <div class="container-default home-features w-container">
+  <section class="section home-features">
+    <div class="container-default home-features w-container" style="margin-top: 100px">
+      <h2>Bienvenue sur CESI Premium, {{ auth.user.prenom }}</h2>
       <div data-w-id="909bc8a8-d9e5-ae08-baba-bddf5ff15df3" style="opacity:0" class="w-layout-grid home-features-grid">
         <div class="card home-feature">
           <img src="./img/1.svg" loading="eager" alt="Real Time Trading - Dark X Webflow Template" class="image card-home-feature" />
@@ -380,6 +377,5 @@ Découvrez la plateforme la plus avancée pour vous simplifier le quotidien à C
       </div>
     </div>
   </section>
-  @include('layouts/footer')
 @end
 @end
