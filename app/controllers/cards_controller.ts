@@ -6,7 +6,7 @@ import Card from '#models/card'
 
 export default class CardsController {
   async renderAll({ view }: HttpContext) {
-    const decks = await Deck.all()
+    const decks = await Deck.query().withCount('cards')
     return view.render('dashboard/decks', { decks: decks })
   }
 
@@ -25,11 +25,12 @@ export default class CardsController {
       promotion: data.promotion,
     })
 
-    for (const cardData of data.cards) {
+    const cardData = data.cards[0]
+    for (let i = 0; i < cardData.front_text.length; i++) {
       await Card.create({
         deckId: deck.id,
-        terme: cardData.front_text,
-        definition: cardData.back_text,
+        terme: cardData.front_text[i],
+        definition: cardData.back_text[i],
       })
     }
 
