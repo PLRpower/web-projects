@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@theme {
+  --font-syne: "Syne", sans-serif;
+  --font-dm: "DM Sans", sans-serif;
+
+  /* Map Tailwind colors to CSS variables */
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-highlight: var(--surface-highlight);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-accent-yellow: var(--accent-yellow);
+  --color-accent-orange: var(--accent-orange);
+  --color-border: var(--border);
+}
+
+:root {
+  /* Light Mode Defaults */
+  --background: #FFFFFF;
+  --surface: #F4F4F5;
+  --surface-highlight: #E4E4E7;
+  --text-primary: #09090B;
+  --text-secondary: #71717A;
+  --accent-yellow: #EAB308;
+  /* Darker yellow for better contrast on white */
+  --accent-orange: #F97316;
+  --border: #E4E4E7;
+
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  /* More opaque */
+  --glass-border: rgba(0, 0, 0, 0.12);
+  /* More visible border */
+  --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  /* Soft shadow for lift */
+}
+
+.dark {
+  /* Dark Mode Defaults */
+  /* Dark Mode Defaults - Dark Brown Theme */
+  --background: #13100C;
+  --surface: #1C1815;
+  --surface-highlight: #292420;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A1A1AA;
+  --accent-yellow: #FFD60A;
+  --accent-orange: #FF9F0A;
+  --border: #27272A;
+
+  --glass-bg: rgba(18, 18, 18, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-syne {
+  font-family: var(--font-syne);
+}
+
+body {
+  color: var(--color-text-primary);
+  background: var(--color-background);
+}
+
+/* Glassmorphism Utility */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-accent {
+  background: linear-gradient(135deg, var(--color-accent-yellow) 0%, var(--color-accent-orange) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-highlight);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border);
+}
