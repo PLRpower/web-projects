@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html data-wf-page="64810a5b5189a13d1b72989e" data-wf-status="1" lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>CESI Drop' - Accueil - Les photos &amp; vidéos instantanées des évènements du CESI</title>
+  <meta content="" name="description" />
+  <meta content="CESI Drop' - Accueil - Les photos &amp; vidéos instantanées des évènements du CESI" property="og:title" />
+  <meta content="" property="og:description" />
+  <meta content="https://studio-cesi.fr/thumbnail.png" property="og:image" />
+  <meta content="CESI Drop' - Accueil - Les photos &amp; vidéos instantanées des évènements du CESI" property="twitter:title" />
+  <meta content="" property="twitter:description" />
+  <meta content="https://studio-cesi.fr/thumbnail.png" property="twitter:image" />
+  <meta property="og:type" content="website" />
+  <meta content="summary_large_image" name="twitter:card" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <link href="/favicon.svg" rel="shortcut icon" type="image/x-icon" />
+  <link href="/webclip.svg" rel="apple-touch-icon" />
+  @vite('resources/css/app.css')
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5B0K1TE6VK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-5B0K1TE6VK');
+</script>
+<!-- -->
+<body>
+<div class="page-wrapper">
+  @include('layouts/navbar')
+  <div class="section">
+    <div class="container-default w-container">
+      <div class="inner-container">
+        <div class="text-center mg-bottom-64px">
+          <h1 class="display-1">CESI Drop'</h1>
+          <div class="inner-container _596px center">
+            <p class="mg-bottom-32px">Découvrez les photos et les vidéos instantanément après les évènements du BDE CESI.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="my-services" class="section" style="padding-top: 0">
+    <div class="container-default w-container">
+      <div class="mg-bottom-40px">
+        <div class="w-layout-grid grid-2-columns title-and-buttons">
+          <div class="title-wrapper">
+            <h2 class="display-3 mg-bottom-0">Les catégories</h2>
+            <div class="title-line size-150px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="w-layout-grid grid-4-columns services-grid">
+        @each(categorie in categories)
+        <a data-w-id="7c0a8744-f565-033b-276b-dbbafab771a4" href="{{ route('categorie', [categorie.id]) }}" class="image-top-link-wrapper w-inline-block">
+          <div class="card-picture-arrow">
+            <div class="card-picture first">
+              <img src="https://studio-cesi.fr/uploads/categories/{{ categorie.id }}.webp" loading="eager" alt="{{ categorie.title }}" class="service-link-image" style="transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;"/>
+            </div>
+            <div style="opacity: 0;" class="rectangle-gradient-bg"></div>
+            <div style="transform: translate3d(-10px, 10px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); opacity: 0; transform-style: preserve-3d;" class="line-square-icon arrow-inside-picture"></div style="transform: translate3d(-10px, 10px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); opacity: 0; transform-style: preserve-3d;">
+          </div>
+          <div class="service-link-text-container">
+            <h3>{{ categorie.title }}</h3>
+            <p class="mg-bottom-0">{{ categorie.description }}</p>
+          </div>
+        </a>
+        @endeach
+      </div>
+    </div>
+  </div>
+  <div class="section" style=" padding-top: 0; position: relative; margin: 10px;">
+    <div class="container-default w-container">
+      <div class="mg-bottom-40px">
+        <div class="w-layout-grid grid-2-columns title-and-buttons">
+          <div class="title-wrapper">
+            <h2 class="display-3 mg-bottom-0">Les photos</h2>
+            <div class="title-line size-150px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="freewall" class="free-wall">
+      @each(media in medias)
+      <div class='brick' id='brick'>
+        <a data-w-id="68bb4bae-5a88-0ba5-1bcc-393272cf8a05" class="portfolio-wrapper w-inline-block" onclick="openPopup('{{ media.id }}', '{{ media.extname }}')" style="cursor: pointer">
+          <img src='https://studio-cesi.fr/uploads/{{ media.id }}.webp' class="card-image fit-cover" alt="{{ media.id }}"/>
+          <div style="opacity:0" class="rectangle-gradient-bg portfolio-project-gradient"></div>
+          <div style="opacity:0;-webkit-transform:translate3d(0, 15px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 15px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 15px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 15px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)" class="portfolio-link-btn-wrapper">
+            <div class="btn-primary no-hover">Afficher <span class="line-square-icon link-icon-right"></span>
+            </div>
+          </div>
+        </a>
+      </div>
+      @end
+    </div>
+  </div>
+  @include('layouts/popup')
+  @include('layouts/footer')
+</div>
+@vite('resources/js/app.js')
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script type="text/javascript" src="/freewall.js"></script>
+<script type="text/javascript" src="/gallery.js"></script>
+</body>
+</html>

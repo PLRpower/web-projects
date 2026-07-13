@@ -1,0 +1,60 @@
+@font-face {
+    font-family: 'Cardinal';
+    src: url('https://fashion-night.vercel.app/fonts/cardinal-regular.woff2') format("woff2"),
+    url('https://fashion-night.vercel.app/fonts/cardinal-regular.woff2') format('woff2');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'Cardinal';
+    src: url('https://fashion-night.vercel.app/fonts/cardinal-medium.woff2') format("woff2"),
+    url('https://fashion-night.vercel.app/fonts/cardinal-medium.woff2') format('woff2');
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: "NeueHaasUnica";
+    src: url("https://fashion-night.vercel.app/fonts/NeueHaasUnica1.woff2") format("woff2"),
+    url("https://fashion-night.vercel.app/fonts/NeueHaasUnica1.woff2") format("woff2");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap
+}
+
+@font-face {
+    font-family: "NeueHaasUnica";
+    src: url("https://fashion-night.vercel.app/fonts/NeueHaasUnica2.woff2") format("woff2"),
+    url("https://fashion-night.vercel.app/fonts/NeueHaasUnica2.woff2") format("woff2");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap
+}
+
+@font-face {
+    font-family: "NeueHaasUnica";
+    src: url("https://fashion-night.vercel.app/fonts/NeueHaasUnica3.woff2") format("woff2"),
+    url("https://fashion-night.vercel.app/fonts/NeueHaasUnica3.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap
+}
+
+@font-face {
+    font-family: "NeueHaasUnica";
+    src: url("https://fashion-night.vercel.app/fonts/NeueHaasUnica4.woff2") format("woff2"),
+    url("https://fashion-night.vercel.app/fonts/NeueHaasUnica4.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap
+}
+
+* {
+    font-family: 'NeueHaasUnica', sans-serif;
+}
+
+.cardinal {
+    font-family: 'Cardinal', sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+

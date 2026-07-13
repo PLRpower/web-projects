@@ -1,0 +1,49 @@
+@eval(await auth.check())
+
+<div data-animation="default" class="header-wrapper w-nav" data-easing2="ease" data-easing="ease" data-collapse="all" role="banner" data-duration="300" data-doc-height="1">
+  <div class="container-default w-container">
+    <div class="header-content-wrapper grid">
+      <div class="header-left-side">
+        <nav role="navigation" class="header-nav-menu-wrapper hamburger-desktop w-nav-menu">
+          <div class="header-nav-menu-content">
+            <ul role="list" class="dropdown-sub-list-wrapper">
+              <li class="header-nav-list-item">
+                <a href="{{ route('accueil') }}" class="header-nav-link display-4 w-nav-link">Accueil <span class="line-square-icon link-icon-right mg-left-12px"></span>
+                </a>
+              </li>
+              <li class="header-nav-list-item">
+                <a href="{{ route('publier') }}" class="header-nav-link display-4 w-nav-link">Publier <span class="line-square-icon link-icon-right mg-left-12px"></span>
+                </a>
+              </li>
+              @if(auth.isAuthenticated)
+              <li class="header-nav-list-item">
+                <a href="{{ route('admin') }}" class="header-nav-link display-4 w-nav-link">Admin <span class="line-square-icon link-icon-right mg-left-12px"></span>
+                </a>
+              </li>
+              @endif
+            </ul>
+          </div>
+        </nav>
+        <div class="hamburger-menu-wrapper w-nav-button">
+          <div class="hamburger-menu-bar top"></div>
+          <div class="hamburger-menu-bar bottom"></div>
+        </div>
+      </div>
+      <div class="header-middle">
+        <a href="{{ route('accueil') }}" class="header-logo-link w-nav-brand">
+          <img src="/logo_full.svg" alt="Logo CESI Drop" style="width: 250px"/>
+        </a>
+      </div>
+      <div class="header-right-side">
+        <div class="social-media-flex-top hidden-on-tablet">
+          <a href="https://discord.gg/xUJ3AYv3xb" target="_blank" rel="noopener noreferrer nofollow" class="social-icon-link w-inline-block">
+            <div class="social-icon-font"></div>
+          </a>
+          <a href="https://www.instagram.com/studio.cesi/" target="_blank" rel="noopener noreferrer nofollow" class="social-icon-link w-inline-block">
+            <div class="social-icon-font"></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

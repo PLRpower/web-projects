@@ -1,0 +1,100 @@
+<div id="imagePopup" class="popup">
+  <span class="close" onclick="closePopup()">&times;</span>
+  <img id="image" style="max-height: 90%; max-width: 90%">
+  <div class="flex mg-top-32px">
+    <a href="" class="btn-primary no
+        -hover mg-right-24px" id="download">
+      Télécharger <span class="line-square-icon link-icon-right"></span>
+    </a>
+    @eval(await auth.check())
+    @if(auth.isAuthenticated)
+    <a class="btn-primary no-hover danger-button" onclick="openDelete()">
+      Supprimer <span class="line-square-icon link-icon-right"></span>
+    </a>
+    <div id="deletePopup" class="popup">
+      <div class="bg-neutral-800 card" style="max-width: 500px; padding: 40px">
+        <form id="deleteForm" action="{{ route('admin.supprimer') }}" method="POST">
+          {{ csrfField() }}
+          <h3 class="mg-bottom-24px">Voulez-vous vraiment supprimer cette photo ?</h3>
+          <input type="hidden" name="imageId" id="imageId">
+          <div class="flex">
+            <a class="btn-primary no-hover mg-right-24px" onclick="closeDelete()" style="cursor: pointer">Annuler</a>
+            <button type="submit" class="btn-primary no-hover danger-button">
+              Supprimer <span class="line-square-icon link-icon-right"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    @else
+    <!--
+    <a class="btn-primary no-hover danger-button" onclick="openDelete()">
+      Signaler <span class="line-square-icon link-icon-right"></span>
+    </a>
+    -->
+    @endif
+  </div>
+</div>
+<script async>
+  const imagePopup = document.getElementById("imagePopup");
+  const deletePopup = document.getElementById("deletePopup")
+  const image = document.getElementById("image");
+  const downloadButton = document.getElementById("download");
+  const deleteInput = document.getElementById("imageId");
+
+  function openPopup(src, extname) {
+    console.log(src, extname)
+    const fullLink = 'https://studio-cesi.fr/uploads/' + src + '.webp'
+    const originalLink = 'https://studio-cesi.fr/uploads/' + src + '_original.' + extname;
+
+    image.src = fullLink;
+    imagePopup.style.display = "flex";
+    downloadButton.href = originalLink;
+    downloadButton.download = originalLink;
+
+    if(extname) {
+      downloadButton.style.display = "block";
+    } else {
+      downloadButton.style.display = "none";
+    }
+    if(deleteInput) {
+      deleteInput.value = src;
+    }
+
+    imagePopup.addEventListener("click", function(event) {
+      if (event.target === imagePopup) {
+        closePopup();
+      }
+    });
+  }
+
+  function closePopup() {
+    imagePopup.style.display = "none";
+
+    imagePopup.removeEventListener("click", function(event) {
+      if (event.target === imagePopup) {
+        closePopup();
+      }
+    });
+  }
+
+  function openDelete() {
+    deletePopup.style.display = "flex";
+
+    deletePopup.addEventListener("click", function(event) {
+      if (event.target === deletePopup) {
+        closeDelete();
+      }
+    });
+  }
+
+  function closeDelete() {
+    deletePopup.style.display = "none";
+
+    deletePopup.removeEventListener("click", function(event) {
+      if (event.target === deletePopup) {
+        closeDelete();
+      }
+    });
+  }
+</script>

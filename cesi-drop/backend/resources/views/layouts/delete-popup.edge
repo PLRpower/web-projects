@@ -1,0 +1,42 @@
+<div id="deleteCatPopup" class="popup">
+  <div class="bg-neutral-800 card" style="max-width: 500px; padding: 40px">
+    <form id="deleteForm" action="" method="POST">
+      {{ csrfField() }}
+      <h3 class="mg-bottom-24px">Voulez-vous vraiment supprimer cette catégorie ainsi que toutes ses photos liées ?</h3>
+      <input type="hidden" name="imageId" id="imageId">
+      <div class="flex">
+        <a class="btn-primary no-hover mg-right-24px" onclick="closeCatDelete()" style="cursor: pointer">Annuler</a>
+        <button type="submit" class="btn-primary no-hover danger-button">
+          Supprimer <span class="line-square-icon link-icon-right"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script async>
+  const deleteCatPopup = document.getElementById("deleteCatPopup")
+  const image = document.getElementById("image");
+  const deleteForm = document.getElementById("deleteForm");
+
+  function openCatDelete(id) {
+    deleteCatPopup.style.display = "flex";
+    deleteForm.action = "/admin/supprimer-cat/" + id;
+
+    deleteCatPopup.addEventListener("click", function(event) {
+      if (event.target === deleteCatPopup) {
+        closeCatDelete();
+      }
+    });
+  }
+
+  function closeCatDelete() {
+    deleteCatPopup.style.display = "none";
+
+    deleteCatPopup.removeEventListener("click", function(event) {
+      if (event.target === deleteCatPopup) {
+        closeCatDelete();
+      }
+    });
+  }
+</script>

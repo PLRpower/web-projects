@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html data-wf-page="64810a5b5189a13d1b72989e" data-wf-status="1" lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>CESI Drop' - Admin - Les photos &amp; vidéos instantanées des évènements du CESI</title>
+  <meta content="" name="description" />
+  <meta content="CESI Drop' - Admin - Les photos &amp; vidéos instantanées des évènements du CESI" property="og:title" />
+  <meta content="" property="og:description" />
+  <meta content="https://studio-cesi.fr/thumbnail.png" property="og:image" />
+  <meta content="CESI Drop' - Admin - Les photos &amp; vidéos instantanées des évènements du CESI" property="twitter:title" />
+  <meta content="" property="twitter:description" />
+  <meta content="https://studio-cesi.fr/thumbnail.png" property="twitter:image" />
+  <meta property="og:type" content="website" />
+  <meta content="summary_large_image" name="twitter:card" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <link href="/favicon.svg" rel="shortcut icon" type="image/x-icon" />
+  <link href="/webclip.svg" rel="apple-touch-icon" />
+  @vite('resources/css/app.css')
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5B0K1TE6VK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-5B0K1TE6VK');
+</script>
+<!-- -->
+<body>
+<div class="page-wrapper">
+  @include('layouts/navbar')
+  <div data-w-id="4bae319c-4fb9-2377-7a9c-95b0023eb8e2" style="-webkit-transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="text-center mg-bottom-48px mg-top-32px">
+    <h1 class="display-3">Choisir les photos du moment</h1>
+    <div class="inner-container _596px center">
+      <p class="mg-bottom-0">Choissisez les photos qui apparaissent sur la page d'accueil.</p>
+    </div>
+  </div>
+  <div class="section" style="padding-top: 30px; position: relative;">
+    <form action="{{ route('admin.choisir.post') }}" method="post">
+      {{ csrfField() }}
+      <div id="freewall" class="free-wall">
+        @each(media in medias)
+        <div class='brick' id='brick' style="width: 600px;">
+          <div class="portfolio-wrapper w-inline-block" data-w-id="68bb4bae-5a88-0ba5-1bcc-393272cf8a05">
+            <img src='https://studio-cesi.fr/uploads/{{ media.id }}.webp' class="card-image fit-cover" alt="{{ media.id }}"/>
+            @if(media.accueil)
+              <div style="opacity:1" class="rectangle-gradient-bg portfolio-project-gradient opacity-full"></div>
+              <input checked type="checkbox" name="selected_images[]" value="{{ media.id }}" class="admin-input" onclick="showGradient(this)">
+            @else
+              <div style="opacity:0" class="rectangle-gradient-bg portfolio-project-gradient"></div>
+              <input type="checkbox" name="selected_images[]" value="{{ media.id }}" class="admin-input" onclick="showGradient(this)">
+            @endif
+          </div>
+        </div>
+        @end
+      </div>
+      <div class="admin-send" style="display: flex; justify-content: center; max-width: 300px">
+        <input type="submit" data-wait="Patientez ..." class="btn-primary w-button" value="Appliquer"></input>
+      </div>
+    </form>
+  </div>
+  @include('layouts/footer')
+</div>
+@vite('resources/js/app.js')
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/freewall.js"></script>
+<script src="/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<script setup lang="ts">
+
+</script>
+
+<template>
+  <div data-animation="default" class="header-wrapper w-nav" data-easing2="ease" data-easing="ease" data-collapse="all" data-w-id="3e4eae5f-c9fd-c051-dc9f-9317b4043bae" role="banner" data-duration="300" data-doc-height="1">
+    <div class="container-default w-container">
+      <div data-w-id="3a2c735b-74cf-4645-547f-b126475df4c5" class="header-content-wrapper grid">
+        <div class="header-left-side">
+          <nav role="navigation" class="header-nav-menu-wrapper hamburger-desktop w-nav-menu">
+            <div class="header-nav-menu-content">
+              <ul role="list" class="dropdown-sub-list-wrapper">
+                <li class="header-nav-list-item">
+                  <nuxt-link to="/" data-w-id="3a2c735b-74cf-4645-547f-b126475df4d3" class="header-nav-link display-4 w-nav-link">Accueil <span class="line-square-icon link-icon-right mg-left-12px"></span>
+                  </nuxt-link>
+                </li>
+                <li class="header-nav-list-item">
+                  <nuxt-link to="/publier" data-w-id="3a2c735b-74cf-4645-547f-b126475df4d8" class="header-nav-link display-4 w-nav-link">Publier <span class="line-square-icon link-icon-right mg-left-12px"></span>
+                  </nuxt-link>
+                </li>
+                <!--
+                <li class="header-nav-list-item">
+                  <a href="/contact" data-w-id="3a2c735b-74cf-4645-547f-b126475df4ec" class="header-nav-link display-4 w-nav-link">Contact <span class="line-square-icon link-icon-right mg-left-12px"></span>
+                  </a>
+                </li>
+                -->
+              </ul>
+            </div>
+          </nav>
+          <div class="hamburger-menu-wrapper w-nav-button">
+            <div class="hamburger-menu-bar top"></div>
+            <div class="hamburger-menu-bar bottom"></div>
+          </div>
+        </div>
+        <div class="header-middle">
+          <nuxt-link to="/" class="header-logo-link w-nav-brand">
+            <nuxt-img src="/img/logo_full.svg" alt="Logo CESI Drop" style="width: 250px"/>
+          </nuxt-link>
+        </div>
+        <div class="header-right-side">
+          <div class="social-media-flex-top hidden-on-tablet">
+            <nuxt-img to="https://discord.gg/xUJ3AYv3xb" target="_blank" rel="noopener noreferrer nofollow" class="social-icon-link w-inline-block">
+              <div class="social-icon-font"></div>
+            </nuxt-img>
+            <nuxt-img to="https://www.instagram.com/studio.cesi/" target="_blank" rel="noopener noreferrer nofollow" class="social-icon-link w-inline-block">
+              <div class="social-icon-font"></div>
+            </nuxt-img>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</template>
+
+<style scoped>
+
+</style>

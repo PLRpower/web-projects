@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "leaderboards",
+  "info": {
+    "singularName": "leaderboard",
+    "pluralName": "leaderboards",
+    "displayName": "Leaderboard"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "rank": {
+      "type": "integer"
+    },
+    "victories": {
+      "type": "integer"
+    }
+  }
+}

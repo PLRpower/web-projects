@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html data-wf-page="64810a31f883450577d090b4" data-wf-status="1" lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>CESI Drop' - Publier - Les photos &amp; vidéos instantanées des évènements du CESI</title>
+  <meta content="CESI Drop' - Publier - Les photos &amp; vidéos instantanées des évènements du CESI" property="og:title" />
+  <meta content="https://studio-cesi.fr/thumbnail.png" property="og:image" />
+  <meta content="CESI Drop' - Publier - Les photos &amp; vidéos instantanées des évènements du CESI" property="twitter:title" />
+  <meta content="https://studio-cesi.fr/thumbnail.png" property="twitter:image" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <link href="https://cdn.jsdelivr.net/npm/filepond@4.31.1/dist/filepond.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/filepond-plugin-image-preview@4.6.12/dist/filepond-plugin-image-preview.min.css" rel="stylesheet">
+  <link href="/favicon.svg" rel="shortcut icon" type="image/x-icon" />
+  <link href="/webclip.svg" rel="apple-touch-icon" />
+  @vite('resources/css/app.css')
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5B0K1TE6VK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-5B0K1TE6VK');
+</script>
+<!-- -->
+<body>
+<div class="page-wrapper">
+  @include('layouts/navbar')
+  <div class="section hero">
+    <div class="container-default w-container">
+      <div data-w-id="4bae319c-4fb9-2377-7a9c-95b0023eb8e2" style="-webkit-transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="text-center mg-bottom-48px">
+        <h1 class="display-1" style="font-size: 100px">Ajouter des photos</h1>
+        <div class="inner-container _596px center">
+          <p class="mg-bottom-0">Ajouter directement des fichiers au site web avec la catégorie.</p>
+        </div>
+      </div>
+      <div class="inner-container _730px center">
+        <div data-w-id="4bae319c-4fb9-2377-7a9c-95b0023eb8ea" style="-webkit-transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="mg-bottom-64px">
+          <div class="card form w-form" style="min-height: 200px;">
+            <select class="input w-select" id="action" name="action" required="" style="margin-bottom: 30px">
+              @each(categorie in categories)
+              <option value="{{ categorie.id }}">Ajouter les photos à la catégorie "{{ categorie.title }}"</option>
+              @end
+              <option value="">Ajouter les photos, sans catégorie"</option>
+            </select>
+            <input type="file" class="filepond" name="filepond" multiple="" data-max-file-size="20MB" data-max-files="100" id="filepond"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  @include('layouts/footer')
+</div>
+@vite('resources/js/app.js')
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filepond@4.31.1/dist/filepond.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filepond-plugin-image-preview@4.6.12/dist/filepond-plugin-image-preview.min.js"></script>
+<script type="text/javascript" src="/admin_upload.js"></script>
+</body>
+</html>

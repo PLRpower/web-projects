@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html data-wf-page="647df6b85e29e9c629d1bae8" data-wf-status="1" lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>CESI Drop' - Mot de passe Admin - Les photos &amp; vidéos instantanées des évènements du CESI</title>
+  <meta content=" " name="description" />
+  <meta content="CESI Drop' - Mot de passe Admin - Les photos &amp; vidéos instantanées des évènements du CESI" property="og:title" />
+  <meta content="" property="og:description" />
+  <meta content="https://studio-cesi.fr/thumbnail.png" property="og:image" />
+  <meta content="CESI Drop' - Mot de passe Admin - Les photos &amp; vidéos instantanées des évènements du CESI" property="twitter:title" />
+  <meta content="" property="twitter:description" />
+  <meta content="https://studio-cesi.fr/thumbnail.png" property="twitter:image" />
+  <meta property="og:type" content="website" />
+  <meta content="summary_large_image" name="twitter:card" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <link href="/favicon.svg" rel="shortcut icon" type="image/x-icon" />
+  <link href="/webclip.svg" rel="apple-touch-icon" />
+  @vite('resources/css/app.css')
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5B0K1TE6VK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-5B0K1TE6VK');
+</script>
+<!-- -->
+<body>
+@include('layouts/navbar')
+<div class="utility-page-wrap">
+  <div class="utility-page-content w-password-page w-form">
+    <form id="email-form" name="email-form" action="{{ route('protege.post') }}" method="post" class="utility-page-form password-protected w-password-page">
+      {{ csrfField() }}
+      <div class="container-default width-100 w-container">
+        <div data-w-id="2078a685-0c58-ebe5-b8d7-ebd2a748e8ad" style="-webkit-transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 10%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0">
+          <div class="mg-bottom-24px">
+            <img alt="Page protégée - CESI Drop'" src="password-icon.svg" />
+          </div>
+          <h1 class="display-4">Page protégée</h1>
+          <p class="mg-bottom-32px">Cette page requiert le mot de passe administrateur pour pouvoir y accéder. Merci d'indiquer le mot de passe.</p>
+          <div class="inner-container _560px center">
+            <div class="position-relative">
+              <input class="input w-password-page w-input" maxlength="256" name="password" data-name="password" placeholder="Mot de passe" type="password" id="password" />
+              <input class="w-hidden" name="email" id="email" data-name="email" type="email" value="admin@admin.com">
+              <input type="submit" data-wait="Patientez ..." class="btn-primary inside-input default w-password-page w-button" value="Accéder" />
+            </div>
+          </div>
+        </div>
+      </div>
+      @if(flashMessages.has('errorsBag.E_INVALID_CREDENTIALS'))
+      <div class="error-message password w-password-page">
+        <div>Le mot de passe saisi est incorrect.</div>
+      </div>
+      @end
+    </form>
+  </div>
+</div>
+@include('layouts/footer')
+@vite('resources/js/app.js')
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+</body>
+</html>
