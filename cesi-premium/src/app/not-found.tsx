@@ -16,40 +16,46 @@ export default function NotFound() {
     }, []);
 
     return (
-        <div className="min-h-screen w-full flex flex-col items-center justify-center bg-surface relative overflow-hidden px-4">
-            {/* Background Gradients */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent-yellow/5 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-500/5 rounded-full blur-[120px]" />
-            </div>
+        <div className="min-h-screen w-full flex flex-col items-center justify-center bg-background relative overflow-hidden px-4">
+            {/* Architectural Drafting Grid */}
+            <div className="absolute inset-0 bg-millimeter opacity-35 pointer-events-none" />
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="z-10 flex flex-col items-center text-center max-w-2xl"
+                className="z-10 flex flex-col items-center text-center max-w-2xl card-editorial p-8 sm:p-12 rounded-3xl bg-surface-card border-border shadow-2xl space-y-6"
             >
-                <div className="w-full max-w-[400px] mb-8 relative">
+                <div className="w-full max-w-[320px] relative">
                     <img
                         src={mounted && resolvedTheme === 'light' ? "/img/404-black.svg" : "/img/404-white.svg"}
                         alt="404 Illustration"
-                        className="w-full h-auto object-contain drop-shadow-xl"
+                        className="w-full h-auto object-contain drop-shadow-md"
                     />
                 </div>
 
-                <h1 className="text-4xl md:text-5xl font-bold font-syne text-text-primary mb-4">
-                    Oups ! Page introuvable
-                </h1>
+                <div className="space-y-2">
+                    <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-md bg-surface border border-border text-[11px] font-mono text-text-secondary">
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent-yellow animate-pulse" />
+                        <span>ERREUR 404 // COORDONNÉES INTROUVABLES</span>
+                    </div>
+                    <h1 className="text-3xl sm:text-5xl font-normal font-serif text-text-primary">
+                        Page introuvable
+                    </h1>
 
-                <p className="text-lg text-text-secondary mb-8 max-w-md mx-auto leading-relaxed">
-                    Il semblerait que vous soyez perdu dans l'espace. La page que vous cherchez n'existe pas ou a été déplacée.
-                </p>
+                    <p className="text-xs sm:text-sm text-text-secondary max-w-md mx-auto leading-relaxed">
+                        Le compas a perdu l&apos;orientation. La ressource que vous recherchez n&apos;existe pas ou a été déplacée.
+                    </p>
+                </div>
 
                 <Link href="/">
-                    <Button size="lg" className="rounded-full px-8 h-12 text-base font-medium bg-accent-yellow text-black hover:bg-yellow-400 border-none">
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Retour à l'accueil
-                    </Button>
+                    <button
+                        type="button"
+                        className="px-6 py-3 rounded-xl bg-accent-yellow text-black font-bold text-xs hover:brightness-105 transition-all shadow-md shadow-accent-yellow/20 flex items-center gap-2 cursor-pointer"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        <span>Retour à l&apos;accueil</span>
+                    </button>
                 </Link>
             </motion.div>
         </div>

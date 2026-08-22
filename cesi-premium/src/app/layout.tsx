@@ -1,23 +1,33 @@
 import type { Metadata } from 'next'
-import { Syne, DM_Sans } from 'next/font/google'
+import { Newsreader, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider';
 
-const syne = Syne({
+const serifFont = Newsreader({
   subsets: ['latin'],
-  variable: '--font-syne',
+  variable: '--font-serif',
   display: 'swap',
+  style: ['normal', 'italic'],
+  weight: ['400', '500', '600', '700'],
 })
 
-const dmSans = DM_Sans({
+const sansFont = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  variable: '--font-dm',
+  variable: '--font-sans',
   display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
+})
+
+const monoFont = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+  weight: ['400', '500', '600'],
 })
 
 export const metadata: Metadata = {
-  title: 'CESI Premium',
-  description: 'La plateforme ultime pour les étudiants CESI.',
+  title: 'Kompas | CESI',
+  description: 'La plateforme collaborative d\'entraide, de révision et d\'ingénierie pour les étudiants du CESI.',
   icons: {
     icon: '/img/favicon.svg',
     shortcut: '/img/favicon.svg',
@@ -31,11 +41,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr" className={`${syne.variable} ${dmSans.variable}`} suppressHydrationWarning>
-      <body className={dmSans.className}>
+    <html
+      lang="fr"
+      className={`${serifFont.variable} ${sansFont.variable} ${monoFont.variable}`}
+      suppressHydrationWarning
+    >
+      <body className={`${sansFont.className} antialiased bg-background text-text-primary selection:bg-amber-300 selection:text-black min-h-screen`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
@@ -45,3 +59,4 @@ export default function RootLayout({
     </html>
   )
 }
+

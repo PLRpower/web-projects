@@ -1,124 +1,145 @@
 'use client';
 
-import { CheckCircle2, Zap } from 'lucide-react';
+import { Check, Sparkles, Zap, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 const tiers = [
     {
         name: "Découverte",
         price: "0€",
-        description: "Pour découvrir la plateforme.",
+        period: "Gratuit à vie",
+        description: "Pour explorer la bibliothèque et tester vos connaissances.",
         features: [
-            "Accès aux archives (3 dernières années)",
-            "Mode entraînement basique (20 questions/jour)",
-            "3 résumés IA / mois",
-            "Statistiques basiques"
+            "Accès aux archives CCTL (3 dernières années)",
+            "Mode entraînement guidé (20 questions / jour)",
+            "Consultation libre des corrigés",
+            "Profil étudiant & statistiques de base"
         ],
         cta: "Commencer gratuitement",
-        highlight: false
+        highlight: false,
+        badge: "ESSENTIEL"
     },
     {
         name: "Premium",
         price: "4.99€",
-        description: "L'essentiel pour réussir.",
+        period: "par mois • sans engagement",
+        description: "La formule complète pour valider tous ses blocs sans stress.",
         features: [
-            "Archives illimitées (Toutes les années)",
-            "Mode entraînement illimité",
-            "Résumés IA illimités",
-            "Suppression des publicités",
-            "Support prioritaire"
+            "Archives CCTL illimitées (Toutes années & promos)",
+            "Simulateur d'examen chronométré noté sur 20",
+            "Générateur de Prosits (7 étapes)",
+            "Flashcards illimitées & répétition espacée",
+            "Téléchargement direct des PDFs originaux"
         ],
         cta: "Passer Premium",
-        highlight: false
+        highlight: true,
+        badge: "POPULAIRE PROMO"
     },
     {
         name: "Ultime",
         price: "6.99€",
-        description: "La boîte à outils ultime de l'ingénieur.",
+        period: "par mois • sans engagement",
+        description: "Le copilote d'ingénierie boosté par l'IA pour viser les majors.",
         features: [
-            "Tout du pack Premium",
-            "Coach IA Personnel (Tuteur 24/7)",
-            "Correction détaillée et expliquée par IA",
-            "Statistiques de performance avancées",
-            "Badge 'Ultime' sur le profil",
-            "Accès en avant-première aux nouvelles features"
+            "Tout le contenu du pack Premium",
+            "Tuteur IA 24/7 avec explications pas à pas",
+            "Correction de code détaillée (TypeScript, SQL, C)",
+            "Génération automatique de livrables Markdown",
+            "Badge exclusif « Membre Ultime » sur le profil"
         ],
         cta: "Devenir Ultime",
-        highlight: true
+        highlight: false,
+        badge: "ACCÉLÉRATEUR IA"
     }
 ];
 
 export default function Pricing() {
     return (
-        <section id="pricing" className="py-24 relative">
-            {/* Ambient Light */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] bg-accent-orange/10 rounded-full blur-[120px] -z-10" />
-
-            <div className="container mx-auto px-6">
-                <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-5xl font-bold mb-4">Investissez dans <span className="text-accent-orange">votre avenir</span></h2>
-                    <p className="text-text-secondary max-w-2xl mx-auto">
-                        Des tarifs adaptés au budget étudiant. Rentabilisez votre année dès le premier mois.
+        <section id="pricing" className="py-24 relative overflow-hidden bg-background">
+            <div className="container mx-auto px-4 sm:px-6 relative z-10 max-w-7xl">
+                <div className="text-center mb-16 space-y-3 max-w-2xl mx-auto">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface text-xs font-mono font-semibold uppercase tracking-wider text-text-secondary border border-border">
+                        <span className="w-2 h-2 rounded-full bg-accent-yellow" />
+                        FORMULES // INVESTISSEMENT ÉTUDIANT
+                    </div>
+                    <h2 className="text-4xl sm:text-5xl md:text-6xl font-serif font-normal text-text-primary tracking-tight">
+                        Des tarifs adaptés au <span className="italic font-normal">budget étudiant</span>.
+                    </h2>
+                    <p className="text-sm sm:text-base text-text-secondary">
+                        Rentabilisez votre semestre dès le premier CCTL validé.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto items-center">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
                     {tiers.map((tier, index) => (
                         <div
                             key={index}
-                            className={`transform transition-all duration-300 relative rounded-3xl ${tier.highlight
-                                ? 'scale-105 z-10'
-                                : 'glass hover:bg-surface-highlight/10 dark:hover:bg-white/5'
-                                }`}
+                            className={`rounded-3xl p-8 flex flex-col justify-between relative transition-all duration-300 ${
+                                tier.highlight
+                                    ? 'bg-surface-card border-2 border-accent-yellow shadow-xl shadow-accent-yellow/10 md:-translate-y-2'
+                                    : 'card-editorial bg-surface-card'
+                            }`}
                         >
+                            {/* Popular Ribbon */}
                             {tier.highlight && (
-                                <div className="absolute inset-0 bg-gradient-to-br from-accent-yellow to-accent-orange rounded-3xl blur opacity-20" />
+                                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-accent-yellow text-black font-mono font-bold text-[11px] uppercase tracking-wider px-3.5 py-1 rounded-full shadow-xs flex items-center gap-1.5">
+                                    <Zap size={12} fill="currentColor" />
+                                    {tier.badge}
+                                </div>
                             )}
 
-                            <div className={`relative p-8 rounded-3xl h-full flex flex-col ${tier.highlight
-                                ? 'bg-surface border border-accent-yellow/50 shadow-2xl shadow-accent-orange/10'
-                                : ''
-                                }`}>
-                                {tier.highlight && (
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-accent-yellow to-accent-orange text-black font-bold px-4 py-1 rounded-full text-sm flex items-center gap-2">
-                                        <Zap size={16} fill="currentColor" />
-                                        MEILLEURE OFFRE
+                            <div className="space-y-6">
+                                <div>
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="font-serif text-2xl font-normal text-text-primary">
+                                            {tier.name}
+                                        </h3>
+                                        {!tier.highlight && (
+                                            <span className="text-[10px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-surface text-text-muted border border-border">
+                                                {tier.badge}
+                                            </span>
+                                        )}
                                     </div>
-                                )}
-
-                                <div className="mb-8">
-                                    <h3 className={`text-xl font-bold mb-2 ${tier.highlight ? 'text-accent-yellow' : 'text-text-primary'}`}>
-                                        {tier.name}
-                                    </h3>
-                                    <div className="flex items-baseline gap-1">
-                                        <span className="text-4xl font-bold font-syne">{tier.price}</span>
-                                        <span className="text-text-secondary">/ mois</span>
-                                    </div>
-                                    <p className="text-sm text-text-secondary mt-2">{tier.description}</p>
+                                    <p className="text-xs text-text-secondary mt-1">
+                                        {tier.description}
+                                    </p>
                                 </div>
 
-                                <ul className="space-y-4 mb-8 flex-grow">
+                                <div className="space-y-0.5 pb-4 border-b border-border/60">
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-4xl sm:text-5xl font-serif font-normal text-text-primary">
+                                            {tier.price}
+                                        </span>
+                                    </div>
+                                    <div className="text-xs font-mono text-text-muted">
+                                        {tier.period}
+                                    </div>
+                                </div>
+
+                                <ul className="space-y-3.5">
                                     {tier.features.map((feature, i) => (
-                                        <li key={i} className="flex items-start gap-3">
-                                            <CheckCircle2
-                                                className={`shrink-0 mt-0.5 ${tier.highlight ? 'text-accent-orange' : 'text-text-secondary'}`}
-                                                size={18}
-                                            />
-                                            <span className={`text-sm ${tier.highlight ? 'text-text-primary' : 'text-text-secondary'}`}>
-                                                {feature}
-                                            </span>
+                                        <li key={i} className="flex items-start gap-3 text-xs sm:text-sm text-text-secondary">
+                                            <div className="w-5 h-5 rounded-md bg-accent-yellow/15 text-accent-yellow flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                                                <Check size={13} />
+                                            </div>
+                                            <span className="leading-snug">{feature}</span>
                                         </li>
                                     ))}
                                 </ul>
+                            </div>
 
-                                <Link
-                                    href="/register"
-                                    className={`block w-full py-4 rounded-xl font-bold text-center transition-all ${tier.highlight
-                                        ? 'bg-gradient-to-r from-accent-yellow to-accent-orange text-black hover:brightness-110 shadow-lg shadow-accent-yellow/20'
-                                        : 'bg-surface-highlight/50 text-text-primary hover:bg-surface-highlight'
+                            <div className="pt-8 mt-8">
+                                <Link href="/register" className="block w-full">
+                                    <button
+                                        className={`w-full py-3.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                                            tier.highlight
+                                                ? 'bg-accent-yellow text-black hover:brightness-105 shadow-md shadow-accent-yellow/20'
+                                                : 'bg-surface text-text-primary hover:bg-surface-highlight border border-border'
                                         }`}
-                                >
-                                    {tier.cta}
+                                    >
+                                        <span>{tier.cta}</span>
+                                        <ArrowRight size={14} />
+                                    </button>
                                 </Link>
                             </div>
                         </div>
@@ -128,3 +149,4 @@ export default function Pricing() {
         </section>
     );
 }
+

@@ -1,7 +1,7 @@
-# CESI Premium - Suivi du Projet
+# Kompas | CESI - Suivi du Projet
 
 ## Objectif Principal
-**CESI Premium** est la plateforme ultime pour les étudiants du CESI.
+**Kompas | CESI** est la plateforme ultime pour les étudiants du CESI.
 Son **coeur de métier** est la gestion des **CCTL** (Contrôles Continus par Test en Ligne) - les examens QCM de l'école.
 
 ## Fonctionnalités Clés

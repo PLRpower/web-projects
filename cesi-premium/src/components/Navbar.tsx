@@ -4,14 +4,21 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeToggle } from './ThemeToggle';
 import { createClient } from '@/utils/supabase/client';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
-import { LogOut, LayoutDashboard, User as UserIcon, ChevronDown } from 'lucide-react';
+import {
+    LogOut,
+    LayoutDashboard,
+    User as UserIcon,
+    Settings,
+    Archive,
+    ArrowRight
+} from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 export default function Navbar() {
-    const supabase = createClient();
+    const supabase = useMemo(() => createClient(), []);
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -61,33 +68,45 @@ export default function Navbar() {
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="fixed top-0 left-0 right-0 z-50 px-6 py-4 glass backdrop-blur-xl"
+            className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 py-3.5 bg-background/95 backdrop-blur-md border-b border-border shadow-xs"
         >
             <div className="max-w-7xl mx-auto flex items-center justify-between">
-                <Link href="/" className="relative h-10 w-48">
-                    <img
-                        src={mounted && resolvedTheme === 'light' ? "/img/logo-black.svg" : "/img/logo.svg"}
-                        alt="CESI Premium"
-                        className="h-full w-auto object-contain"
-                    />
-                </Link>
+                <div className="flex items-center gap-8">
+                    <Link href="/" className="relative h-9 w-44 block group">
+                        <img
+                            src={mounted && resolvedTheme === 'light' ? "/img/logo-black.svg" : "/img/logo.svg"}
+                            alt="Kompas | CESI"
+                            className="h-full w-auto object-contain transition-transform group-hover:scale-102"
+                        />
+                    </Link>
 
-                <div className="hidden md:flex items-center gap-8 text-sm font-medium text-text-secondary">
-                    <Link href="/#features" className="hover:text-text-primary transition-colors">Fonctionnalités</Link>
-                    <Link href="/#archives" className="hover:text-text-primary transition-colors">Archives</Link>
-                    <Link href="/pricing" className="hover:text-text-primary transition-colors">Abonnement</Link>
+                    <div className="hidden lg:flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                        <Link href="/" className="hover:text-text-primary hover:text-accent-yellow transition-colors">
+                            Page d&apos;accueil
+                        </Link>
+                        <Link href="/cctl" className="hover:text-text-primary hover:text-accent-yellow transition-colors">
+                            CCTL
+                        </Link>
+                        <Link href="/prosits" className="hover:text-text-primary hover:text-accent-yellow transition-colors">
+                            Prosits
+                        </Link>
+                        <Link href="/livrables" className="hover:text-text-primary hover:text-accent-yellow transition-colors">
+                            Livrables
+                        </Link>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                     <ThemeToggle />
                     {user ? (
                         <div className="relative" ref={dropdownRef}>
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="flex items-center gap-2 focus:outline-none"
+                                className="flex items-center gap-2 focus:outline-none cursor-pointer"
+                                aria-label="Menu utilisateur"
                             >
-                                <div className="w-10 h-10 rounded-full bg-surface-highlight flex items-center justify-center font-bold text-accent-yellow border border-border hover:border-accent-yellow/50 transition-colors">
-                                    {user.email?.charAt(0).toUpperCase() || <UserIcon size={20} />}
+                                <div className="w-9 h-9 rounded-xl bg-surface-card flex items-center justify-center font-bold text-accent-yellow border border-border shadow-xs hover:border-accent-yellow transition-colors">
+                                    {user.email?.charAt(0).toUpperCase() || <UserIcon size={16} />}
                                 </div>
                             </button>
 
@@ -97,27 +116,51 @@ export default function Navbar() {
                                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        transition={{ duration: 0.2 }}
-                                        className="absolute right-0 mt-2 w-56 rounded-xl bg-white/95 dark:bg-neutral-900/95 border border-border/50 shadow-xl backdrop-blur-2xl overflow-hidden"
+                                        transition={{ duration: 0.15 }}
+                                        className="absolute right-0 mt-2 w-64 rounded-2xl bg-surface-card border border-border shadow-xl overflow-hidden z-50 p-1.5 space-y-1"
                                     >
-                                        <div className="p-4 border-b border-white/5">
-                                            <p className="text-sm font-bold text-text-primary truncate">{user.email}</p>
-                                            <p className="text-xs text-text-secondary">Membre</p>
+                                        <div className="p-3.5 border-b border-border/60">
+                                            <p className="text-xs font-bold text-text-primary truncate">{user.email}</p>
+                                            <p className="text-[11px] font-mono text-accent-yellow font-semibold mt-0.5">ÉLÈVE-INGÉNIEUR CESI</p>
                                         </div>
-                                        <div className="p-2">
+                                        <div className="p-1 space-y-0.5">
                                             <Link
                                                 href="/dashboard"
                                                 onClick={() => setIsDropdownOpen(false)}
-                                                className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-highlight rounded-lg transition-colors"
+                                                className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-surface rounded-xl transition-colors"
                                             >
-                                                <LayoutDashboard size={16} />
-                                                Mon Dashboard
+                                                <LayoutDashboard size={15} />
+                                                Tableau de bord
+                                            </Link>
+                                            <Link
+                                                href="/dashboard/archives"
+                                                onClick={() => setIsDropdownOpen(false)}
+                                                className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-surface rounded-xl transition-colors"
+                                            >
+                                                <Archive size={15} className="text-accent-yellow" />
+                                                CCTL &amp; Annales
+                                            </Link>
+                                            <Link
+                                                href="/dashboard/profile"
+                                                onClick={() => setIsDropdownOpen(false)}
+                                                className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-surface rounded-xl transition-colors"
+                                            >
+                                                <UserIcon size={15} />
+                                                Mon Profil Étudiant
+                                            </Link>
+                                            <Link
+                                                href="/dashboard/settings"
+                                                onClick={() => setIsDropdownOpen(false)}
+                                                className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-surface rounded-xl transition-colors"
+                                            >
+                                                <Settings size={15} />
+                                                Paramètres
                                             </Link>
                                             <button
                                                 onClick={handleLogout}
-                                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-red-500 hover:bg-red-500/10 rounded-xl transition-colors pt-2 border-t border-border/40 mt-1 cursor-pointer"
                                             >
-                                                <LogOut size={16} />
+                                                <LogOut size={15} />
                                                 Déconnexion
                                             </button>
                                         </div>
@@ -126,14 +169,21 @@ export default function Navbar() {
                             </AnimatePresence>
                         </div>
                     ) : (
-                        <>
-                            <Link href="/login" className="text-sm font-medium hover:text-text-primary transition-colors hidden sm:block">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <Link
+                                href="/login"
+                                className="text-sm font-semibold text-text-secondary hover:text-text-primary px-4 py-2.5 rounded-xl hover:bg-surface/50 transition-colors hidden sm:block"
+                            >
                                 Connexion
                             </Link>
-                            <Link href="/register" className="bg-accent-yellow text-black px-5 py-2 rounded-full text-sm font-bold hover:bg-yellow-400 transition-colors">
-                                S'inscrire
+                            <Link
+                                href="/register"
+                                className="bg-accent-yellow text-black px-4 sm:px-5 py-2.5 rounded-xl text-sm font-bold hover:brightness-105 transition-all shadow-xs inline-flex items-center gap-1.5 group"
+                            >
+                                <span>S&apos;inscrire</span>
+                                <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
                             </Link>
-                        </>
+                        </div>
                     )}
                 </div>
             </div>

@@ -1,47 +1,51 @@
 'use client';
 
+import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CTA() {
     return (
-        <section className="py-24 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-accent-orange/5" />
-
-            <div className="container mx-auto px-6 relative z-10">
+        <section className="py-20 relative overflow-hidden bg-background">
+            <div className="container mx-auto px-4 sm:px-6 relative z-10 max-w-5xl">
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.98 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    className="glass rounded-3xl p-12 md:p-20 text-center border border-white/10 relative overflow-hidden"
+                    className="rounded-3xl p-8 sm:p-14 text-center border-2 border-border bg-surface-card bg-millimeter relative overflow-hidden shadow-2xl"
                 >
-                    {/* Decorative Blobs */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-accent-yellow/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent-orange/20 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2" />
+                    {/* Glowing Ambient Radial Halo */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[350px] bg-[radial-gradient(ellipse_at_center,rgba(229,160,13,0.14)_0%,transparent_70%)] pointer-events-none" />
 
-                    <div className="relative z-10 max-w-3xl mx-auto">
-                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-accent-yellow mb-8">
-                            <Sparkles size={16} />
-                            Rejoignez l'élite
-                        </span>
-
-                        <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
-                            Créez votre compte et <br />
-                            <span className="gradient-accent">boostez votre productivité.</span>
+                    <div className="relative z-10 max-w-2xl mx-auto space-y-6">
+                        {/* Title */}
+                        <h2 className="text-4xl sm:text-5xl md:text-6xl font-serif font-normal text-text-primary tracking-tight leading-[1.08]">
+                            Prêt à aborder vos prochains CCTL <br />
+                            <span className="italic font-normal">avec sérénité ?</span>
                         </h2>
 
-                        <p className="text-lg text-text-secondary mb-10 max-w-xl mx-auto">
-                            Rejoignez des centaines d'étudiants qui utilisent déjà CESI Premium pour valider leur année sans stress.
+                        {/* Subtitle */}
+                        <p className="text-sm sm:text-base text-text-secondary leading-relaxed font-normal">
+                            Rejoignez dès aujourd&apos;hui les étudiants de votre campus qui révisent sur Kompas. Connectez-vous pour débloquer toutes les fonctionnalités de révision.
                         </p>
 
-                        <Link
-                            href="/register"
-                            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-text-primary text-background font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-accent-orange/10"
-                        >
-                            Créer un compte
-                            <ArrowRight className="w-5 h-5" />
-                        </Link>
+                        {/* Action Buttons */}
+                        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <Link href="/register" className="w-full sm:w-auto">
+                                <button className="w-full sm:w-auto px-8 py-4 rounded-xl bg-accent-yellow text-black font-bold text-sm hover:brightness-105 transition-all shadow-md shadow-accent-yellow/20 flex items-center justify-center gap-2.5 cursor-pointer group">
+                                    <span>Créer mon compte étudiant</span>
+                                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </button>
+                            </Link>
+
+                            <Link href="/cctl" className="w-full sm:w-auto">
+                                <button className="w-full sm:w-auto px-6 py-4 rounded-xl bg-surface border border-border text-text-primary font-semibold text-sm hover:bg-surface-highlight transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer">
+                                    <BookOpen size={16} className="text-accent-yellow" />
+                                    <span>Consulter les annales libres</span>
+                                </button>
+                            </Link>
+                        </div>
                     </div>
                 </motion.div>
             </div>

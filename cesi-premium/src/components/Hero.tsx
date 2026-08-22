@@ -1,45 +1,128 @@
 'use client';
 
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { 
+    ArrowRight, 
+    Search
+} from 'lucide-react';
+import Link from 'next/link';
 
 export default function Hero() {
+    const [searchQuery, setSearchQuery] = useState('');
+
     return (
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-            {/* Background Elements */}
-            <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-accent-yellow rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[128px] opacity-20 dark:opacity-60 animate-pulse" />
-            <div className="absolute bottom-0 -left-10 w-96 h-96 bg-accent-orange rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[128px] opacity-20 dark:opacity-60 animate-pulse delay-1000" />
-
-            <div className="container mx-auto px-6 relative z-10 text-center">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
+        <section className="relative min-h-[75vh] flex flex-col justify-center overflow-hidden pt-36 pb-14 sm:pt-40 sm:pb-16 bg-background">
+            {/* Architectural concentric circle lines */}
+            <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden">
+                <svg
+                    className="w-[820px] h-[820px] max-w-none text-zinc-400/25 dark:text-zinc-500/20"
+                    viewBox="0 0 1000 1000"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
                 >
-                    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-medium text-accent-yellow mb-6">
-                        <Sparkles size={16} />
-                        La plus grosse banque de fichiers CESI
+                    <circle cx="500" cy="500" r="380" stroke="currentColor" strokeWidth="0.75" strokeDasharray="4 8" />
+                    <circle cx="500" cy="500" r="200" stroke="currentColor" strokeWidth="0.75" strokeOpacity="0.5" />
+
+                    <g className="animate-spin origin-[500px_500px]" style={{ animationDuration: '120s', willChange: 'transform' }}>
+                        <circle cx="500" cy="500" r="290" stroke="#E5A00D" strokeWidth="1" strokeDasharray="50 40 80 50" strokeOpacity="0.22" />
+                    </g>
+                </svg>
+            </div>
+
+            {/* Ambient Radial Glow */}
+            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] pointer-events-none z-0 bg-[radial-gradient(ellipse_at_center,rgba(229,160,13,0.12)_0%,transparent_70%)]" />
+
+            <div className="container mx-auto px-4 sm:px-6 relative z-10 max-w-5xl text-center space-y-6 sm:space-y-7">
+                
+                {/* Announcement Badge */}
+                <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="inline-flex items-center justify-center"
+                >
+                    <Link
+                        href="/cctl"
+                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-card border border-border text-xs text-text-secondary hover:border-accent-yellow/60 hover:text-text-primary transition-all shadow-xs group"
+                    >
+                        <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="font-semibold text-text-primary">Nouveauté Juillet 2026 :</span>
+                        <span>Simulateur examen CCTL</span>
+                        <ArrowRight size={12} className="text-accent-yellow group-hover:translate-x-0.5 transition-transform" />
+                    </Link>
+                </motion.div>
+
+                {/* Main Headline */}
+                <motion.h1
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.1 }}
+                    className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif tracking-tight text-text-primary leading-[1.08] max-w-5xl mx-auto"
+                >
+                    Tous les <span className="italic font-normal">CCTL,</span> <span className="italic font-normal">Prosits</span> <br className="hidden sm:inline" />
+                    et{' '}
+                    <span className="relative inline-block">
+                        <span className="relative z-10">livrables du CESI.</span>
+                        <span className="absolute bottom-2 sm:bottom-3 left-0 right-0 h-3.5 sm:h-4 bg-accent-yellow/25 -z-0 rounded-sm" />
                     </span>
+                </motion.h1>
 
-                    <h1 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight">
-                        La plateforme qui vous <br />
-                        <span className="gradient-accent">simplifie la vie</span> au CESI.
-                    </h1>
+                {/* Subtitle */}
+                <motion.p
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="text-base sm:text-lg md:text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed font-normal"
+                >
+                    Découvrez la plus grosse base de données de CCTL, Prosits et Livrables du CESI. Simplifiez vos révisions avec des outils créés sur-mesure.
+                </motion.p>
 
-                    <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed">
-                        Découvrez une panoplie de fonctionnalités pour vos études. CCTL corrigés, QCM automatiques, Partage de fichiers, Accès aux Prosits et Livrables complétés.
-                    </p>
+                {/* Main Search Bar */}
+                <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.25 }}
+                    className="max-w-2xl mx-auto space-y-3"
+                >
+                    <div className="relative flex items-center">
+                        <Search className="absolute left-4 w-5 h-5 text-text-muted pointer-events-none z-10" />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Rechercher un CCTL, un Prosit, un livrable..."
+                            className="w-full pl-12 pr-28 py-4 rounded-2xl bg-surface-card border border-border focus:border-accent-yellow focus:outline-none text-sm text-text-primary shadow-lg transition-all placeholder:text-text-muted"
+                        />
+                        <Link 
+                            href={searchQuery ? `/cctl?q=${encodeURIComponent(searchQuery)}` : '/cctl'}
+                            className="absolute right-2.5 z-20"
+                        >
+                            <button className="px-5 py-2.5 rounded-xl bg-accent-yellow text-black font-bold text-xs hover:brightness-105 transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+                                <span>Explorer</span>
+                                <ArrowRight size={13} />
+                            </button>
+                        </Link>
+                    </div>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <button className="group relative px-8 py-3 rounded-full bg-text-primary text-background font-bold text-lg hover:scale-105 transition-transform flex items-center gap-2">
-                            Créer mon compte
-                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </button>
-                        <button className="px-8 py-3 rounded-full glass font-bold text-lg text-text-primary hover:bg-surface-highlight/20 transition-colors">
-                            Comment ça marche ?
-                        </button>
+                    {/* Open Source / GitHub mention */}
+                    <div className="flex items-center justify-center gap-2 text-xs text-text-muted pt-2 sm:pt-2.5">
+                        <span>Plateforme 100% libre &amp;</span>
+                        <a
+                            href="https://github.com/anatol/kompas-cesi"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 font-medium text-text-secondary hover:text-text-primary hover:underline transition-colors"
+                        >
+                            <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                            </svg>
+                            <span>Open Source sur GitHub</span>
+                            <span className="text-[10px] font-mono text-accent-yellow">↗</span>
+                        </a>
                     </div>
                 </motion.div>
+
             </div>
         </section>
     );

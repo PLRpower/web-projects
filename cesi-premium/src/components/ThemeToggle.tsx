@@ -23,36 +23,37 @@ export function ThemeToggle() {
     const isDark = resolvedTheme === "dark"
 
     return (
-        <div
-            className="flex items-center p-1 rounded-full bg-surface-highlight/50 border border-border relative cursor-pointer w-16 h-9"
+        <button
+            type="button"
+            className="flex items-center p-1 rounded-full bg-surface border border-border relative cursor-pointer w-16 h-8 hover:border-text-muted transition-colors shadow-xs"
             onClick={() => setTheme(isDark ? "light" : "dark")}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                    setTheme(isDark ? "light" : "dark")
-                }
-            }}
+            title={isDark ? "Passer en mode clair" : "Passer en mode sombre"}
+            aria-label="Changer de thème"
         >
-            {/* Background Indicator (Static, no animation) */}
+            {/* Sliding Indicator */}
             <div
-                className={`absolute top-1 bottom-1 w-[28px] bg-surface rounded-full shadow-sm z-0 transition-transform duration-0 ${isDark ? "translate-x-[100%]" : "translate-x-0"
-                    }`}
+                className={`absolute top-0.5 bottom-0.5 w-[26px] bg-surface-card rounded-full shadow-xs border border-border/80 z-0 transition-transform duration-200 ease-out ${
+                    isDark ? "translate-x-[30px]" : "translate-x-0"
+                }`}
             />
 
-            <div className="relative z-10 flex items-center justify-between w-full pl-0.5 pr-0">
+            <div className="relative z-10 flex items-center justify-between w-full px-1">
                 <div
-                    className={`flex items-center justify-center w-6 h-6 rounded-full transition-colors ${!isDark ? 'text-amber-500' : 'text-text-secondary/50'}`}
+                    className={`flex items-center justify-center w-5 h-5 rounded-full transition-colors ${
+                        !isDark ? 'text-amber-500 font-bold' : 'text-text-muted/60'
+                    }`}
                 >
-                    <Sun size={14} />
+                    <Sun size={13} />
                 </div>
                 <div
-                    className={`flex items-center justify-center w-6 h-6 rounded-full transition-colors ${isDark ? 'text-blue-400' : 'text-text-secondary/50'}`}
+                    className={`flex items-center justify-center w-5 h-5 rounded-full transition-colors ${
+                        isDark ? 'text-amber-400 font-bold' : 'text-text-muted/60'
+                    }`}
                 >
-                    <Moon size={14} />
+                    <Moon size={13} />
                 </div>
             </div>
-            <span className="sr-only">Toggle theme</span>
-        </div>
+            <span className="sr-only">Changer de thème</span>
+        </button>
     )
 }

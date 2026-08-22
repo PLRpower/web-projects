@@ -10,11 +10,14 @@ const config: Config = {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['var(--font-dm)', 'sans-serif'],
-                syne: ['var(--font-syne)', 'sans-serif'],
+                sans: ['var(--font-sans)', 'sans-serif'],
+                serif: ['var(--font-serif)', 'Georgia', 'serif'],
+                syne: ['var(--font-serif)', 'Georgia', 'serif'], // Backward compat mapped to modern serif
+                mono: ['var(--font-mono)', 'monospace'],
             }
         },
     },
     plugins: [],
 }
 export default config
+
