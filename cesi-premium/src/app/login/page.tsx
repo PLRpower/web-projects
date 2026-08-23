@@ -1,7 +1,7 @@
 'use client';
 
-import { useActionState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useActionState, Suspense, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,13 +9,26 @@ import Link from 'next/link';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { login } from '@/app/auth/actions';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { createClient } from '@/utils/supabase/client';
 
 function LoginForm() {
     const [state, dispatch] = useActionState(login, null);
     const searchParams = useSearchParams();
+    const router = useRouter();
     const isResetSuccess = searchParams.get('reset') === 'success';
+    const redirectUrl = searchParams.get('redirect') || searchParams.get('redirectTo');
+
+    useEffect(() => {
+        const supabase = createClient();
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            if (user) {
+                router.replace(redirectUrl || '/dashboard');
+            }
+        });
+    }, [router, redirectUrl]);
 
     return (
+
         <div className="w-full max-w-md p-8 sm:p-10 rounded-3xl bg-surface-card border border-border shadow-2xl relative z-10">
             <div className="mb-8 space-y-2 text-center sm:text-left">
                 <h1 className="text-3xl sm:text-4xl font-normal text-text-primary font-serif">Connexion</h1>
@@ -36,6 +49,9 @@ function LoginForm() {
             )}
 
             <form action={dispatch} className="space-y-4">
+                {redirectUrl && (
+                    <input type="hidden" name="redirectTo" value={redirectUrl} />
+                )}
                 {state?.error && (
                     <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-xl text-sm text-center">
                         {state.error}

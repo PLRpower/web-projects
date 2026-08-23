@@ -226,15 +226,15 @@ export function CCTLPublishModal({ exam, isOpen, onClose, onPublished }: CCTLPub
                         </div>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                            <Link href={`/dashboard/archives/${publishedData.id}`} className="w-full sm:w-auto">
+                            <Link href={`/dashboard/cctl/${publishedData.id}`} className="w-full sm:w-auto">
                                 <Button variant="premium" className="w-full text-xs font-bold">
                                     Voir la fiche & s'entraîner
                                     <ArrowRight className="w-4 h-4 ml-1.5" />
                                 </Button>
                             </Link>
-                            <Link href="/dashboard/archives" className="w-full sm:w-auto">
+                            <Link href="/dashboard/cctl" className="w-full sm:w-auto">
                                 <Button variant="outline" className="w-full text-xs border-border/60">
-                                    Aller aux Archives CCTL
+                                    Aller aux CCTL
                                 </Button>
                             </Link>
                         </div>

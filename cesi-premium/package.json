@@ -1,5 +1,5 @@
 {
-  "name": "cesi-agora",
+  "name": "kompas",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -21,6 +21,7 @@
     "next-themes": "^0.4.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "stripe": "^22.5.0",
     "tailwind-merge": "^3.4.0",
     "unpdf": "^1.8.1"
   },

@@ -27,12 +27,21 @@ import {
     Share2,
     Calendar,
     GraduationCap,
-    Copy
+    Copy,
+    Download,
+    WifiOff
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CodeBlock } from '@/components/cctl/CodeBlock';
 import { FlashcardDeck, FlashcardItem } from '@/types/flashcard';
 import { SEED_FLASHCARD_DECKS } from '@/lib/flashcard-seed-data';
+import {
+    saveDeckOffline,
+    removeDeckOffline,
+    isDeckSavedOffline,
+    getOfflineDecks,
+    useNetworkStatus
+} from '@/lib/offline-storage';
 
 const PROMO_OPTIONS = ['Tous', 'A1', 'A2', 'A3', 'A4', 'A5'];
 const DOMAIN_OPTIONS = [
@@ -50,7 +59,7 @@ const CODE_LANGUAGES = ['typescript', 'javascript', 'sql', 'bash', 'python', 'c'
 
 export default function FlashcardsPage() {
     // Current user name
-    const [userName, setUserName] = useState('Alexandre Martin (FISA A3)');
+    const [userName, setUserName] = useState('Élève-Ingénieur');
     const [userPromo, setUserPromo] = useState('A3');
 
     // Decks state
@@ -59,7 +68,11 @@ export default function FlashcardsPage() {
 
     // Active View: 'hub' | 'creator' | 'player'
     const [viewMode, setViewMode] = useState<'hub' | 'creator' | 'player'>('hub');
-    const [activeTab, setActiveTab] = useState<'community' | 'my_decks'>('community');
+    const [activeTab, setActiveTab] = useState<'community' | 'my_decks' | 'offline'>('community');
+
+    // Network & Offline Storage State
+    const { isOnline } = useNetworkStatus();
+    const [offlineDeckIds, setOfflineDeckIds] = useState<Record<string, boolean>>({});
 
     // Filters
     const [searchQuery, setSearchQuery] = useState('');
@@ -98,9 +111,19 @@ export default function FlashcardsPage() {
     const [knownCards, setKnownCards] = useState<Record<string, boolean>>({});
     const [isFinished, setIsFinished] = useState(false);
 
+    // Sync Offline Decks
+    const syncOfflineDecks = () => {
+        const offline = getOfflineDecks();
+        const map: Record<string, boolean> = {};
+        offline.forEach(d => {
+            map[d.id] = true;
+        });
+        setOfflineDeckIds(map);
+    };
+
     // Load from localStorage
     useEffect(() => {
-        const savedProfile = localStorage.getItem('cesi_agora_user_profile');
+        const savedProfile = localStorage.getItem('kompas_user_profile');
         if (savedProfile) {
             try {
                 const parsed = JSON.parse(savedProfile);
@@ -109,7 +132,7 @@ export default function FlashcardsPage() {
             } catch {}
         }
 
-        const savedDecks = localStorage.getItem('cesi_agora_custom_flashcards_decks');
+        const savedDecks = localStorage.getItem('kompas_custom_flashcards_decks');
         if (savedDecks) {
             try {
                 const parsed = JSON.parse(savedDecks);
@@ -119,27 +142,44 @@ export default function FlashcardsPage() {
             } catch {}
         } else {
             // Save initial seed to localStorage
-            localStorage.setItem('cesi_agora_custom_flashcards_decks', JSON.stringify(SEED_FLASHCARD_DECKS));
+            localStorage.setItem('kompas_custom_flashcards_decks', JSON.stringify(SEED_FLASHCARD_DECKS));
         }
 
-        const savedLikes = localStorage.getItem('cesi_agora_flashcards_liked_decks');
+        const savedLikes = localStorage.getItem('kompas_flashcards_liked_decks');
         if (savedLikes) {
             try {
                 setLikedDecks(JSON.parse(savedLikes));
             } catch {}
         }
+
+        syncOfflineDecks();
+        window.addEventListener('kompas_offline_updated', syncOfflineDecks);
+        return () => window.removeEventListener('kompas_offline_updated', syncOfflineDecks);
     }, []);
 
     // Save decks to localStorage
     const persistDecks = (updated: FlashcardDeck[]) => {
         setDecks(updated);
-        localStorage.setItem('cesi_agora_custom_flashcards_decks', JSON.stringify(updated));
+        localStorage.setItem('kompas_custom_flashcards_decks', JSON.stringify(updated));
+    };
+
+    // Toggle Offline Download for a Deck
+    const handleToggleOffline = (deck: FlashcardDeck, e: React.MouseEvent) => {
+        e.stopPropagation();
+        const isSaved = offlineDeckIds[deck.id];
+        if (isSaved) {
+            removeDeckOffline(deck.id);
+        } else {
+            saveDeckOffline(deck);
+        }
+        syncOfflineDecks();
     };
 
     // Filtered decks
     const filteredDecks = useMemo(() => {
         return decks.filter(deck => {
             if (activeTab === 'my_decks' && deck.authorName !== userName) return false;
+            if (activeTab === 'offline' && !offlineDeckIds[deck.id]) return false;
             if (activeTab === 'community' && !deck.isPublic && deck.authorName !== userName) return false;
 
             const promoMatch = selectedPromo === 'Tous' || deck.promo === selectedPromo;
@@ -155,7 +195,7 @@ export default function FlashcardsPage() {
 
             return promoMatch && domainMatch && searchMatch;
         });
-    }, [decks, activeTab, userName, selectedPromo, selectedDomain, searchQuery]);
+    }, [decks, activeTab, userName, selectedPromo, selectedDomain, searchQuery, offlineDeckIds]);
 
     // Handle Start Practice
     const handleStartPractice = (deck: FlashcardDeck) => {
@@ -179,7 +219,7 @@ export default function FlashcardsPage() {
         const isLiked = likedDecks[deckId];
         const updatedLikes = { ...likedDecks, [deckId]: !isLiked };
         setLikedDecks(updatedLikes);
-        localStorage.setItem('cesi_agora_flashcards_liked_decks', JSON.stringify(updatedLikes));
+        localStorage.setItem('kompas_flashcards_liked_decks', JSON.stringify(updatedLikes));
 
         const updated = decks.map(d => {
             if (d.id === deckId) {
@@ -361,10 +401,6 @@ export default function FlashcardsPage() {
                     <div className="card-editorial p-6 sm:p-8 rounded-3xl bg-surface/60 border-border relative overflow-hidden flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
                         <div className="absolute inset-0 bg-millimeter opacity-30 pointer-events-none" />
                         <div className="space-y-2 relative z-10">
-                            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-md bg-surface-card border border-border text-[11px] font-mono text-text-secondary">
-                                <span className="w-1.5 h-1.5 rounded-full bg-accent-yellow animate-pulse" />
-                                <span>MÉMORISATION ACTIVE // RÉPÉTITION ESPACÉE</span>
-                            </div>
                             <h1 className="text-3xl sm:text-4xl font-normal font-serif text-text-primary flex items-center gap-3">
                                 <Brain className="w-8 h-8 text-accent-yellow" />
                                 Flashcards &amp; Decks d&apos;Étude
@@ -410,6 +446,19 @@ export default function FlashcardsPage() {
                         >
                             <User className="w-4 h-4" />
                             <span>Mes Decks ({decks.filter(d => d.authorName === userName).length})</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('offline')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                                activeTab === 'offline'
+                                    ? 'bg-accent-yellow text-black font-bold shadow-xs'
+                                    : 'text-text-secondary hover:text-text-primary hover:bg-surface'
+                            }`}
+                        >
+                            <Download className="w-4 h-4" />
+                            <span>📦 Hors-Ligne / Train ({Object.keys(offlineDeckIds).length})</span>
                         </button>
                     </div>
 
@@ -538,6 +587,34 @@ export default function FlashcardsPage() {
                                                 S&apos;entraîner
                                             </Button>
 
+                                            {/* Offline Download Button */}
+                                            <button
+                                                type="button"
+                                                onClick={(e) => handleToggleOffline(deck, e)}
+                                                className={`px-2.5 h-9 rounded-xl border text-xs font-mono transition-all flex items-center gap-1 cursor-pointer shrink-0 ${
+                                                    offlineDeckIds[deck.id]
+                                                        ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold'
+                                                        : 'bg-surface border-border/70 text-text-muted hover:text-text-primary hover:border-accent-yellow'
+                                                }`}
+                                                title={
+                                                    offlineDeckIds[deck.id]
+                                                        ? 'Enregistré hors-ligne pour révision sans connexion'
+                                                        : 'Télécharger pour réviser dans le train/bus sans réseau'
+                                                }
+                                            >
+                                                {offlineDeckIds[deck.id] ? (
+                                                    <>
+                                                        <Check className="w-3.5 h-3.5 text-emerald-500" />
+                                                        <span className="hidden sm:inline">Hors-Ligne</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Download className="w-3.5 h-3.5" />
+                                                        <span className="hidden sm:inline">Télécharger</span>
+                                                    </>
+                                                )}
+                                            </button>
+
                                             {isMyDeck && (
                                                 <>
                                                     <Button
@@ -584,17 +661,28 @@ export default function FlashcardsPage() {
                                 <Layers className="w-8 h-8" />
                             </div>
                             <div className="space-y-1">
-                                <h3 className="font-bold font-syne text-lg text-text-primary">Aucun deck trouvé</h3>
+                                <h3 className="font-bold font-syne text-lg text-text-primary">
+                                    {activeTab === 'offline' ? 'Aucun deck téléchargé hors-ligne' : 'Aucun deck trouvé'}
+                                </h3>
                                 <p className="text-xs leading-relaxed">
-                                    {activeTab === 'my_decks'
+                                    {activeTab === 'offline'
+                                        ? 'Téléchargez des paquets de cartes en cliquant sur le bouton « Télécharger » pour y accéder sans connexion dans les transports.'
+                                        : activeTab === 'my_decks'
                                         ? 'Vous n\'avez pas encore créé de deck de flashcards. Créez-en un pour réviser et le partager !'
                                         : 'Aucun deck ne correspond à vos filtres actuels.'}
                                 </p>
                             </div>
-                            <Button variant="premium" size="sm" onClick={handleOpenCreator}>
-                                <Plus className="w-4 h-4 mr-1.5" />
-                                Créer mon premier deck
-                            </Button>
+                            {activeTab === 'offline' ? (
+                                <Button variant="premium" size="sm" onClick={() => setActiveTab('community')}>
+                                    <Globe className="w-4 h-4 mr-1.5" />
+                                    Explorer les decks communauté
+                                </Button>
+                            ) : (
+                                <Button variant="premium" size="sm" onClick={handleOpenCreator}>
+                                    <Plus className="w-4 h-4 mr-1.5" />
+                                    Créer mon premier deck
+                                </Button>
+                            )}
                         </div>
                     )}
                 </div>

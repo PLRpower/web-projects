@@ -11,6 +11,7 @@ export async function login(previousState: any, formData: FormData) {
 
         const email = formData.get('email') as string
         const password = formData.get('password') as string
+        const redirectTo = (formData.get('redirectTo') as string) || '/dashboard'
 
         const { error } = await supabase.auth.signInWithPassword({
             email,
@@ -22,7 +23,8 @@ export async function login(previousState: any, formData: FormData) {
         }
 
         revalidatePath('/', 'layout')
-        redirect('/')
+        const target = redirectTo.startsWith('/') && !redirectTo.startsWith('//') ? redirectTo : '/dashboard'
+        redirect(target)
     } catch (err: any) {
         if (err?.digest?.startsWith('NEXT_REDIRECT')) {
             throw err; // Re-throw Next.js internal redirect
@@ -63,7 +65,7 @@ export async function signup(previousState: any, formData: FormData) {
         }
 
         revalidatePath('/', 'layout')
-        redirect('/')
+        redirect('/onboarding')
     } catch (err: any) {
         if (err?.digest?.startsWith('NEXT_REDIRECT')) {
             throw err; // Re-throw Next.js internal redirect

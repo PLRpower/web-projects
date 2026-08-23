@@ -1,57 +1,57 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { FileCheck, BrainCircuit, Users, FolderOpen, FileText, Wand2, ArrowRight } from 'lucide-react';
+import { Sparkles, Bot, FileCheck, BrainCircuit, Users, FolderOpen, FileText, Wand2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 const features = [
     {
         num: "01",
-        icon: <FileCheck className="w-6 h-6 text-accent-yellow" />,
+        icon: <Sparkles className="w-6 h-6 text-accent-yellow" />,
+        title: "Générateur IA de CCTL Blancs",
+        description: "Déposez votre cours ou vos notes (PDF, Word, photos). L'IA génère un faux CCTL inédit au format exact du CESI pour vous entraîner à l'infini.",
+        tag: "IA Générative CESI",
+        link: "/dashboard/cctl/generateur"
+    },
+    {
+        num: "02",
+        icon: <Bot className="w-6 h-6 text-accent-orange" />,
+        title: "Coach IA Pas-à-Pas & Tuteur",
+        description: "Sur chaque question ratée, le tuteur IA détaille le raisonnement méthodique, déjoue les pièges et donne l'astuce de mémorisation clé.",
+        tag: "Tuteur Virtuel 24/7",
+        link: "/dashboard/cctl"
+    },
+    {
+        num: "03",
+        icon: <FileCheck className="w-6 h-6 text-emerald-400" />,
         title: "CCTL & Annales Corrigées",
-        description: "Accédez à la plus vaste banque de sujets d'examens annotés par les étudiants et les majors de promo du CESI.",
+        description: "Accédez à la plus vaste banque de sujets d'examens réels annotés par les étudiants et les majors de promo de tous les campus CESI.",
         tag: "Examens réels",
         link: "/cctl"
     },
     {
-        num: "02",
-        icon: <FolderOpen className="w-6 h-6 text-accent-yellow" />,
-        title: "Livrables de Projet",
-        description: "Consultez et téléchargez les DAT, cahiers des charges, rapports d'audit et diaporamas de soutenance validés.",
+        num: "04",
+        icon: <FolderOpen className="w-6 h-6 text-blue-400" />,
+        title: "Livrables de Projet Validés",
+        description: "Consultez et téléchargez les DAT, cahiers des charges, rapports d'audit et diaporamas de soutenance certifiés.",
         tag: "Rendus de blocs",
         link: "/livrables"
     },
     {
-        num: "03",
-        icon: <Wand2 className="w-6 h-6 text-accent-orange" />,
+        num: "05",
+        icon: <Wand2 className="w-6 h-6 text-accent-yellow" />,
         title: "Assistant Prosit en 7 Étapes",
         description: "Structurez vos séances (mots-clés, problématique, plan d'action) et exportez vos fiches directement en Markdown.",
-        tag: "Méthode",
+        tag: "Méthode PBA",
         link: "/prosits"
     },
     {
-        num: "04",
-        icon: <BrainCircuit className="w-6 h-6 text-blue-400" />,
-        title: "Flashcards & Répétition Espacée",
-        description: "Créez vos paquets de révision ou révisez les concepts clés (Maths, Physique, SOLID, SQL, Réseaux) de votre filière.",
-        tag: "Mémorisation",
-        link: "/dashboard/flashcards"
-    },
-    {
-        num: "05",
-        icon: <Users className="w-6 h-6 text-emerald-400" />,
-        title: "Chat Promo & 25 Campus",
-        description: "Discutez en direct avec votre promo, échangez vos retours d'expériences et téléchargez les templates indispensables.",
-        tag: "Réseau CESI",
-        link: "/dashboard/community"
-    },
-    {
         num: "06",
-        icon: <FileText className="w-6 h-6 text-amber-500" />,
-        title: "Dépôt & Partage Anonyme",
-        description: "Déposez votre export de CCTL en 1 clic : l'extracteur automatique le numérise pour vos camarades en préservant l'anonymat.",
-        tag: "Open Source Étudiant",
-        link: "/dashboard/import"
+        icon: <BrainCircuit className="w-6 h-6 text-purple-400" />,
+        title: "Flashcards & Mode Hors-Ligne (PWA)",
+        description: "Révisez vos fiches et CCTL dans les transports (bus, train, métro) sur smartphone même sans connexion Internet.",
+        tag: "Transports & Offline",
+        link: "/dashboard/flashcards"
     }
 ];
 

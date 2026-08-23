@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
@@ -16,9 +17,11 @@ export default function Footer() {
             <div className="container mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-6 max-w-7xl relative z-10">
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                     <Link href="/" className="relative h-8 w-40 block">
-                        <img
+                        <Image
                             src={mounted && resolvedTheme === 'light' ? "/img/logo-black.svg" : "/img/logo.svg"}
                             alt="Kompas | CESI"
+                            width={160}
+                            height={32}
                             className="h-full w-auto object-contain"
                         />
                     </Link>

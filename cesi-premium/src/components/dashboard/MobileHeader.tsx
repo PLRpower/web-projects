@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import {
@@ -9,13 +10,15 @@ import {
     X,
     LayoutDashboard,
     Brain,
-    Wand2,
+    FileText,
     Archive,
     Users,
     User,
     Settings,
     LogOut,
-    FolderGit2
+    FolderGit2,
+    Target,
+    Tv
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -23,10 +26,12 @@ import { createClient } from '@/utils/supabase/client';
 
 const navItems = [
     { label: 'Tableau de bord', icon: LayoutDashboard, href: '/dashboard' },
-    { label: 'CCTL', icon: Archive, href: '/dashboard/archives' },
+    { label: 'CCTL & IA', icon: Archive, href: '/dashboard/cctl' },
+    { label: 'Diagnostic & Radar', icon: Target, href: '/dashboard/diagnostic' },
+    { label: 'Live Battle Amphi', icon: Tv, href: '/live/host' },
+    { label: 'Prosits', icon: FileText, href: '/dashboard/prosits' },
     { label: 'Livrables', icon: FolderGit2, href: '/dashboard/livrables' },
     { label: 'Flashcards', icon: Brain, href: '/dashboard/flashcards' },
-    { label: 'Prosits', icon: Wand2, href: '/dashboard/prosits' },
     { label: 'Chat Promo', icon: Users, href: '/dashboard/community' },
     { label: 'Profil Étudiant', icon: User, href: '/dashboard/profile' },
     { label: 'Paramètres', icon: Settings, href: '/dashboard/settings' },
@@ -54,9 +59,11 @@ export default function MobileHeader() {
         <header className="md:hidden sticky top-0 z-50 glass border-b border-border px-4 py-3">
             <div className="flex items-center justify-between">
                 <Link href="/" className="relative h-7 w-36 block">
-                    <img
+                    <Image
                         src={mounted && resolvedTheme === 'light' ? "/img/logo-black.svg" : "/img/logo.svg"}
                         alt="Kompas | CESI"
+                        width={144}
+                        height={28}
                         className="h-full w-auto object-contain"
                     />
                 </Link>

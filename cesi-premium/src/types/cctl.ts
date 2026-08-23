@@ -116,6 +116,22 @@ export interface CCTLExam {
     };
 }
 
+export function formatAcademicYear(yearStr?: string): string {
+    if (!yearStr) return '2024 - 2025';
+    const trimmed = yearStr.trim();
+    if (trimmed.includes('-') || trimmed.includes('/')) {
+        const parts = trimmed.split(/[-/]/).map(p => p.trim());
+        if (parts.length >= 2) {
+            return `${parts[0]} - ${parts[1]}`;
+        }
+    }
+    const num = parseInt(trimmed, 10);
+    if (!isNaN(num) && num > 2000) {
+        return `${num - 1} - ${num}`;
+    }
+    return trimmed;
+}
+
 export interface CCTLImportResponse {
     success: boolean;
     exam?: CCTLExam;

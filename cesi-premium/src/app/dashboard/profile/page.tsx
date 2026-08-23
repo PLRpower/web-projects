@@ -1,27 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
     User,
     Mail,
     MapPin,
     GraduationCap,
-    Award,
     Flame,
     Zap,
-    BookOpen,
     CheckCircle2,
     Clock,
     TrendingUp,
     Sparkles,
-    Shield,
-    Calendar,
     Edit3,
     Save,
     Check,
-    Star,
-    Layers,
-    Share2
+    Star
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/client';
@@ -69,104 +64,21 @@ const SPECIALTIES = [
     'Généraliste'
 ];
 
-interface Achievement {
-    id: string;
-    title: string;
-    description: string;
-    icon: string;
-    unlocked: boolean;
-    progress: string;
-    rarity: 'common' | 'rare' | 'epic' | 'legendary';
-}
-
-const INITIAL_ACHIEVEMENTS: Achievement[] = [
-    {
-        id: 'major',
-        title: 'Major de Promo',
-        description: 'Obtenir le Grade A à une épreuve CCTL officielle.',
-        icon: '🎓',
-        unlocked: true,
-        progress: '1/1 complété',
-        rarity: 'legendary'
-    },
-    {
-        id: 'prosit-master',
-        title: 'Survivant du Prosit',
-        description: 'Compléter 5 fiches méthodologiques de Prosit.',
-        icon: '⚡',
-        unlocked: true,
-        progress: '5/5 complétés',
-        rarity: 'rare'
-    },
-    {
-        id: 'sniper',
-        title: 'CCTL Sniper',
-        description: 'Répondre correctement à 20 questions consécutives.',
-        icon: '🎯',
-        unlocked: true,
-        progress: '20/20 d\'affilée',
-        rarity: 'epic'
-    },
-    {
-        id: 'contributor',
-        title: 'Bibliothécaire Agora',
-        description: 'Partager un sujet de CCTL dans les archives.',
-        icon: '📚',
-        unlocked: false,
-        progress: '0/1 uploadé',
-        rarity: 'rare'
-    },
-    {
-        id: 'night-owl',
-        title: 'Noctambule du FabLab',
-        description: 'Terminer une session de révision après 23h.',
-        icon: '☕',
-        unlocked: true,
-        progress: 'Débloqué à 23h42',
-        rarity: 'common'
-    },
-    {
-        id: 'streak-god',
-        title: 'Discipline de Fer',
-        description: 'Maintenir une série de révision de 14 jours.',
-        icon: '🔥',
-        unlocked: true,
-        progress: '14/14 jours',
-        rarity: 'epic'
-    },
-    {
-        id: 'guardian',
-        title: 'Gardien du Livrable',
-        description: 'Valider un bloc complet sans rattrapage.',
-        icon: '🛡️',
-        unlocked: false,
-        progress: 'En cours (Bloc Web)',
-        rarity: 'common'
-    },
-    {
-        id: 'ultimate',
-        title: 'Membre Ultime',
-        description: 'Accéder aux explications détaillées par IA 24/7.',
-        icon: '👑',
-        unlocked: true,
-        progress: 'Actif',
-        rarity: 'legendary'
-    }
-];
-
 export default function ProfilePage() {
     const supabase = createClient();
     const [isEditing, setIsEditing] = useState(false);
     const [savedSuccess, setSavedSuccess] = useState(false);
 
     // Profile state
-    const [name, setName] = useState('Alexandre Martin');
-    const [email, setEmail] = useState('alexandre.martin@viacesi.fr');
+    const [name, setName] = useState('Élève-Ingénieur');
+    const [email, setEmail] = useState('');
     const [campus, setCampus] = useState('Rouen');
     const [promo, setPromo] = useState('A3');
     const [specialty, setSpecialty] = useState('Informatique & Numérique (FISE)');
-    const [bio, setBio] = useState('Futur ingénieur full-stack au CESI Rouen. Passionné d\'architecture logicielle et de devops.');
-    const [subscriptionTier, setSubscriptionTier] = useState<'Découverte' | 'Premium' | 'Ultime'>('Ultime');
+    const [subscriptionTier, setSubscriptionTier] = useState<'Découverte' | 'Premium'>('Découverte');
+    const [subscriptionPlan, setSubscriptionPlan] = useState<'free' | 'monthly' | 'annual'>('free');
+    const [isPremium, setIsPremium] = useState(false);
+    const [isPortalLoading, setIsPortalLoading] = useState(false);
 
     // Stats
     const [stats] = useState({
@@ -184,61 +96,125 @@ export default function ProfilePage() {
     useEffect(() => {
         // Load user from Supabase if available
         const loadUser = async () => {
+            let dynamicName = '';
+            let premiumResolved = false;
+            let planResolved: 'free' | 'monthly' | 'annual' = 'free';
+
             const { data: { user } } = await supabase.auth.getUser();
-            if (user && user.email) {
-                setEmail(user.email);
-                if (user.user_metadata?.name) {
-                    setName(user.user_metadata.name);
+            if (user) {
+                if (user.email) setEmail(user.email);
+                
+                const meta = user.user_metadata;
+                premiumResolved = Boolean(
+                    meta?.is_premium === true ||
+                    meta?.subscription_tier === 'Premium' ||
+                    meta?.subscription_tier === 'Ultime' ||
+                    meta?.role === 'admin'
+                );
+
+                if (meta?.subscription_plan) planResolved = meta.subscription_plan;
+                if (meta?.name) {
+                    dynamicName = meta.name;
+                } else if (meta?.firstname && meta?.lastname) {
+                    dynamicName = `${meta.firstname} ${meta.lastname}`.trim();
+                } else if (meta?.full_name) {
+                    dynamicName = meta.full_name;
+                } else if (user.email) {
+                    const parts = user.email.split('@')[0].split('.');
+                    if (parts.length >= 2) {
+                        const first = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+                        const last = parts[1].toUpperCase();
+                        dynamicName = `${first} ${last}`;
+                    } else {
+                        dynamicName = user.email.split('@')[0];
+                    }
                 }
+
+                if (meta?.campus) setCampus(meta.campus);
+                if (meta?.promo) setPromo(meta.promo);
+                if (meta?.specialty) setSpecialty(meta.specialty);
             }
 
             // Load local saved profile
-            const savedProfile = localStorage.getItem('cesi_agora_user_profile');
+            const savedProfile = localStorage.getItem('kompas_user_profile');
             if (savedProfile) {
                 try {
                     const parsed = JSON.parse(savedProfile);
-                    if (parsed.name) setName(parsed.name);
+                    if (parsed.name && parsed.name !== 'Alexandre Martin') {
+                        dynamicName = parsed.name;
+                    }
+                    if (parsed.email) setEmail(parsed.email);
                     if (parsed.campus) setCampus(parsed.campus);
                     if (parsed.promo) setPromo(parsed.promo);
                     if (parsed.specialty) setSpecialty(parsed.specialty);
-                    if (parsed.bio) setBio(parsed.bio);
-                    if (parsed.subscriptionTier) setSubscriptionTier(parsed.subscriptionTier);
+                    if (parsed.isPremium || parsed.subscriptionTier === 'Premium' || parsed.subscriptionTier === 'Ultime') {
+                        premiumResolved = true;
+                        if (parsed.subscriptionPlan) planResolved = parsed.subscriptionPlan;
+                    }
                 } catch {
                     // Ignore parse error
                 }
             }
+
+            if (dynamicName) {
+                setName(dynamicName);
+            }
+            setIsPremium(premiumResolved);
+            setSubscriptionTier(premiumResolved ? 'Premium' : 'Découverte');
+            setSubscriptionPlan(planResolved);
         };
 
         loadUser();
     }, [supabase]);
 
-    const handleSaveProfile = () => {
+    const handleOpenStripePortal = async () => {
+        setIsPortalLoading(true);
+        try {
+            const res = await fetch('/api/stripe/portal', { method: 'POST' });
+            const data = await res.json();
+            if (data.success && data.url) {
+                window.location.href = data.url;
+            } else {
+                alert(data.error || 'Impossible d\'accéder au portail Stripe. Si vous n\'avez pas encore souscrit par carte, vous pouvez vous abonner sur la page Tarifs.');
+            }
+        } catch (e) {
+            console.error('Stripe portal error:', e);
+            alert('Erreur de connexion au portail Stripe');
+        } finally {
+            setIsPortalLoading(false);
+        }
+    };
+
+
+    const handleSaveProfile = async () => {
         const profileData = {
             name,
             email,
             campus,
             promo,
             specialty,
-            bio,
             subscriptionTier
         };
-        localStorage.setItem('cesi_agora_user_profile', JSON.stringify(profileData));
+        localStorage.setItem('kompas_user_profile', JSON.stringify(profileData));
+
+        try {
+            await supabase.auth.updateUser({
+                data: {
+                    name,
+                    campus,
+                    promo,
+                    specialty
+                }
+            });
+        } catch (e) {
+            console.warn('Supabase profile sync skipped:', e);
+        }
+
+        window.dispatchEvent(new Event('kompas_profile_updated'));
+
         setIsEditing(false);
         setSavedSuccess(true);
         setTimeout(() => setSavedSuccess(false), 3000);
-    };
-
-    const getRarityBadge = (rarity: Achievement['rarity']) => {
-        switch (rarity) {
-            case 'legendary':
-                return 'bg-gradient-to-r from-amber-500 to-accent-yellow text-black font-bold';
-            case 'epic':
-                return 'bg-purple-500/20 text-purple-300 border border-purple-500/40';
-            case 'rare':
-                return 'bg-blue-500/20 text-blue-300 border border-blue-500/40';
-            default:
-                return 'bg-surface-highlight text-text-secondary border border-border';
-        }
     };
 
     return (
@@ -247,16 +223,12 @@ export default function ProfilePage() {
             <div className="card-editorial p-6 sm:p-8 rounded-3xl bg-surface/60 border-border relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div className="absolute inset-0 bg-millimeter opacity-30 pointer-events-none" />
                 <div className="space-y-2 relative z-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-md bg-surface-card border border-border text-[11px] font-mono text-text-secondary">
-                        <span className="w-1.5 h-1.5 rounded-full bg-accent-yellow animate-pulse" />
-                        <span>ESPACE ÉTUDIANT // PROFIL &amp; XP</span>
-                    </div>
                     <h1 className="text-3xl sm:text-4xl font-normal font-serif flex items-center gap-3 text-text-primary">
                         <User className="w-8 h-8 text-accent-yellow" />
                         Mon Espace <span className="italic font-normal">Étudiant CESI</span>
                     </h1>
                     <p className="text-xs sm:text-sm text-text-secondary">
-                        Gérez vos informations de scolarité, suivez vos statistiques et votre palmarès de badges.
+                        Gérez vos informations de scolarité, votre campus et vos statistiques académiques.
                     </p>
                 </div>
 
@@ -364,15 +336,6 @@ export default function ProfilePage() {
                                         ))}
                                     </select>
                                 </div>
-                                <div>
-                                    <label className="text-xs font-semibold text-text-secondary block mb-1">Bio / Statut</label>
-                                    <textarea
-                                        value={bio}
-                                        onChange={(e) => setBio(e.target.value)}
-                                        rows={2}
-                                        className="w-full bg-surface-highlight/40 border border-border rounded-xl px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-yellow/50 resize-none"
-                                    />
-                                </div>
                             </div>
                         ) : (
                             <div className="space-y-3 text-sm">
@@ -388,13 +351,58 @@ export default function ProfilePage() {
                                     <GraduationCap className="w-4 h-4 text-blue-400" />
                                     <span>Promo {promo} — {specialty}</span>
                                 </div>
-                                {bio && (
-                                    <p className="text-xs text-text-secondary/90 bg-surface-highlight/40 p-3 rounded-xl border border-border/50 italic">
-                                        &ldquo;{bio}&rdquo;
-                                    </p>
-                                )}
                             </div>
                         )}
+
+                        {/* Stripe Subscription Management Block */}
+                        <div className="p-4 rounded-2xl bg-surface/70 border border-border/80 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted font-bold">
+                                    Abonnement Kompas
+                                </span>
+                                {isPremium ? (
+                                    <span className="text-[10px] font-mono uppercase font-bold text-accent-yellow bg-accent-yellow/15 px-2 py-0.5 rounded-full border border-accent-yellow/30">
+                                        Actif
+                                    </span>
+                                ) : (
+                                    <span className="text-[10px] font-mono uppercase text-text-muted bg-surface px-2 py-0.5 rounded-full border border-border">
+                                        Gratuit
+                                    </span>
+                                )}
+                            </div>
+
+                            <div>
+                                <p className="text-sm font-bold text-text-primary">
+                                    {isPremium ? 'Kompas Premium' : 'Formule Découverte'}
+                                </p>
+                                <p className="text-xs text-text-secondary mt-0.5">
+                                    {isPremium
+                                        ? (subscriptionPlan === 'monthly' ? 'Facturation Mensuelle (4,99 €/mois)' : 'Paiement Annuel (39,99 €/an)')
+                                        : 'Accès limité à 15 questions / jour'}
+                                </p>
+                            </div>
+
+                            {isPremium ? (
+                                <button
+                                    type="button"
+                                    onClick={handleOpenStripePortal}
+                                    disabled={isPortalLoading}
+                                    className="w-full py-2 px-3 rounded-xl bg-surface hover:bg-surface-highlight border border-border text-xs font-semibold text-text-primary transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                                >
+                                    <span>{isPortalLoading ? 'Chargement Stripe...' : 'Gérer l\'abonnement & Factures'}</span>
+                                </button>
+                            ) : (
+                                <Link href="/dashboard/pricing" className="block w-full">
+                                    <button
+                                        type="button"
+                                        className="w-full py-2.5 px-3 rounded-xl bg-accent-yellow text-black font-bold text-xs hover:brightness-105 transition-all shadow-sm shadow-accent-yellow/20 flex items-center justify-center gap-1.5 cursor-pointer"
+                                    >
+                                        <Sparkles className="w-3.5 h-3.5" />
+                                        <span>Passer à Kompas Premium (3,33€/m)</span>
+                                    </button>
+                                </Link>
+                            )}
+                        </div>
                     </div>
 
                     {/* Streak & Plan Footer */}
@@ -414,6 +422,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
+
                 {/* Right: Level, XP & Key Metrics */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* XP & Level Progress Card */}
@@ -422,7 +431,7 @@ export default function ProfilePage() {
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2 text-accent-yellow text-xs font-bold uppercase tracking-wider">
                                     <Star className="w-4 h-4 fill-accent-yellow text-accent-yellow" />
-                                    Progression d&apos;ingénieur Agora
+                                    Progression d&apos;ingénieur
                                 </div>
                                 <h3 className="text-2xl font-bold font-syne text-text-primary">
                                     Niveau {stats.level} : {stats.levelTitle}
@@ -479,69 +488,13 @@ export default function ProfilePage() {
 
                         <div className="glass p-5 rounded-2xl border border-border space-y-1 text-center sm:text-left">
                             <div className="flex items-center justify-center sm:justify-start gap-2 text-text-secondary text-xs">
-                                <Award className="w-4 h-4 text-purple-400" />
-                                <span>Badges CESI</span>
+                                <Clock className="w-4 h-4 text-purple-400" />
+                                <span>Temps d&apos;étude</span>
                             </div>
-                            <div className="text-2xl font-bold font-syne text-text-primary">
-                                {INITIAL_ACHIEVEMENTS.filter(a => a.unlocked).length} / {INITIAL_ACHIEVEMENTS.length}
-                            </div>
-                            <div className="text-[11px] text-purple-400">6 débloqués</div>
+                            <div className="text-2xl font-bold font-syne text-text-primary">26h</div>
+                            <div className="text-[11px] text-purple-400">Ce mois-ci</div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            {/* Achievements / Palmarès CESI */}
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold font-syne text-text-primary flex items-center gap-2.5">
-                            <Award className="w-6 h-6 text-accent-yellow" />
-                            Palmarès & Trophées d&apos;Élève-Ingénieur
-                        </h2>
-                        <p className="text-xs text-text-secondary mt-0.5">
-                            Accomplissez des défis de révision pour débloquer des trophées exclusifs.
-                        </p>
-                    </div>
-                    <span className="text-xs font-semibold text-text-secondary">
-                        {INITIAL_ACHIEVEMENTS.filter(a => a.unlocked).length} débloqués sur {INITIAL_ACHIEVEMENTS.length}
-                    </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {INITIAL_ACHIEVEMENTS.map((ach) => (
-                        <div
-                            key={ach.id}
-                            className={`glass rounded-2xl p-5 border transition-all duration-300 relative overflow-hidden flex flex-col justify-between ${
-                                ach.unlocked
-                                    ? 'border-border/80 hover:border-accent-yellow/40 hover:-translate-y-0.5 shadow-md'
-                                    : 'opacity-50 border-border/40 grayscale'
-                            }`}
-                        >
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-3xl p-2 rounded-xl bg-surface-highlight/50 inline-block">
-                                        {ach.icon}
-                                    </span>
-                                    <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full ${getRarityBadge(ach.rarity)}`}>
-                                        {ach.rarity}
-                                    </span>
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-sm font-syne text-text-primary">{ach.title}</h3>
-                                    <p className="text-xs text-text-secondary mt-1 leading-relaxed">{ach.description}</p>
-                                </div>
-                            </div>
-
-                            <div className="pt-3 mt-4 border-t border-border/40 flex items-center justify-between text-[11px]">
-                                <span className={ach.unlocked ? 'text-emerald-400 font-semibold flex items-center gap-1' : 'text-text-secondary'}>
-                                    {ach.unlocked ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
-                                    {ach.progress}
-                                </span>
-                                {ach.unlocked && <span className="text-accent-yellow font-bold">+250 XP</span>}
-                            </div>
-                        </div>
-                    ))}
                 </div>
             </div>
         </div>

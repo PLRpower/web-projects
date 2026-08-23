@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeToggle } from './ThemeToggle';
 import { createClient } from '@/utils/supabase/client';
@@ -13,6 +14,7 @@ import {
     User as UserIcon,
     Settings,
     Archive,
+    Sparkles,
     ArrowRight
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
@@ -73,9 +75,12 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto flex items-center justify-between">
                 <div className="flex items-center gap-8">
                     <Link href="/" className="relative h-9 w-44 block group">
-                        <img
+                        <Image
                             src={mounted && resolvedTheme === 'light' ? "/img/logo-black.svg" : "/img/logo.svg"}
                             alt="Kompas | CESI"
+                            width={176}
+                            height={36}
+                            priority
                             className="h-full w-auto object-contain transition-transform group-hover:scale-102"
                         />
                     </Link>
@@ -133,12 +138,20 @@ export default function Navbar() {
                                                 Tableau de bord
                                             </Link>
                                             <Link
-                                                href="/dashboard/archives"
+                                                href="/dashboard/cctl"
                                                 onClick={() => setIsDropdownOpen(false)}
                                                 className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-surface rounded-xl transition-colors"
                                             >
                                                 <Archive size={15} className="text-accent-yellow" />
                                                 CCTL &amp; Annales
+                                            </Link>
+                                            <Link
+                                                href="/dashboard/cctl/generateur"
+                                                onClick={() => setIsDropdownOpen(false)}
+                                                className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-accent-yellow hover:text-accent-yellow hover:bg-accent-yellow/10 rounded-xl transition-colors font-semibold"
+                                            >
+                                                <Sparkles size={15} className="text-accent-yellow" />
+                                                Générateur IA de CCTL
                                             </Link>
                                             <Link
                                                 href="/dashboard/profile"

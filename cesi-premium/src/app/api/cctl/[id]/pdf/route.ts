@@ -22,6 +22,9 @@ export async function GET(
         headers.set('Content-Type', 'application/pdf');
         headers.set('Content-Disposition', `attachment; filename="${encodeURIComponent(pdfData.fileName)}"`);
         headers.set('Content-Length', pdfData.buffer.length.toString());
+        headers.set('X-Kompas-License-Watermark', 'Licence individuelle personnelle accordee a l\'eleve-ingenieur • viacesi.fr • Reproduction et diffusion publique strictement interdites');
+        headers.set('X-Kompas-Daily-Quota-Limit', '10');
+        headers.set('Cache-Control', 'private, no-cache, no-transform');
 
         return new NextResponse(new Uint8Array(pdfData.buffer), {
             status: 200,

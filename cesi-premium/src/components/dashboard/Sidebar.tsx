@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
     LayoutDashboard,
@@ -11,9 +12,11 @@ import {
     LogOut,
     User as UserIcon,
     Brain,
-    Wand2,
+    FileText,
     Users,
-    FolderGit2
+    FolderGit2,
+    Target,
+    Tv
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -22,10 +25,12 @@ import { User } from '@supabase/supabase-js';
 
 const navItems = [
     { label: 'Tableau de bord', icon: LayoutDashboard, href: '/dashboard' },
-    { label: 'CCTL', icon: Archive, href: '/dashboard/archives' },
+    { label: 'CCTL & IA', icon: Archive, href: '/dashboard/cctl' },
+    { label: 'Diagnostic & Radar', icon: Target, href: '/dashboard/diagnostic' },
+    { label: 'Live Battle Amphi', icon: Tv, href: '/live/host' },
+    { label: 'Prosits', icon: FileText, href: '/dashboard/prosits' },
     { label: 'Livrables', icon: FolderGit2, href: '/dashboard/livrables' },
     { label: 'Flashcards', icon: Brain, href: '/dashboard/flashcards' },
-    { label: 'Prosits', icon: Wand2, href: '/dashboard/prosits' },
     { label: 'Chat Promo', icon: Users, href: '/dashboard/community' },
     { label: 'Paramètres', icon: Settings, href: '/dashboard/settings' },
 ];
@@ -40,36 +45,80 @@ export default function Sidebar() {
     const [profileName, setProfileName] = useState('Élève-Ingénieur');
     const [specialty, setSpecialty] = useState('Informatique');
     const [promo, setPromo] = useState('A3');
+    const [isPremium, setIsPremium] = useState(false);
 
     useEffect(() => {
         setMounted(true);
 
-        const fetchUser = async () => {
+        const loadProfile = async () => {
+            let nameResolved = '';
+            let specialtyResolved = '';
+            let promoResolved = '';
+            let premiumResolved = false;
+
             const { data: { user } } = await supabase.auth.getUser();
             setUser(user);
-            if (user?.email) {
-                const parts = user.email.split('@')[0].split('.');
-                if (parts.length >= 2) {
-                    const first = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
-                    const last = parts[1].toUpperCase();
-                    setProfileName(`${first} ${last}`);
-                } else {
-                    setProfileName(user.email.split('@')[0]);
+            if (user) {
+                const meta = user.user_metadata;
+                premiumResolved = Boolean(
+                    meta?.is_premium === true ||
+                    meta?.subscription_tier === 'Premium' ||
+                    meta?.subscription_tier === 'Ultime' ||
+                    meta?.role === 'admin'
+                );
+
+                if (meta?.name) {
+                    nameResolved = meta.name;
+                } else if (meta?.firstname && meta?.lastname) {
+                    nameResolved = `${meta.firstname} ${meta.lastname}`.trim();
+                } else if (meta?.full_name) {
+                    nameResolved = meta.full_name;
+                } else if (user.email) {
+                    const parts = user.email.split('@')[0].split('.');
+                    if (parts.length >= 2) {
+                        const first = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+                        const last = parts[1].toUpperCase();
+                        nameResolved = `${first} ${last}`;
+                    } else {
+                        nameResolved = user.email.split('@')[0];
+                    }
                 }
+                if (meta?.specialty) specialtyResolved = meta.specialty;
+                if (meta?.promo) promoResolved = meta.promo;
             }
+
+            const savedProfile = localStorage.getItem('kompas_user_profile');
+            if (savedProfile) {
+                try {
+                    const parsed = JSON.parse(savedProfile);
+                    if (parsed.name && parsed.name !== 'Alexandre Martin') nameResolved = parsed.name;
+                    if (parsed.specialty) specialtyResolved = parsed.specialty;
+                    if (parsed.promo) promoResolved = parsed.promo;
+                    if (parsed.isPremium || parsed.subscriptionTier === 'Premium' || parsed.subscriptionTier === 'Ultime') {
+                        premiumResolved = true;
+                    }
+                } catch {}
+            }
+
+            if (nameResolved) setProfileName(nameResolved);
+            if (specialtyResolved) setSpecialty(specialtyResolved);
+            if (promoResolved) setPromo(promoResolved);
+            setIsPremium(premiumResolved);
         };
 
-        fetchUser();
+        loadProfile();
 
-        const savedProfile = localStorage.getItem('cesi_agora_user_profile');
-        if (savedProfile) {
-            try {
-                const parsed = JSON.parse(savedProfile);
-                if (parsed.name) setProfileName(parsed.name);
-                if (parsed.specialty) setSpecialty(parsed.specialty);
-                if (parsed.promo) setPromo(parsed.promo);
-            } catch {}
-        }
+        const handleProfileEvent = () => {
+            loadProfile();
+        };
+
+        window.addEventListener('kompas_profile_updated', handleProfileEvent);
+        window.addEventListener('storage', handleProfileEvent);
+
+        return () => {
+            window.removeEventListener('kompas_profile_updated', handleProfileEvent);
+            window.removeEventListener('storage', handleProfileEvent);
+        };
     }, [supabase]);
 
     const handleLogout = async () => {
@@ -82,9 +131,11 @@ export default function Sidebar() {
             {/* Logo */}
             <div className="p-5 border-b border-border/80 bg-surface/50">
                 <Link href="/" className="relative h-8 w-44 block group">
-                    <img
+                    <Image
                         src={mounted && resolvedTheme === 'light' ? "/img/logo-black.svg" : "/img/logo.svg"}
                         alt="Kompas | CESI"
+                        width={176}
+                        height={32}
                         className="h-full w-auto object-contain transition-transform group-hover:scale-102"
                     />
                 </Link>
@@ -118,27 +169,47 @@ export default function Sidebar() {
                 <Link
                     href="/dashboard/profile"
                     className={cn(
-                        "p-2.5 rounded-2xl border transition-all flex items-center gap-3 group block",
+                        "p-2.5 rounded-xl border transition-all flex flex-row items-center gap-3 group w-full",
                         pathname === '/dashboard/profile'
                             ? "bg-accent-yellow/15 border-accent-yellow/50"
                             : "bg-surface-card border-border hover:border-accent-yellow/40 hover:bg-surface"
                     )}
                 >
-                    <div className="w-10 h-10 rounded-xl bg-accent-yellow/15 text-accent-yellow border border-accent-yellow/30 flex items-center justify-center font-bold text-sm shrink-0">
-                        {profileName ? profileName.charAt(0).toUpperCase() : <UserIcon size={18} />}
+                    <div className="w-8 h-8 rounded-lg bg-accent-yellow/15 text-accent-yellow border border-accent-yellow/30 flex items-center justify-center font-bold text-xs shrink-0">
+                        {profileName ? profileName.charAt(0).toUpperCase() : <UserIcon size={15} />}
                     </div>
 
                     <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-text-primary truncate group-hover:text-accent-yellow transition-colors">
+                        <p className="text-xs font-semibold text-text-primary truncate group-hover:text-accent-yellow transition-colors leading-tight">
                             {profileName}
                         </p>
-                        <p className="text-[11px] text-text-muted font-mono truncate">
-                            {promo} • {specialty}
-                        </p>
+                        <div className="flex items-center gap-1 mt-0.5">
+                            {isPremium ? (
+                                <span className="text-[10px] font-mono font-bold text-accent-yellow flex items-center gap-0.5">
+                                    ⭐ Kompas Premium
+                                </span>
+                            ) : (
+                                <span className="text-[10px] font-mono text-text-muted">
+                                    Compte Découverte
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </Link>
 
-                <div className="flex items-center justify-between gap-2 pt-1">
+                {/* Upgrade mini button for free tier users */}
+                {!isPremium && (
+                    <Link href="/dashboard/pricing" className="block w-full">
+                        <button
+                            type="button"
+                            className="w-full py-2 px-3 rounded-xl bg-accent-yellow/15 hover:bg-accent-yellow text-accent-yellow hover:text-black border border-accent-yellow/30 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                            <span>Kompas Premium (3,33€/m)</span>
+                        </button>
+                    </Link>
+                )}
+
+                <div className="flex items-center justify-between gap-2 pt-0.5">
                     <div className="flex items-center gap-1">
                         <ThemeToggle />
                     </div>
@@ -146,7 +217,7 @@ export default function Sidebar() {
                     <button
                         type="button"
                         onClick={handleLogout}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
                         title="Se déconnecter"
                     >
                         <LogOut size={14} />
@@ -157,3 +228,4 @@ export default function Sidebar() {
         </aside>
     );
 }
+

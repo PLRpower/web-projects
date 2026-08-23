@@ -203,11 +203,8 @@ ${deliverables.split('\n').filter(d => d.trim()).map(d => `- [ ] ${d.trim()}`).j
             <div className="card-editorial p-6 sm:p-8 rounded-3xl bg-surface/60 border-border relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div className="absolute inset-0 bg-millimeter opacity-30 pointer-events-none" />
                 <div className="space-y-2 relative z-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-md bg-surface-card border border-border text-[11px] font-mono text-accent-orange">
-                        <span className="w-1.5 h-1.5 rounded-full bg-accent-orange animate-pulse" />
-                    </div>
                     <h1 className="text-3xl sm:text-4xl font-normal font-serif text-text-primary flex items-center gap-3">
-                        <Wand2 className="w-8 h-8 text-accent-orange" />
+                        <FileText className="w-8 h-8 text-accent-orange" />
                         Prosits <span className="italic font-normal">CESI</span>
                     </h1>
                     <p className="text-xs sm:text-sm text-text-secondary max-w-2xl">

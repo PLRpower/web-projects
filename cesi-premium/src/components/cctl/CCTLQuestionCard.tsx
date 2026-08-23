@@ -19,20 +19,30 @@ import {
 import { CCTLQuestion, CCTLChoice } from '@/types/cctl';
 import { CodeBlock } from './CodeBlock';
 import { Button } from '@/components/ui/button';
+import { AICoachModal } from './AICoachModal';
 
 interface CCTLQuestionCardProps {
     question: CCTLQuestion;
     mode: 'review' | 'practice';
     onUpdateQuestion?: (updated: CCTLQuestion) => void;
+    hideQuestionNumber?: boolean;
+    displayIndex?: number;
 }
 
-export function CCTLQuestionCard({ question, mode, onUpdateQuestion }: CCTLQuestionCardProps) {
+export function CCTLQuestionCard({
+    question,
+    mode,
+    onUpdateQuestion,
+    hideQuestionNumber = false,
+    displayIndex
+}: CCTLQuestionCardProps) {
     // State for practice / training mode
     const [selectedChoiceIds, setSelectedChoiceIds] = useState<string[]>([]);
     const [typedAnswer, setTypedAnswer] = useState('');
     const [matchingAnswers, setMatchingAnswers] = useState<Record<string, string>>({});
     const [hasSubmittedPractice, setHasSubmittedPractice] = useState(false);
     const [showCorrectionInPractice, setShowCorrectionInPractice] = useState(false);
+    const [isCoachOpen, setIsCoachOpen] = useState(false);
 
     const isMultiple = question.type === 'multiple_choice';
     const isNumerical = question.type === 'numerical';
@@ -153,52 +163,63 @@ export function CCTLQuestionCard({ question, mode, onUpdateQuestion }: CCTLQuest
 
     const typeBadge = getTypeBadge();
 
+    const resolvedStudentAnswerText = isShortAnswer
+        ? typedAnswer
+        : isMatching
+        ? Object.entries(matchingAnswers).map(([k, v]) => `${k} -> ${v}`).join(', ')
+        : question.choices.filter(c => selectedChoiceIds.includes(c.id)).map(c => `${c.id}. ${c.text}`).join(', ');
+
     return (
-        <div className="card-editorial rounded-3xl p-6 sm:p-7 space-y-5 bg-surface-card transition-all duration-200 hover:border-accent-yellow relative">
-            {/* Header: Question Number, Type Badge, and Student Result Status */}
+        <div className="card-editorial rounded-3xl p-6 sm:p-7 space-y-5 bg-surface-card transition-all duration-200 hover:border-accent-yellow">
+            {/* Header: Question Number on Left, Type Badge and Status on Right */}
             <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border/60">
                 <div className="flex items-center gap-2.5 flex-wrap">
-                    <span className="flex items-center justify-center px-2.5 py-1 rounded-lg bg-accent-yellow text-black font-mono font-bold text-xs shadow-xs">
-                        Q{question.number < 10 ? `0${question.number}` : question.number}
-                    </span>
-                    {question.sectionTitle && (
+                    {!hideQuestionNumber ? (
+                        <span className="flex items-center justify-center px-2.5 py-1 rounded-lg bg-accent-yellow text-black font-mono font-bold text-xs shadow-xs">
+                            Q{question.number < 10 ? `0${question.number}` : question.number}
+                        </span>
+                    ) : (
+                        <span className="flex items-center justify-center px-2.5 py-1 rounded-lg bg-accent-yellow text-black font-mono font-bold text-xs shadow-xs tracking-wider">
+                            Q##
+                        </span>
+                    )}
+                    {!hideQuestionNumber && question.sectionTitle && (
                         <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-md bg-accent-yellow/15 text-accent-yellow border border-accent-yellow/30">
                             {question.sectionTitle} {question.sectionQuestionNumber ? `• Q${question.sectionQuestionNumber}` : ''}
                         </span>
                     )}
+                </div>
+
+                <div className="flex items-center gap-2.5 flex-wrap">
                     <span className="text-[11px] font-mono font-medium px-2.5 py-0.5 rounded-md bg-surface text-text-secondary border border-border">
                         {typeBadge.label}
                     </span>
-                    {mode === 'review' && question.correctAnswersCount > 0 && (
-                        <span className="text-xs font-mono text-text-muted hidden sm:inline">
-                            • {question.correctAnswersCount} réponse{question.correctAnswersCount > 1 ? 's' : ''} attendue{question.correctAnswersCount > 1 ? 's' : ''}
-                        </span>
+                    {mode === 'review' ? (
+                        getStatusBadge()
+                    ) : (
+                        hasSubmittedPractice && (
+                            <span
+                                className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full border ${
+                                    isPracticeFullyCorrect
+                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                                        : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30'
+                                }`}
+                            >
+                                {isPracticeFullyCorrect ? (
+                                    <>
+                                        <CheckCircle2 className="w-3.5 h-3.5" />
+                                        Correct (+1 pt)
+                                    </>
+                                ) : (
+                                    <>
+                                        <XCircle className="w-3.5 h-3.5" />
+                                        Incorrect
+                                    </>
+                                )}
+                            </span>
+                        )
                     )}
                 </div>
-
-                {mode === 'review' ? (
-                    getStatusBadge()
-                ) : (
-                    hasSubmittedPractice && (
-                        <span
-                            className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full border ${
-                                isPracticeFullyCorrect
-                                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
-                                    : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30'
-                            }`}
-                        >
-                            {isPracticeFullyCorrect ? (
-                                <>
-                                    <CheckCircle2 className="w-4 h-4" /> Bonne réponse !
-                                </>
-                            ) : (
-                                <>
-                                    <XCircle className="w-4 h-4" /> Réponse incorrecte
-                                </>
-                            )}
-                        </span>
-                    )
-                )}
             </div>
 
             {/* Prompt & Statement (100% Copyable / Selectable Text) */}
@@ -495,7 +516,7 @@ export function CCTLQuestionCard({ question, mode, onUpdateQuestion }: CCTLQuest
                                     </div>
 
                                     {showCorrectionInPractice && isExpected && (
-                                        <span className="shrink-0 flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px]">
+                                        <span className="shrink-0 flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-[11px]">
                                             <Check className="w-3.5 h-3.5" /> Bonne réponse
                                         </span>
                                     )}
@@ -508,67 +529,121 @@ export function CCTLQuestionCard({ question, mode, onUpdateQuestion }: CCTLQuest
 
             {/* Practice Actions Bar */}
             {mode === 'practice' && (
-                <div className="pt-3 border-t border-border/40 flex items-center justify-between gap-3">
-                    <div className="text-xs text-text-muted font-mono">
-                        {isMatching
-                            ? 'ASSOCIATION D\'ÉLÉMENTS'
-                            : isShortAnswer
-                            ? 'SAISIE LIBRE'
-                            : isMultiple
-                            ? 'CHOIX MULTIPLES'
-                            : 'CHOIX UNIQUE'}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        {!hasSubmittedPractice ? (
+                <div className="space-y-3 pt-3 border-t border-border/40">
+                    {/* Failure Coaching Alert when student answers incorrectly */}
+                    {hasSubmittedPractice && !isPracticeFullyCorrect && (
+                        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                            <div className="flex items-center gap-2.5 text-amber-600 dark:text-amber-400 font-medium">
+                                <Sparkles className="w-4 h-4 text-accent-yellow shrink-0" />
+                                <span>Question non validée : Le Coach IA vous explique le piège et vous propose 2 exercices similaires.</span>
+                            </div>
                             <Button
                                 type="button"
                                 variant="premium"
                                 size="sm"
-                                onClick={handlePracticeSubmit}
-                                disabled={
-                                    isShortAnswer
-                                        ? !typedAnswer.trim()
-                                        : isMatching
-                                        ? !question.matchingPairs?.every(p => Boolean(matchingAnswers[p.id]))
-                                        : selectedChoiceIds.length === 0
-                                }
+                                onClick={() => setIsCoachOpen(true)}
+                                className="text-xs font-bold shrink-0 shadow-md shadow-accent-yellow/20"
                             >
-                                Valider ma réponse
+                                <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                                Expliquer la réponse (Coach IA)
                             </Button>
-                        ) : (
-                            <>
+                        </div>
+                    )}
+
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        {hasSubmittedPractice ? (
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setIsCoachOpen(true)}
+                                className="border-accent-yellow/50 bg-accent-yellow/10 hover:bg-accent-yellow/20 text-text-primary text-xs font-bold"
+                            >
+                                <Sparkles className="w-3.5 h-3.5 mr-1.5 text-accent-yellow" />
+                                Coach IA : Explication &amp; Drills
+                            </Button>
+                        ) : <div />}
+
+                        <div className="flex items-center gap-2">
+                            {!hasSubmittedPractice ? (
                                 <Button
                                     type="button"
-                                    variant="outline"
+                                    variant="premium"
                                     size="sm"
-                                    onClick={() => setShowCorrectionInPractice(!showCorrectionInPractice)}
-                                    className="border-border text-xs"
+                                    onClick={handlePracticeSubmit}
+                                    disabled={
+                                        isShortAnswer
+                                            ? !typedAnswer.trim()
+                                            : isMatching
+                                            ? !question.matchingPairs?.every(p => Boolean(matchingAnswers[p.id]))
+                                            : selectedChoiceIds.length === 0
+                                    }
                                 >
-                                    {showCorrectionInPractice ? (
-                                        <>
-                                            <EyeOff className="w-3.5 h-3.5 mr-1.5" /> Masquer corrigé
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Eye className="w-3.5 h-3.5 mr-1.5" /> Voir corrigé
-                                        </>
-                                    )}
+                                    Valider ma réponse
                                 </Button>
-                                <Button
-                                    type="button"
-                                    variant="secondary"
-                                    size="sm"
-                                    onClick={handlePracticeReset}
-                                    className="text-xs"
-                                >
-                                    <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> Réessayer
-                                </Button>
-                            </>
-                        )}
+                            ) : (
+                                <>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setShowCorrectionInPractice(!showCorrectionInPractice)}
+                                        className="border-border text-xs"
+                                    >
+                                        {showCorrectionInPractice ? (
+                                            <>
+                                                <EyeOff className="w-3.5 h-3.5 mr-1.5" /> Masquer corrigé
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Eye className="w-3.5 h-3.5 mr-1.5" /> Voir corrigé
+                                            </>
+                                        )}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={handlePracticeReset}
+                                        className="text-xs"
+                                    >
+                                        <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> Réessayer
+                                    </Button>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
+
+            {/* Review Mode Bottom Action Bar */}
+            {mode === 'review' && (
+                <div className="pt-3 border-t border-border/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                    <span className="text-text-muted flex items-center gap-1.5 text-[11px]">
+                        <Sparkles className="w-3.5 h-3.5 text-accent-yellow" />
+                        Tuteur IA disponible pour détailler le raisonnement et tester des variantes.
+                    </span>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsCoachOpen(true)}
+                        className="border-accent-yellow/40 hover:bg-accent-yellow/10 text-xs font-bold text-text-primary"
+                    >
+                        <Sparkles className="w-3.5 h-3.5 mr-1.5 text-accent-yellow" />
+                        Coach IA : Raisonnement Pas-à-Pas
+                    </Button>
+                </div>
+            )}
+
+            {/* Interactive Coach IA Modal */}
+            <AICoachModal
+                isOpen={isCoachOpen}
+                onClose={() => setIsCoachOpen(false)}
+                question={question}
+                studentAnswerText={resolvedStudentAnswerText}
+                isCorrect={mode === 'practice' ? isPracticeFullyCorrect : true}
+            />
         </div>
     );
 }

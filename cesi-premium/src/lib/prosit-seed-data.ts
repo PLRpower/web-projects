@@ -190,7 +190,7 @@ export const ALL_SEED_PROSITS: PrositEntry[] = [
         promo: 'A2',
         specialty: 'Généraliste',
         year: '2025',
-        authorName: 'Équipe Agora CESI',
+        authorName: 'Équipe Kompas',
         isAnonymous: true,
         publishedAt: '2025-12-05T10:00:00.000Z',
         viewsCount: 340,

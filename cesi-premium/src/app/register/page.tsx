@@ -1,6 +1,7 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
@@ -9,11 +10,23 @@ import { signup } from '@/app/auth/actions';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { createClient } from '@/utils/supabase/client';
 
 export default function RegisterPage() {
     const [state, dispatch] = useActionState(signup, null);
+    const router = useRouter();
+
+    useEffect(() => {
+        const supabase = createClient();
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            if (user) {
+                router.replace('/dashboard');
+            }
+        });
+    }, [router]);
 
     return (
+
         <div className="min-h-screen flex relative bg-background">
             {/* Back to Home */}
             <Link

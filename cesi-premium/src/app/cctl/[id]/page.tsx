@@ -28,55 +28,69 @@ import { Button } from '@/components/ui/button';
 import { CodeBlock } from '@/components/cctl/CodeBlock';
 import { ALL_SEED_CCTLS } from '@/lib/cctl-seed-data';
 import { PublishedCCTLEntry } from '@/lib/cctl-store';
+import { formatAcademicYear } from '@/types/cctl';
 
 export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const router = useRouter();
 
-    const [cctlEntry, setCctlEntry] = useState<PublishedCCTLEntry>(() => {
-        return ALL_SEED_CCTLS.find(c => c.id === id) || ALL_SEED_CCTLS[0];
-    });
+    const [cctlEntry, setCctlEntry] = useState<PublishedCCTLEntry | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchCctl = async () => {
+            setIsLoading(true);
             try {
                 const res = await fetch(`/api/cctl/${id}`);
                 const data = await res.json();
                 if (data.success && data.cctl) {
                     setCctlEntry(data.cctl);
+                } else {
+                    const fallback = ALL_SEED_CCTLS.find(c => c.id === id);
+                    if (fallback) setCctlEntry(fallback);
                 }
             } catch (e) {
                 console.error('Failed to load cctl dynamically:', e);
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchCctl();
     }, [id]);
 
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-background flex flex-col justify-between">
+                <Navbar />
+                <main className="container mx-auto px-4 py-32 flex flex-col items-center justify-center space-y-4">
+                    <div className="w-8 h-8 rounded-full border-2 border-accent-yellow border-t-transparent animate-spin" />
+                    <p className="text-sm text-text-secondary">Chargement de l&apos;examen...</p>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
+
+    if (!cctlEntry) {
+        return (
+            <div className="min-h-screen bg-background flex flex-col justify-between">
+                <Navbar />
+                <main className="container mx-auto px-4 py-32 text-center space-y-4">
+                    <h1 className="text-2xl font-bold font-syne">Examen introuvable</h1>
+                    <p className="text-sm text-text-secondary">Le CCTL demandé n&apos;existe pas ou a été archivé.</p>
+                    <Link href="/cctl">
+                        <Button variant="premium">Retour aux CCTLs</Button>
+                    </Link>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
+
     const exam = cctlEntry.exam;
 
-    // Modal state for locked features
-    const [lockedModal, setLockedModal] = useState<{
-        open: boolean;
-        title: string;
-        description: string;
-        actionLabel: string;
-        targetUrl: string;
-    }>({
-        open: false,
-        title: '',
-        description: '',
-        actionLabel: 'Se connecter',
-        targetUrl: '/login'
-    });
-
-    const triggerLockedFeature = (featureName: string, description: string, targetUrl: string = `/login?redirect=/dashboard/archives/${id}`) => {
-        setLockedModal({
-            open: true,
-            title: featureName,
-            description,
-            actionLabel: 'Se connecter / Créer un compte',
-            targetUrl
-        });
+    const redirectToRegister = (targetUrl: string = `/register?redirect=/dashboard/cctl/${id}`) => {
+        router.push(targetUrl);
     };
 
     return (
@@ -104,7 +118,7 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                                     {cctlEntry.specialty ? `${cctlEntry.specialty} • ${cctlEntry.promo}` : cctlEntry.promo}
                                 </span>
                                 <span className="px-3 py-1 rounded-full bg-surface text-text-secondary font-mono font-medium text-xs border border-border">
-                                    {cctlEntry.year}
+                                    {formatAcademicYear(cctlEntry.year)}
                                 </span>
                                 <span className="px-3 py-1 rounded-full bg-surface text-text-secondary font-medium text-xs border border-border">
                                     {cctlEntry.domain}
@@ -133,12 +147,8 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                             <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => triggerLockedFeature(
-                                    'Masquer les réponses & S\'entraîner',
-                                    'Pour masquer les réponses et tester vos connaissances en mode interactif sans tricher, connectez-vous à votre compte étudiant Kompas | CESI.',
-                                    `/login?redirect=/dashboard/archives/${id}`
-                                )}
-                                className="border-border hover:border-accent-yellow text-xs font-semibold"
+                                onClick={() => redirectToRegister(`/register?redirect=/dashboard/cctl/${id}`)}
+                                className="border-border hover:border-accent-yellow text-xs font-semibold cursor-pointer"
                             >
                                 <EyeOff className="w-3.5 h-3.5 mr-1.5 text-accent-yellow" />
                                 Cacher les réponses
@@ -148,12 +158,8 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                             <Button
                                 variant="premium"
                                 size="sm"
-                                onClick={() => triggerLockedFeature(
-                                    'Simulateur d\'Examen Chronométré',
-                                    'Le mode examen reproduit les conditions réelles du CCTL avec un compte à rebours de 45 minutes, le calcul de la note sur 20 et le décompte des discordances.',
-                                    `/login?redirect=/dashboard/training`
-                                )}
-                                className="text-xs font-bold shadow-md shadow-accent-yellow/20"
+                                onClick={() => redirectToRegister(`/register?redirect=/dashboard/cctl/${id}`)}
+                                className="text-xs font-bold shadow-md shadow-accent-yellow/20 cursor-pointer"
                             >
                                 <Zap className="w-3.5 h-3.5 mr-1.5" />
                                 Mode Entraînement /20
@@ -163,12 +169,8 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                             <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => triggerLockedFeature(
-                                    'Flashcards de Mémorisation',
-                                    'Révisez ce sujet de CCTL avec des cartes interactives 3D recto/verso et suivez votre niveau de maîtrise question par question.',
-                                    `/login?redirect=/dashboard/training`
-                                )}
-                                className="border-border text-xs font-semibold"
+                                onClick={() => redirectToRegister(`/register?redirect=/dashboard/cctl/${id}`)}
+                                className="border-border text-xs font-semibold cursor-pointer"
                             >
                                 <Brain className="w-3.5 h-3.5 mr-1.5 text-accent-yellow" />
                                 Flashcards
@@ -179,12 +181,8 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => triggerLockedFeature(
-                                'Télécharger le Sujet en PDF',
-                                'Connectez-vous pour télécharger les sujets complets d\'examens CCTL au format PDF original avec mise en page CESI.',
-                                `/login?redirect=/dashboard/archives/${id}`
-                            )}
-                            className="border-border text-xs text-text-secondary hover:text-text-primary"
+                            onClick={() => redirectToRegister(`/register?redirect=/dashboard/cctl/${id}`)}
+                            className="border-border text-xs text-text-secondary hover:text-text-primary cursor-pointer"
                         >
                             <Download className="w-3.5 h-3.5 mr-1.5" />
                             Télécharger PDF
@@ -231,15 +229,11 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
 
                                     <button
                                         type="button"
-                                        onClick={() => triggerLockedFeature(
-                                            'Mode Entraînement Interactif',
-                                            'Pour cocher vos propres réponses et obtenir une note personnalisée sur 20, lancez le mode entraînement.',
-                                            `/login?redirect=/dashboard/training`
-                                        )}
-                                        className="text-xs text-text-secondary hover:text-accent-yellow font-medium transition-colors flex items-center gap-1"
+                                        onClick={() => redirectToRegister(`/register?redirect=/dashboard/cctl/${id}`)}
+                                        className="text-xs text-text-secondary hover:text-accent-yellow font-medium transition-colors flex items-center gap-1 cursor-pointer"
                                     >
-                                        <Lock className="w-3 h-3" />
-                                        Tester en mode quiz
+                                        <Sparkles className="w-3 h-3 text-accent-yellow" />
+                                        Tester en mode entraînement
                                     </button>
                                 </div>
 
@@ -338,48 +332,6 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                     </div>
                 </div>
             </main>
-
-            {/* Modal for Locked Actions */}
-            {lockedModal.open && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                    <div className="glass rounded-3xl border border-accent-yellow/30 bg-surface p-6 sm:p-8 max-w-md w-full space-y-6 shadow-2xl relative animate-in zoom-in-95 duration-200">
-                        <button
-                            type="button"
-                            onClick={() => setLockedModal({ ...lockedModal, open: false })}
-                            className="absolute top-4 right-4 p-2 rounded-full hover:bg-surface-highlight text-text-secondary hover:text-text-primary transition-colors"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
-
-                        <div className="space-y-3 text-center pt-2">
-                            <div className="w-14 h-14 rounded-2xl bg-accent-yellow/15 text-accent-yellow border border-accent-yellow/30 flex items-center justify-center mx-auto text-2xl shadow-lg">
-                                <Lock className="w-7 h-7" />
-                            </div>
-                            <h3 className="text-xl font-normal font-serif text-text-primary">
-                                {lockedModal.title}
-                            </h3>
-                            <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-                                {lockedModal.description}
-                            </p>
-                        </div>
-
-                        <div className="space-y-3 pt-2">
-                            <Link href="/login" className="block w-full">
-                                <Button variant="premium" className="w-full font-bold shadow-lg shadow-accent-yellow/20">
-                                    Se connecter avec mon compte CESI
-                                    <ArrowRight className="w-4 h-4 ml-2" />
-                                </Button>
-                            </Link>
-
-                            <Link href="/register" className="block w-full">
-                                <Button variant="outline" className="w-full border-border/70 font-semibold text-xs">
-                                    Créer un compte gratuit
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             <Footer />
         </div>

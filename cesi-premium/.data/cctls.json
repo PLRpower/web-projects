@@ -10,7 +10,7 @@
     "authorName": "Étudiant CESI",
     "isAnonymous": false,
     "publishedAt": "2026-08-18T19:54:58.256Z",
-    "viewsCount": 155,
+    "viewsCount": 178,
     "downloadsCount": 87,
     "typesSummary": [
       "QCM Unique",
@@ -2431,7 +2431,7 @@
     "authorName": "Enseignant CESI Génie Logiciel",
     "isAnonymous": false,
     "publishedAt": "2026-01-18T08:30:00.000Z",
-    "viewsCount": 184,
+    "viewsCount": 187,
     "downloadsCount": 92,
     "hasPdf": true,
     "pdfFileName": "CCTL_FISA_A3_Archi_Patterns_2026.pdf",
@@ -5036,7 +5036,7 @@
     "authorName": "Enseignant CESI Systèmes & C",
     "isAnonymous": false,
     "publishedAt": "2025-09-25T09:00:00.000Z",
-    "viewsCount": 138,
+    "viewsCount": 143,
     "downloadsCount": 65,
     "hasPdf": true,
     "pdfFileName": "CCTL_A2_Linux_Systeme_C_2025.pdf",
@@ -5579,6 +5579,448 @@
         "fileName": "CCTL_A2_Linux_Systeme_C_2025.pdf",
         "totalPages": 6,
         "parsedAt": "2026-08-18T23:53:41.784Z",
+        "source": "database"
+      }
+    }
+  },
+  {
+    "id": "cctl-mt5qkzze-jbyv",
+    "title": "CCTL Blanc Inédit - Testy (A3)",
+    "subject": "Testy",
+    "promo": "A3",
+    "year": "2026 - 2027",
+    "domain": "Informatique & Logiciel",
+    "totalQuestions": 10,
+    "authorName": "Étudiant CESI",
+    "isAnonymous": false,
+    "publishedAt": "2026-08-23T11:41:18.506Z",
+    "viewsCount": 6,
+    "downloadsCount": 0,
+    "hasPdf": false,
+    "pdfFileName": "Testy_A3_2026 - 2027.pdf",
+    "typesSummary": [
+      "QCM Unique",
+      "QCM Multiple",
+      "Code Snippets",
+      "Association"
+    ],
+    "exam": {
+      "id": "cctl-mt5qkzze-jbyv",
+      "title": "CCTL Blanc Inédit - Testy (A3)",
+      "subject": "Testy",
+      "promo": "A3",
+      "specialty": "Informatique",
+      "domain": "Informatique & Logiciel",
+      "year": "2026 - 2027",
+      "description": "Examen blanc sur-mesure généré par l'IA Kompas selon les critères officiels CESI à partir de vos notes de cours.",
+      "difficulty": "Examen Officiel Blanc",
+      "durationMinutes": 30,
+      "totalQuestions": 10,
+      "sections": [
+        {
+          "id": "sec-1",
+          "title": "Partie 1 : Fondations & Théorie",
+          "questionCount": 5
+        },
+        {
+          "id": "sec-2",
+          "title": "Partie 2 : Analyse de Code & Architecture",
+          "questionCount": 5
+        }
+      ],
+      "questions": [
+        {
+          "id": "q-ai-1",
+          "number": 1,
+          "sectionTitle": "DL1 Sécurité Web & Auth",
+          "sectionQuestionNumber": 1,
+          "type": "single_choice",
+          "typeLabel": "Question à réponse unique",
+          "status": "correct",
+          "discordanceCount": 0,
+          "prompt": "Quelle est la principale vulnérabilité introduite lorsqu'un jeton JWT (JSON Web Token) d'authentification est stocké directement dans le `localStorage` du navigateur ?",
+          "codeLanguage": "typescript",
+          "choices": [
+            {
+              "id": "A",
+              "text": "L'exposition directe aux attaques de type Cross-Site Scripting (XSS) permettant l'exfiltration du token via JavaScript.",
+              "isExpected": true
+            },
+            {
+              "id": "B",
+              "text": "La vulnérabilité aux attaques CSRF (Cross-Site Request Forgery) automatiques sur chaque requête fetch.",
+              "isExpected": false
+            },
+            {
+              "id": "C",
+              "text": "L'impossibilité pour le serveur d'utiliser le protocole HTTPS avec des en-têtes Authorization.",
+              "isExpected": false
+            },
+            {
+              "id": "D",
+              "text": "L'expiration automatique du jeton dès la fermeture de l'onglet par le garbage collector.",
+              "isExpected": false
+            }
+          ],
+          "correctAnswersCount": 1,
+          "points": 1,
+          "explanation": "Le localStorage est totalement accessible par n'importe quel script JavaScript exécuté sur la page. Une faille XSS permet d'exfiltrer immédiatement le jeton. La recommandation de sécurité OWASP est d'utiliser un cookie `HttpOnly` et `SameSite=Strict/Lax`."
+        },
+        {
+          "id": "q-ai-2",
+          "number": 2,
+          "sectionTitle": "DL1 Sécurité Web & Auth",
+          "sectionQuestionNumber": 2,
+          "type": "multiple_choice",
+          "typeLabel": "Question à choix multiples",
+          "status": "correct",
+          "discordanceCount": 0,
+          "prompt": "Quels en-têtes HTTP de sécurité doivent impérativement être configurés pour limiter les attaques d'injection et de détournement de clics (Clickjacking) ? (Sélectionnez 2 réponses)",
+          "codeLanguage": "typescript",
+          "choices": [
+            {
+              "id": "A",
+              "text": "Content-Security-Policy (CSP)",
+              "isExpected": true
+            },
+            {
+              "id": "B",
+              "text": "X-Frame-Options: DENY ou SAMEORIGIN",
+              "isExpected": true
+            },
+            {
+              "id": "C",
+              "text": "Access-Control-Allow-Origin: *",
+              "isExpected": false
+            },
+            {
+              "id": "D",
+              "text": "Cache-Control: public, max-age=31536000",
+              "isExpected": false
+            }
+          ],
+          "correctAnswersCount": 2,
+          "points": 1,
+          "explanation": "`Content-Security-Policy` restreint les sources autorisées pour les scripts, styles et iframes, et `X-Frame-Options` empêche l'intégration frauduleuse de l'application dans une iframe invisible (Clickjacking)."
+        },
+        {
+          "id": "q-ai-3",
+          "number": 3,
+          "sectionTitle": "DL2 Architecture React & State",
+          "sectionQuestionNumber": 3,
+          "type": "code_analysis",
+          "typeLabel": "Analyse de Code",
+          "status": "correct",
+          "discordanceCount": 0,
+          "prompt": "Analysez l'extrait de code React / Next.js ci-dessous. Quel est le problème d'exécution provoqué par ce composant ?",
+          "codeSnippet": "import { useState, useEffect } from 'react';\n\nexport function UserDashboard({ userId }: { userId: string }) {\n  const [data, setData] = useState<any>(null);\n\n  useEffect(() => {\n    fetch('/api/user/' + userId)\n      .then(res => res.json())\n      .then(json => setData(json));\n  }); // <-- Remarquez les dépendances\n\n  return <div>{data?.name}</div>;\n}",
+          "codeLanguage": "typescript",
+          "choices": [
+            {
+              "id": "A",
+              "text": "Le composant entre dans une boucle infinie de re-renders car useEffect sans tableau de dépendances s'exécute après chaque setState.",
+              "isExpected": true
+            },
+            {
+              "id": "B",
+              "text": "Une erreur de compilation TypeScript car useState n'accepte pas le type générique any.",
+              "isExpected": false
+            },
+            {
+              "id": "C",
+              "text": "La requête fetch est bloquée par CORS car Next.js interdit les chemins relatifs.",
+              "isExpected": false
+            },
+            {
+              "id": "D",
+              "text": "Le composant refuse de monter car useEffect ne retourne pas de fonction de nettoyage (cleanup).",
+              "isExpected": false
+            }
+          ],
+          "correctAnswersCount": 1,
+          "points": 1,
+          "explanation": "Sans second argument `[]` ou `[userId]`, le hook `useEffect` s'exécute à CHAQUE rendu. Comme le callback appelle `setData`, cela déclenche un nouveau re-render, menant à une boucle infinie."
+        },
+        {
+          "id": "q-ai-4",
+          "number": 4,
+          "sectionTitle": "DL2 Architecture React & State",
+          "sectionQuestionNumber": 4,
+          "type": "matching",
+          "typeLabel": "Association d'éléments",
+          "status": "correct",
+          "discordanceCount": 0,
+          "prompt": "Associez chaque concept d'architecture logicielle à sa définition ou à son cas d'usage optimal :",
+          "codeLanguage": "typescript",
+          "choices": [],
+          "matchingPairs": [
+            {
+              "id": "A",
+              "leftItem": "Server-Side Rendering (SSR)",
+              "rightExpected": "Génération du HTML à chaque requête HTTP pour données dynamiques et SEO"
+            },
+            {
+              "id": "B",
+              "leftItem": "Incremental Static Regeneration (ISR)",
+              "rightExpected": "Revalidation en arrière-plan de pages statiques après un intervalle défini"
+            },
+            {
+              "id": "C",
+              "leftItem": "Client-Side Rendering (CSR)",
+              "rightExpected": "Exécution du bundle JS dans le navigateur avec SPA interactive"
+            },
+            {
+              "id": "D",
+              "leftItem": "Edge Middleware",
+              "rightExpected": "Routage, authentification et réécriture ultra-rapide au plus proche de l'utilisateur"
+            }
+          ],
+          "correctAnswersCount": 1,
+          "points": 1,
+          "explanation": "Le SSR génère le DOM côté serveur à chaque appel, l'ISR permet d'avoir la vitesse du statique avec un rafraîchissement périodique en tâche de fond, le CSR déporte le rendu dans le navigateur client, et le Middleware Edge filtre les requêtes en amont."
+        },
+        {
+          "id": "q-ai-5",
+          "number": 5,
+          "sectionTitle": "DL3 Bases de Données & Transactions",
+          "sectionQuestionNumber": 5,
+          "type": "single_choice",
+          "typeLabel": "Question à réponse unique",
+          "status": "correct",
+          "discordanceCount": 0,
+          "prompt": "Dans le cadre des propriétés ACID des SGBD relationnels (PostgreSQL, MySQL), que garantit précisément la propriété d'Isolation ?",
+          "codeLanguage": "typescript",
+          "choices": [
+            {
+              "id": "A",
+              "text": "L'exécution concurrente de plusieurs transactions produit le même état que si elles avaient été exécutées séquentiellement.",
+              "isExpected": true
+            },
+            {
+              "id": "B",
+              "text": "Toutes les opérations d'une transaction sont validées ou aucune ne l'est (tout ou rien).",
+              "isExpected": false
+            },
+            {
+              "id": "C",
+              "text": "Une fois validées (COMMIT), les modifications persistent même en cas de panne de courant.",
+              "isExpected": false
+            },
+            {
+              "id": "D",
+              "text": "La base de données passe toujours d'un état valide à un autre en respectant les contraintes d'intégrité.",
+              "isExpected": false
+            }
+          ],
+          "correctAnswersCount": 1,
+          "points": 1,
+          "explanation": "A = Atomicité (tout ou rien), C = Cohérence (respect des règles d'intégrité), I = Isolation (les transactions concurrentes ne se parasitent pas), D = Durabilité (persistance sur disque après COMMIT)."
+        },
+        {
+          "id": "q-ai-6",
+          "number": 6,
+          "sectionTitle": "DL3 Bases de Données & Transactions",
+          "sectionQuestionNumber": 1,
+          "type": "code_analysis",
+          "typeLabel": "Analyse de Code",
+          "status": "correct",
+          "discordanceCount": 0,
+          "prompt": "Considérez la table `orders` indexée sur `(created_at, status)`. Pourquoi la requête ci-dessous ne peut-elle pas utiliser efficacement l'index B-Tree ?",
+          "codeSnippet": "SELECT * FROM orders \nWHERE DATE(created_at) = '2025-01-15' \nAND status = 'COMPLETED';",
+          "codeLanguage": "sql",
+          "choices": [
+            {
+              "id": "A",
+              "text": "L'application de la fonction `DATE()` sur la colonne indexée empêche le moteur de parcourir l'index sans balayage complet (sauf index fonctionnel).",
+              "isExpected": true
+            },
+            {
+              "id": "B",
+              "text": "Le mot-clé `SELECT *` désactive automatiquement tous les index de la table.",
+              "isExpected": false
+            },
+            {
+              "id": "C",
+              "text": "L'opérateur `=` n'est pas compatible avec les index B-Tree (seul `LIKE` est supporté).",
+              "isExpected": false
+            },
+            {
+              "id": "D",
+              "text": "La clause `AND` oblige le SGBD à créer une table temporaire en mémoire RAM.",
+              "isExpected": false
+            }
+          ],
+          "correctAnswersCount": 1,
+          "points": 1,
+          "explanation": "Envelopper une colonne indexée dans une fonction scalaire (`DATE(col)`) empêche le planificateur d'utiliser l'index direct. Il faut écrire : `created_at >= '2025-01-15 00:00:00' AND created_at < '2025-01-16 00:00:00'`."
+        },
+        {
+          "id": "q-ai-7",
+          "number": 7,
+          "sectionTitle": "DL4 Principes SOLID & Design Patterns",
+          "sectionQuestionNumber": 2,
+          "type": "single_choice",
+          "typeLabel": "Question à réponse unique",
+          "status": "correct",
+          "discordanceCount": 0,
+          "prompt": "Quel principe SOLID est directement enfreint lorsqu'une classe dérivée lève une `NotSupportedException` sur une méthode imposée par sa classe de base ?",
+          "codeLanguage": "typescript",
+          "choices": [
+            {
+              "id": "A",
+              "text": "Le principe de substitution de Liskov (LSP - Liskov Substitution Principle).",
+              "isExpected": true
+            },
+            {
+              "id": "B",
+              "text": "Le principe de responsabilité unique (SRP - Single Responsibility Principle).",
+              "isExpected": false
+            },
+            {
+              "id": "C",
+              "text": "Le principe ouvert/fermé (OCP - Open/Closed Principle).",
+              "isExpected": false
+            },
+            {
+              "id": "D",
+              "text": "Le principe d'inversion des dépendances (DIP - Dependency Inversion Principle).",
+              "isExpected": false
+            }
+          ],
+          "correctAnswersCount": 1,
+          "points": 1,
+          "explanation": "Le principe de Liskov stipule que les objets d'un programme doivent pouvoir être remplacés par des instances de leurs sous-types sans altérer la cohérence du programme. Si une sous-classe refuse d'exécuter un comportement du parent, le contrat est rompu."
+        },
+        {
+          "id": "q-ai-8",
+          "number": 8,
+          "sectionTitle": "DL4 Principes SOLID & Design Patterns",
+          "sectionQuestionNumber": 3,
+          "type": "matching",
+          "typeLabel": "Association d'éléments",
+          "status": "correct",
+          "discordanceCount": 0,
+          "prompt": "Associez chaque Design Pattern à sa famille et à son intention principale :",
+          "codeLanguage": "typescript",
+          "choices": [],
+          "matchingPairs": [
+            {
+              "id": "A",
+              "leftItem": "Adapter (Adaptateur)",
+              "rightExpected": "Convertit l'interface d'une classe en une autre interface attendue par le client"
+            },
+            {
+              "id": "B",
+              "leftItem": "Observer (Observateur)",
+              "rightExpected": "Définit une relation 1-à-N pour notifier automatiquement les objets d'un changement"
+            },
+            {
+              "id": "C",
+              "leftItem": "Strategy (Stratégie)",
+              "rightExpected": "Encapsule des algorithmes interchangeables au runtime dans des classes distinctes"
+            },
+            {
+              "id": "D",
+              "leftItem": "Decorator (Décorateur)",
+              "rightExpected": "Ajoute dynamiquement des responsabilités supplémentaires à un objet sans modifier sa classe"
+            }
+          ],
+          "correctAnswersCount": 1,
+          "points": 1,
+          "explanation": "L'Adapter convertit les interfaces incompatibles, l'Observer diffuse des événements d'état, la Strategy permet de varier l'algorithme à la volée, et le Decorator étend les fonctionnalités par composition."
+        },
+        {
+          "id": "q-ai-9",
+          "number": 9,
+          "sectionTitle": "DL5 Conteneurisation & DevOps",
+          "sectionQuestionNumber": 4,
+          "type": "multiple_choice",
+          "typeLabel": "Question à choix multiples",
+          "status": "correct",
+          "discordanceCount": 0,
+          "prompt": "Quelles sont les bonnes pratiques fondamentales lors de la rédaction d'un `Dockerfile` de production en environnement Node.js / Next.js ? (Sélectionnez 2 réponses)",
+          "codeLanguage": "typescript",
+          "choices": [
+            {
+              "id": "A",
+              "text": "Utiliser un Multi-Stage Build pour exclure les dépendances de développement et le code source brut de l'image finale.",
+              "isExpected": true
+            },
+            {
+              "id": "B",
+              "text": "Exécuter l'application avec un utilisateur non-root (`USER node`) pour restreindre les privilèges en cas de compromission.",
+              "isExpected": true
+            },
+            {
+              "id": "C",
+              "text": "Copier l'intégralité du répertoire avec `COPY . .` avant d'exécuter `npm install` pour maximiser le cache Docker.",
+              "isExpected": false
+            },
+            {
+              "id": "D",
+              "text": "Désactiver le fichier `.dockerignore` pour s'assurer que `node_modules` local est injecté tel quel.",
+              "isExpected": false
+            }
+          ],
+          "correctAnswersCount": 2,
+          "points": 1,
+          "explanation": "Le Multi-Stage Build réduit considérablement la taille de l'image et la surface d'attaque. L'exécution sous un utilisateur non-root limite les risques d'évasion de conteneur."
+        },
+        {
+          "id": "q-ai-10",
+          "number": 10,
+          "sectionTitle": "DL5 Conteneurisation & DevOps",
+          "sectionQuestionNumber": 5,
+          "type": "single_choice",
+          "typeLabel": "Question à réponse unique",
+          "status": "correct",
+          "discordanceCount": 0,
+          "prompt": "En Kubernetes, quel objet de ressource permet d'exposer un ensemble de Pods avec une IP virtuelle stable et d'assurer la répartition de charge interne au cluster ?",
+          "codeLanguage": "typescript",
+          "choices": [
+            {
+              "id": "A",
+              "text": "Service (de type ClusterIP ou NodePort)",
+              "isExpected": true
+            },
+            {
+              "id": "B",
+              "text": "ConfigMap",
+              "isExpected": false
+            },
+            {
+              "id": "C",
+              "text": "PersistentVolumeClaim (PVC)",
+              "isExpected": false
+            },
+            {
+              "id": "D",
+              "text": "HorizontalPodAutoscaler (HPA)",
+              "isExpected": false
+            }
+          ],
+          "correctAnswersCount": 1,
+          "points": 1,
+          "explanation": "Un `Service` Kubernetes fournit une adresse IP virtuelle unique et un nom DNS interne permanent pour router le trafic vers les Pods ciblés par son sélecteur de labels."
+        }
+      ],
+      "stats": {
+        "correctCount": 10,
+        "partialCount": 0,
+        "incorrectCount": 0,
+        "totalDiscordances": 0,
+        "typeCounts": {
+          "single_choice": 4,
+          "multiple_choice": 2,
+          "matching": 2,
+          "fill_blank": 0,
+          "code_analysis": 2
+        }
+      },
+      "metadata": {
+        "fileName": "cctl_blanc_ia.pdf",
+        "totalPages": 4,
+        "parsedAt": "2026-08-23T11:41:18.498Z",
         "source": "database"
       }
     }

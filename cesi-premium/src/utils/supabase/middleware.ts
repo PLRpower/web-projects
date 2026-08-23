@@ -51,10 +51,18 @@ export async function updateSession(request: NextRequest) {
     // of sync and terminate the user's session prematurely!
 
     try {
-        await supabase.auth.getUser()
+        const { data: { user } } = await supabase.auth.getUser()
+
+        const authRoutes = ['/login', '/register', '/forgot-password']
+        if (user && authRoutes.includes(request.nextUrl.pathname)) {
+            const redirectUrl = request.nextUrl.clone()
+            redirectUrl.pathname = '/dashboard'
+            return NextResponse.redirect(redirectUrl)
+        }
     } catch (e) {
         // Ignore network / connection errors in middleware so page rendering isn't blocked
     }
 
     return supabaseResponse
 }
+

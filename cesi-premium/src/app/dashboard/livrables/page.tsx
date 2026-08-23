@@ -164,10 +164,6 @@ ${livrable.tags.map(t => `- \`${t}\``).join('\n')}
             <div className="card-editorial p-6 sm:p-8 rounded-3xl bg-surface/60 border-border relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div className="absolute inset-0 bg-millimeter opacity-30 pointer-events-none" />
                 <div className="space-y-2 relative z-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-md bg-surface-card border border-border text-[11px] font-mono text-text-secondary">
-                        <span className="w-1.5 h-1.5 rounded-full bg-accent-yellow animate-pulse" />
-                        <span>RENDUS DE BLOC // MODÈLES &amp; LIVRABLES OFFICIELS</span>
-                    </div>
                     <h1 className="text-3xl sm:text-4xl font-normal font-serif text-text-primary flex items-center gap-3">
                         <FolderGit2 className="w-8 h-8 text-accent-yellow" />
                         Livrables <span className="italic font-normal">de Projet</span>

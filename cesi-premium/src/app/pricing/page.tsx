@@ -1,13 +1,5 @@
-import Navbar from '@/components/Navbar';
-import Pricing from '@/components/Pricing';
-import Footer from '@/components/Footer';
+import { redirect } from 'next/navigation';
 
 export default function PricingPage() {
-    return (
-        <main className="min-h-screen pt-20">
-            <Navbar />
-            <Pricing />
-            <Footer />
-        </main>
-    );
+    redirect('/dashboard/pricing');
 }

@@ -19,7 +19,9 @@ import {
     Eye,
     Shield,
     Calendar,
-    GraduationCap
+    GraduationCap,
+    Gift,
+    Crown
 } from 'lucide-react';
 import { CCTLExam, CCTLQuestion } from '@/types/cctl';
 import { CCTLDropzone } from '@/components/cctl/CCTLDropzone';
@@ -27,6 +29,8 @@ import { CCTLQuestionCard } from '@/components/cctl/CCTLQuestionCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { claimContributionReward } from '@/lib/rewards-store';
+import { RewardCelebrationModal } from '@/components/rewards/RewardCelebrationModal';
 
 export default function ImportCCTLPage() {
     const [exam, setExam] = useState<CCTLExam | null>(null);
@@ -43,6 +47,10 @@ export default function ImportCCTLPage() {
     const [isPublishing, setIsPublishing] = useState(false);
     const [publishedResult, setPublishedResult] = useState<any>(null);
     const [publishError, setPublishError] = useState<string | null>(null);
+
+    // Crowdsourcing Reward State
+    const [awardedReward, setAwardedReward] = useState<any>(null);
+    const [isRewardModalOpen, setIsRewardModalOpen] = useState(false);
 
     // Question filter state
     const [searchQuery, setSearchQuery] = useState('');
@@ -99,6 +107,16 @@ export default function ImportCCTLPage() {
             }
 
             setPublishedResult(data.published);
+
+            // Award crowdsourcing bonus: +1 Month Premium and +50 AI Credits
+            const reward = claimContributionReward({
+                type: 'cctl_upload',
+                title: `${pubSubject} (${pubPromo} - ${pubYear})`,
+                bonusMonths: 1,
+                aiCredits: 50
+            });
+            setAwardedReward(reward);
+            setIsRewardModalOpen(true);
         } catch (err: any) {
             console.error('Publish error:', err);
             setPublishError(err?.message || 'Une erreur est survenue lors de la publication.');
@@ -125,16 +143,12 @@ export default function ImportCCTLPage() {
             <div className="card-editorial p-6 sm:p-8 rounded-3xl bg-surface/60 border-border relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div className="absolute inset-0 bg-millimeter opacity-30 pointer-events-none" />
                 <div className="space-y-2 relative z-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-md bg-surface-card border border-border text-[11px] font-mono text-text-secondary">
-                        <span className="w-1.5 h-1.5 rounded-full bg-accent-yellow animate-pulse" />
-                        <span>NUMÉRISATION // PARSER AUTOMATIQUE</span>
-                    </div>
                     <h1 className="text-3xl sm:text-4xl font-normal font-serif flex items-center gap-3 text-text-primary">
                         <Share2 className="w-8 h-8 text-accent-yellow" />
                         Publier un <span className="italic font-normal">CCTL</span>
                     </h1>
                     <p className="text-xs sm:text-sm text-text-secondary">
-                        Vous venez de passer un examen ? Déposez votre export PDF pour enrichir les archives et aider les promotions futures.
+                        Vous venez de passer un examen ? Déposez votre export PDF pour enrichir les archives et débloquer vos mois Premium.
                     </p>
                 </div>
 
@@ -151,8 +165,30 @@ export default function ImportCCTLPage() {
             </div>
 
             {!exam ? (
-                /* ================= STEP 1: UPLOAD ================= */
+                /* ================= STEP 1: UPLOAD & REWARDS BANNER ================= */
                 <div className="space-y-8">
+                    {/* Crowdsourcing Rewards Incentive Card */}
+                    <div className="card-editorial p-6 rounded-3xl bg-gradient-to-r from-accent-yellow/15 via-surface-card to-surface-card border-2 border-accent-yellow/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+                        <div className="flex items-center gap-3.5">
+                            <div className="w-12 h-12 rounded-2xl bg-accent-yellow text-black flex items-center justify-center font-bold shadow-md shadow-accent-yellow/20 shrink-0">
+                                <Gift className="w-6 h-6" />
+                            </div>
+                            <div className="space-y-0.5">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <h3 className="font-serif text-base sm:text-lg font-bold text-text-primary">
+                                        Programme de Récompense Contributeur
+                                    </h3>
+                                    <span className="text-[10px] font-mono font-bold uppercase bg-accent-yellow text-black px-2 py-0.5 rounded-full">
+                                        +1 Mois Premium Offert
+                                    </span>
+                                </div>
+                                <p className="text-xs text-text-secondary leading-relaxed">
+                                    Chaque sujet CCTL validé crédite immédiatement <strong>1 Mois Premium</strong> et <strong>50 Crédits IA</strong> sur votre compte.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     <CCTLDropzone
                         onExamParsed={handleExamParsed}
                         isLoading={isLoading}
@@ -361,26 +397,51 @@ export default function ImportCCTLPage() {
                                         CCTL publié avec succès !
                                     </h2>
                                     <p className="text-sm text-text-secondary leading-relaxed">
-                                        Merci pour votre contribution ! Le sujet <strong className="text-text-primary">« {publishedResult.title} »</strong> est maintenant disponible dans les Archives pour tous les étudiants.
+                                        Merci pour votre contribution ! Le sujet <strong className="text-text-primary">« {publishedResult.title} »</strong> est maintenant disponible dans les Archives.
                                     </p>
                                 </div>
 
+                                {awardedReward && (
+                                    <div className="p-4 rounded-2xl bg-surface border border-accent-yellow/40 max-w-md mx-auto space-y-2 text-left shadow-md">
+                                        <div className="flex items-center gap-2 text-accent-yellow font-bold text-xs uppercase tracking-wider">
+                                            <Gift className="w-4 h-4" />
+                                            <span>Récompenses débloquées sur votre compte</span>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
+                                            <div className="p-2.5 rounded-xl bg-surface-highlight/50 font-semibold text-text-primary">
+                                                +{awardedReward.earnedMonths} Mois Premium
+                                            </div>
+                                            <div className="p-2.5 rounded-xl bg-surface-highlight/50 font-semibold text-text-primary">
+                                                +{awardedReward.earnedCredits} Crédits IA
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                                    <Link href={`/dashboard/archives/${publishedResult.id}`}>
+                                    <Link href={`/dashboard/cctl/${publishedResult.id}`}>
                                         <Button variant="premium" className="font-bold text-xs shadow-lg shadow-accent-yellow/20 px-6">
                                             Voir la fiche du sujet
                                             <ArrowRight className="w-4 h-4 ml-2" />
                                         </Button>
                                     </Link>
-                                    <Link href="/dashboard/archives">
+                                    <Link href="/dashboard/cctl">
                                         <Button variant="outline" className="border-border/60 text-xs px-6">
-                                            Consulter les Archives CCTL
+                                            Consulter les CCTL
                                         </Button>
                                     </Link>
                                 </div>
                             </div>
                         )}
                     </div>
+
+                    {/* Reward Celebration Modal */}
+                    <RewardCelebrationModal
+                        isOpen={isRewardModalOpen}
+                        onClose={() => setIsRewardModalOpen(false)}
+                        reward={awardedReward}
+                        examTitle={pubSubject}
+                    />
 
                     {/* Extraction Verification Section */}
                     <div className="space-y-5">

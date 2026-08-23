@@ -178,7 +178,7 @@ export default function CommunityPage() {
     const [userSpecialty, setUserSpecialty] = useState('Informatique');
 
     useEffect(() => {
-        const saved = localStorage.getItem('cesi_agora_user_profile');
+        const saved = localStorage.getItem('kompas_user_profile');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
@@ -188,7 +188,7 @@ export default function CommunityPage() {
             } catch {}
         }
 
-        const savedMessages = localStorage.getItem('cesi_promo_chat_messages');
+        const savedMessages = localStorage.getItem('kompas_promo_chat_messages');
         if (savedMessages) {
             try {
                 const parsed = JSON.parse(savedMessages);
@@ -229,7 +229,7 @@ export default function CommunityPage() {
         const updated = [...messages, newMsg];
         setMessages(updated);
         setNewMessageText('');
-        localStorage.setItem('cesi_promo_chat_messages', JSON.stringify(updated));
+        localStorage.setItem('kompas_promo_chat_messages', JSON.stringify(updated));
     };
 
     const handleReaction = (messageId: string, emoji: string) => {
@@ -274,7 +274,7 @@ export default function CommunityPage() {
         });
 
         setMessages(updated);
-        localStorage.setItem('cesi_promo_chat_messages', JSON.stringify(updated));
+        localStorage.setItem('kompas_promo_chat_messages', JSON.stringify(updated));
     };
 
     const filteredMessages = messages.filter(
@@ -294,10 +294,6 @@ export default function CommunityPage() {
             <div className="card-editorial p-6 sm:p-8 rounded-3xl bg-surface/60 border-border relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div className="absolute inset-0 bg-millimeter opacity-30 pointer-events-none" />
                 <div className="space-y-2 relative z-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-md bg-surface-card border border-border text-[11px] font-mono text-text-secondary">
-                        <span className="w-1.5 h-1.5 rounded-full bg-accent-yellow animate-pulse" />
-                        <span>ESPACE COMMUNAUTAIRE // 25 CAMPUS CESI</span>
-                    </div>
                     <h1 className="text-3xl sm:text-4xl font-normal font-serif flex items-center gap-3 text-text-primary">
                         <Users className="w-8 h-8 text-accent-yellow" />
                         Chat Promo &amp; <span className="italic font-normal">Entraide CESI</span>
