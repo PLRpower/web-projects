@@ -7,10 +7,7 @@ import {
     RotateCw,
     Shuffle,
     CheckCircle,
-    XCircle,
-    Sparkles,
-    Check,
-    HelpCircle
+    XCircle
 } from 'lucide-react';
 import { CCTLQuestion } from '@/types/cctl';
 import { Button } from '@/components/ui/button';
@@ -163,47 +160,78 @@ export function CCTLFlashcards({ questions }: CCTLFlashcardsProps) {
                         </div>
                     </div>
 
-                    {/* VERSO (Back Face) */}
-                    <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl glass border-2 border-emerald-500/40 shadow-xl p-8 flex flex-col justify-between">
-                        {/* Card Top Banner */}
-                        <div className="flex items-center justify-between pb-4 border-b border-border/40">
-                            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                                Solution &amp; Correction
-                            </span>
-                            <div className="flex items-center gap-1.5 text-xs text-accent-yellow">
-                                <RotateCw className="w-3.5 h-3.5" />
-                                <span>Cliquez pour voir la question</span>
-                            </div>
-                        </div>
-
-                        {/* Card Main Body */}
-                        <div className="py-6 flex-1 flex flex-col justify-center space-y-4">
-                            <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold text-sm">
-                                <CheckCircle className="w-5 h-5" />
-                                <span>Réponse{expectedChoices.length > 1 ? 's' : ''} correcte{expectedChoices.length > 1 ? 's' : ''} :</span>
+                        {/* VERSO (Back Face) */}
+                        <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl glass border-2 border-emerald-500 dark:border-emerald-500/50 shadow-xl p-8 flex flex-col justify-between overflow-y-auto">
+                            {/* Card Top Banner */}
+                            <div className="flex items-center justify-between pb-4 border-b border-border/40">
+                                <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-600 text-white dark:bg-emerald-500/20 dark:text-emerald-300 dark:border dark:border-emerald-500/40 shadow-xs">
+                                    Solution &amp; Correction
+                                </span>
+                                <div className="flex items-center gap-1.5 text-xs text-accent-yellow font-semibold">
+                                    <RotateCw className="w-3.5 h-3.5" />
+                                    <span>Cliquez pour voir la question</span>
+                                </div>
                             </div>
 
-                            <div className="space-y-2.5">
-                                {expectedChoices.map((choice) => (
-                                    <div
-                                        key={choice.id}
-                                        className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-neutral-900 dark:text-neutral-100 flex items-start gap-3"
-                                    >
-                                        <span className="w-6 h-6 rounded-lg bg-emerald-600 dark:bg-emerald-500 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                                            {choice.id}
-                                        </span>
-                                        <p className="text-sm font-semibold leading-relaxed">{choice.text}</p>
+                            {/* Card Main Body */}
+                            <div className="py-4 flex-1 flex flex-col justify-center space-y-4">
+                                <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-bold text-sm">
+                                    <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                                    <span>
+                                        {expectedChoices.length > 1
+                                            ? 'Réponses correctes attendues :'
+                                            : 'Réponse officielle attendue :'}
+                                    </span>
+                                </div>
+
+                                {expectedChoices.length > 0 ? (
+                                    <div className="space-y-2.5">
+                                        {expectedChoices.map((choice) => (
+                                            <div
+                                                key={choice.id}
+                                                className="p-4 rounded-2xl bg-emerald-500/10 border-2 border-emerald-500 dark:bg-emerald-500/15 dark:border-emerald-400 text-emerald-800 dark:text-emerald-300 flex items-start gap-3 shadow-xs"
+                                            >
+                                                <span className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-800 dark:bg-emerald-500/25 dark:text-emerald-200 border border-emerald-500/40 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 shadow-xs">
+                                                    {choice.id}
+                                                </span>
+                                                <p className="text-sm sm:text-base font-bold leading-relaxed">{choice.text}</p>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
+                                ) : currentQuestion.matchingPairs && currentQuestion.matchingPairs.length > 0 ? (
+                                    <div className="space-y-2">
+                                        {currentQuestion.matchingPairs.map((pair) => (
+                                            <div
+                                                key={pair.id}
+                                                className="p-3 rounded-xl bg-surface border border-border flex items-center justify-between gap-3 text-xs"
+                                            >
+                                                <span className="font-mono font-semibold text-text-primary">{pair.id}. {pair.leftItem}</span>
+                                                <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30 font-mono font-semibold">{pair.rightExpected}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="p-4 rounded-2xl bg-emerald-500/10 border-2 border-emerald-500 dark:bg-emerald-500/15 dark:border-emerald-400 space-y-1 shadow-xs">
+                                        <p className="text-base sm:text-lg font-bold font-mono text-emerald-800 dark:text-emerald-300">
+                                            {currentQuestion.choices?.find(c => c.isExpected)?.text || currentQuestion.fillBlanks?.[0]?.expectedText || 'Réponse enregistrée'}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {currentQuestion.explanation && (
+                                    <div className="p-3 rounded-xl bg-surface/80 border border-border text-xs text-text-secondary leading-relaxed">
+                                        <strong className="text-text-primary block mb-0.5">💡 Explication :</strong>
+                                        {currentQuestion.explanation}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Card Footer */}
+                            <div className="pt-3 border-t border-border/40 flex items-center justify-between text-xs text-text-secondary">
+                                <span className="text-emerald-800 dark:text-emerald-400 font-bold">Réponse vérifiée</span>
+                                <span className="italic">Appuyez sur Suivante pour continuer</span>
                             </div>
                         </div>
-
-                        {/* Card Footer */}
-                        <div className="pt-4 border-t border-border/40 flex items-center justify-between text-xs text-text-secondary">
-                            <span className="text-emerald-400 font-semibold">Réponse enregistrée</span>
-                            <span className="italic">Appuyez sur Entrée pour continuer</span>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -225,18 +253,18 @@ export function CCTLFlashcards({ questions }: CCTLFlashcardsProps) {
                         variant="secondary"
                         size="sm"
                         onClick={() => handleMarkKnown(false)}
-                        className="text-xs hover:bg-red-500/20 hover:text-red-300"
+                        className="text-xs text-text-primary hover:bg-red-500/20 hover:text-red-700 dark:hover:text-red-300"
                     >
-                        <XCircle className="w-4 h-4 mr-1.5 text-red-400" /> À revoir
+                        <XCircle className="w-4 h-4 mr-1.5 text-red-600 dark:text-red-400" /> À revoir
                     </Button>
                     <Button
                         type="button"
                         variant="secondary"
                         size="sm"
                         onClick={() => handleMarkKnown(true)}
-                        className="text-xs hover:bg-emerald-500/20 hover:text-emerald-300"
+                        className="text-xs text-text-primary hover:bg-emerald-500/20 hover:text-emerald-700 dark:hover:text-emerald-300"
                     >
-                        <CheckCircle className="w-4 h-4 mr-1.5 text-emerald-400" /> Maîtrisé
+                        <CheckCircle className="w-4 h-4 mr-1.5 text-emerald-600 dark:text-emerald-400" /> Maîtrisé
                     </Button>
                 </div>
 

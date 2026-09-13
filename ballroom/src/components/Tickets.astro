@@ -1,0 +1,39 @@
+---
+import { TICKET_URL } from '../i18n';
+import type { Dict } from '../i18n';
+
+interface Props {
+  t: Dict;
+}
+
+const { t } = Astro.props;
+const placeholder = TICKET_URL === '#tickets';
+---
+
+<section class="section" id="tickets">
+  <div class="container">
+    <div class="tickets-panel">
+      <p class="eyebrow" style="justify-content: center; display: inline-flex;">{t.tickets.eyebrow}</p>
+      <h2 class="section-title">{t.tickets.title}</h2>
+      <p class="tickets-note">{t.tickets.note}</p>
+
+      <div class="tickets-cards">
+        <div class="ticket-card">
+          <p class="name">{t.tickets.standard.name}</p>
+          <p class="price">{t.tickets.standard.price}</p>
+          <p class="note">{t.tickets.standard.note}</p>
+        </div>
+        <div class="ticket-card">
+          <p class="name">{t.tickets.student.name}</p>
+          <p class="price">{t.tickets.student.price}</p>
+          <p class="note">{t.tickets.student.note}</p>
+        </div>
+      </div>
+
+      <a href={TICKET_URL} class="btn btn-primary" aria-disabled={placeholder ? 'true' : undefined}>
+        {t.tickets.cta}
+      </a>
+      {placeholder && <p class="tickets-legal">{t.tickets.legal}</p>}
+    </div>
+  </div>
+</section>

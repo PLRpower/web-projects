@@ -1,0 +1,58 @@
+---
+import { Image } from 'astro:assets';
+import stageWide from '../assets/gallery/ballroom-06.jpg';
+import type { Dict } from '../i18n';
+
+interface Props {
+  t: Dict;
+}
+
+const { t } = Astro.props;
+---
+
+<section class="section" id="about">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">{t.about.eyebrow}</p>
+      <h2 class="section-title">{t.about.title}</h2>
+    </div>
+
+    <div class="about-grid">
+      <div>
+        <p class="about-lead">{t.about.lead}</p>
+        <p class="about-body">{t.about.body}</p>
+      </div>
+      <div>
+        <h3 class="section-title" style="font-size: 1.3rem; margin-bottom: 0.5rem;">{t.about.pillarsTitle}</h3>
+        <ol class="pillars">
+          {t.about.pillars.map((p, i) => (
+            <li>
+              <span class="num">0{i + 1}</span>
+              <span class="name">{p.name}</span>
+              <span class="desc">— {p.desc}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+
+    <figure class="section-photo">
+      <Image
+        src={stageWide}
+        alt={t.about.photoAlt}
+        widths={[640, 900, 1200]}
+        sizes="(min-width: 1150px) 1120px, 96vw"
+        format="webp"
+      />
+      <figcaption>{t.about.photoCaption}</figcaption>
+    </figure>
+
+    <div class="identity">
+      <h3>{t.about.identityTitle}</h3>
+      <p>{t.about.identity}</p>
+      <div class="tag-row">
+        {t.about.tags.map((tag) => <span class="tag">{tag}</span>)}
+      </div>
+    </div>
+  </div>
+</section>

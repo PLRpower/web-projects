@@ -1,0 +1,48 @@
+---
+import '../styles/global.css';
+import { languages } from '../i18n';
+
+interface Props {
+  title: string;
+  description: string;
+  htmlLang: string;
+  currentPath: string;
+}
+
+const { title, description, htmlLang, currentPath } = Astro.props;
+
+const alternates = [
+  ...languages.map((l) => ({ lang: l.code, href: l.path })),
+  { lang: 'x-default', href: '/' },
+];
+---
+
+<!doctype html>
+<html lang={htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={new URL(currentPath, Astro.site)} />
+    {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={new URL(a.href, Astro.site)} />)}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL('/og.jpg', Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="og:locale" content={htmlLang} />
+    <meta name="theme-color" content="#0a0406" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@300..700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

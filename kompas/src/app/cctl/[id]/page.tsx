@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -20,7 +20,8 @@ import {
     ArrowRight,
     X,
     Shield,
-    Award
+    Award,
+    Shuffle
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -28,7 +29,47 @@ import { Button } from '@/components/ui/button';
 import { CodeBlock } from '@/components/cctl/CodeBlock';
 import { ALL_SEED_CCTLS } from '@/lib/cctl-seed-data';
 import { PublishedCCTLEntry } from '@/lib/cctl-store';
-import { formatAcademicYear } from '@/types/cctl';
+import { formatAcademicYear, CCTLChoice, CCTLMatchingPair, CCTLQuestion } from '@/types/cctl';
+
+function shuffleArray<T>(array: T[]): T[] {
+    const copy = [...array];
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
+
+function shuffleChoices(choices: CCTLChoice[]): CCTLChoice[] {
+    if (!choices || choices.length <= 1) return choices;
+    const originalIds = choices.map(c => c.id);
+    const shuffled = shuffleArray(choices);
+    return shuffled.map((c, idx) => ({
+        ...c,
+        id: originalIds[idx] || String.fromCharCode(65 + idx)
+    }));
+}
+
+function shuffleMatchingPairs(pairs: CCTLMatchingPair[]): CCTLMatchingPair[] {
+    if (!pairs || pairs.length <= 1) return pairs;
+    const originalIds = pairs.map(p => p.id);
+    const shuffled = shuffleArray(pairs);
+    return shuffled.map((p, idx) => ({
+        ...p,
+        id: originalIds[idx] || String(idx + 1)
+    }));
+}
+
+function shuffleQuestionAnswers(q: CCTLQuestion): CCTLQuestion {
+    let updated = { ...q };
+    if (updated.choices && updated.choices.length > 1) {
+        updated.choices = shuffleChoices(updated.choices);
+    }
+    if (updated.matchingPairs && updated.matchingPairs.length > 1) {
+        updated.matchingPairs = shuffleMatchingPairs(updated.matchingPairs);
+    }
+    return updated;
+}
 
 export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
@@ -36,6 +77,8 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
 
     const [cctlEntry, setCctlEntry] = useState<PublishedCCTLEntry | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isAnswersShuffled, setIsAnswersShuffled] = useState(false);
+    const [shuffleKey, setShuffleKey] = useState(0);
 
     useEffect(() => {
         const fetchCctl = async () => {
@@ -58,6 +101,26 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
         fetchCctl();
     }, [id]);
 
+    const handleToggleShuffleAnswers = () => {
+        if (!isAnswersShuffled) {
+            setIsAnswersShuffled(true);
+            setShuffleKey(k => k + 1);
+        } else {
+            setIsAnswersShuffled(false);
+        }
+    };
+
+    const exam = cctlEntry?.exam;
+
+    const displayedQuestions = useMemo(() => {
+        if (!exam || !exam.questions) return [];
+        let list = [...exam.questions];
+        if (isAnswersShuffled) {
+            list = list.map(q => shuffleQuestionAnswers(q));
+        }
+        return list;
+    }, [exam, isAnswersShuffled, shuffleKey]);
+
     if (isLoading) {
         return (
             <div className="min-h-screen bg-background flex flex-col justify-between">
@@ -71,7 +134,7 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
         );
     }
 
-    if (!cctlEntry) {
+    if (!cctlEntry || !exam) {
         return (
             <div className="min-h-screen bg-background flex flex-col justify-between">
                 <Navbar />
@@ -86,8 +149,6 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
             </div>
         );
     }
-
-    const exam = cctlEntry.exam;
 
     const redirectToRegister = (targetUrl: string = `/register?redirect=/dashboard/cctl/${id}`) => {
         router.push(targetUrl);
@@ -157,7 +218,23 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                     {/* Engaging Action Buttons Bar */}
                     <div className="pt-4 border-t border-border flex flex-wrap items-center justify-between gap-3 relative z-10">
                         <div className="flex flex-wrap items-center gap-2.5">
-                            {/* Button 1: Hide Answers (Interactive CTA) */}
+                            {/* Button 1: Shuffle Answers Button */}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleToggleShuffleAnswers}
+                                className={`text-xs font-semibold cursor-pointer transition-all ${
+                                    isAnswersShuffled
+                                        ? 'bg-accent-yellow text-black border-accent-yellow shadow-md shadow-accent-yellow/20'
+                                        : 'border-border hover:border-accent-yellow text-text-primary'
+                                }`}
+                                title="Mélanger l'ordre des propositions et réponses au sein de chaque question"
+                            >
+                                <Shuffle className="w-3.5 h-3.5 mr-1.5" />
+                                {isAnswersShuffled ? 'Réponses mélangées' : 'Mélanger les réponses'}
+                            </Button>
+
+                            {/* Button 2: Hide Answers (Interactive CTA) */}
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -168,7 +245,7 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                                 Cacher les réponses
                             </Button>
 
-                            {/* Button 2: Exam Simulator Mode */}
+                            {/* Button 3: Exam Simulator Mode */}
                             <Button
                                 variant="premium"
                                 size="sm"
@@ -179,7 +256,7 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                                 Mode Entraînement /20
                             </Button>
 
-                            {/* Button 3: Flashcards */}
+                            {/* Button 4: Flashcards */}
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -217,12 +294,12 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
 
                 {/* Questions Feed (Simplified view with questions + visible answers) */}
                 <div className="space-y-6">
-                    {exam.questions.map((question, idx) => {
+                    {displayedQuestions.map((question, idx) => {
                         const isMultiple = question.type === 'multiple_choice';
 
                         return (
                             <div
-                                key={question.id || idx}
+                                key={`${isAnswersShuffled ? 'sa' : 'oa'}-${shuffleKey}-${question.id || idx}`}
                                 className="glass rounded-3xl border border-border/80 p-6 sm:p-7 space-y-5 shadow-lg relative overflow-hidden"
                             >
                                 {/* Question Top Bar */}
@@ -266,42 +343,82 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                                 </div>
 
                                 {/* Choices with Visible Expected Answers */}
-                                <div className="space-y-2.5 pt-1">
-                                    {question.choices.map((choice) => {
-                                        const isExpected = choice.isExpected;
-
-                                        return (
-                                            <div
-                                                key={choice.id}
-                                                className={`p-3.5 rounded-2xl border transition-all flex items-start gap-3.5 ${
-                                                    isExpected
-                                                        ? 'bg-emerald-500/10 border-emerald-500/40 text-neutral-900 dark:text-neutral-100 dark:bg-emerald-500/15 shadow-sm'
-                                                        : 'bg-surface-highlight/20 border-border/40 text-text-secondary opacity-75'
-                                                }`}
-                                            >
+                                {question.matchingPairs && question.matchingPairs.length > 0 ? (
+                                    <div className="space-y-2.5 pt-1">
+                                        <div className="grid grid-cols-1 gap-2.5">
+                                            {question.matchingPairs.map((pair) => (
                                                 <div
-                                                    className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
-                                                        isExpected
-                                                            ? 'bg-emerald-600 dark:bg-emerald-500 text-white font-bold'
-                                                            : 'bg-surface-highlight text-text-secondary border border-border/60'
-                                                     }`}
+                                                    key={pair.id}
+                                                    className="p-4 rounded-2xl border border-border/80 bg-surface/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
                                                 >
-                                                    {isExpected ? (isMultiple ? '✓' : '●') : choice.id}
+                                                    <div className="flex items-start gap-3 font-mono flex-1 min-w-0">
+                                                        <span className="w-6 h-6 rounded-lg bg-surface-highlight border border-border flex items-center justify-center text-xs font-bold text-text-muted shrink-0">
+                                                            {pair.id}
+                                                        </span>
+                                                        <span className="font-semibold text-text-primary break-words text-sm leading-relaxed">
+                                                            {pair.leftItem}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30 text-xs font-semibold font-mono shadow-xs shrink-0 sm:justify-end">
+                                                        <Check className="w-3.5 h-3.5" />
+                                                        <span>{pair.rightExpected}</span>
+                                                    </div>
                                                 </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : (question.type === 'short_answer' || question.type === 'fill_blank' || (question.type === 'numerical' && (!question.choices || question.choices.length === 0))) ? (
+                                    <div className="p-4 sm:p-5 rounded-2xl bg-emerald-500/10 border-2 border-emerald-500 dark:bg-emerald-500/15 dark:border-emerald-400 flex items-start justify-between gap-3 shadow-xs">
+                                        <div className="space-y-1">
+                                            <span className="text-[11px] font-mono font-bold uppercase text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                                                <Check className="w-3.5 h-3.5" /> Réponse attendue
+                                            </span>
+                                            <p className="text-base sm:text-lg font-bold font-mono text-emerald-800 dark:text-emerald-300 select-text">
+                                                {question.choices?.find(c => c.isExpected)?.text || question.fillBlanks?.[0]?.expectedText || ''}
+                                            </p>
+                                        </div>
+                                        <span className="flex items-center gap-1.5 font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-500/15 dark:bg-emerald-500/20 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs shrink-0 shadow-xs">
+                                            <Check className="w-4 h-4" /> Réponse attendue
+                                        </span>
+                                    </div>
+                                ) : question.choices && question.choices.length > 0 ? (
+                                    <div className="space-y-2.5 pt-1">
+                                        {question.choices.map((choice) => {
+                                            const isExpected = choice.isExpected;
 
-                                                <div className="flex-1 text-xs sm:text-sm font-semibold leading-relaxed text-neutral-900 dark:text-neutral-100">
-                                                    {choice.text}
+                                            return (
+                                                <div
+                                                    key={choice.id}
+                                                    className={`p-4 rounded-2xl border transition-all flex items-start gap-3.5 ${
+                                                        isExpected
+                                                            ? 'bg-emerald-500/10 border-2 border-emerald-500 dark:bg-emerald-500/15 dark:border-emerald-400 shadow-sm ring-1 ring-emerald-500/30'
+                                                            : 'bg-surface/60 border-border/70 text-text-primary hover:bg-surface'
+                                                    }`}
+                                                >
+                                                    <div
+                                                        className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 shadow-xs ${
+                                                            isExpected
+                                                                ? 'bg-emerald-500/20 text-emerald-800 dark:bg-emerald-500/25 dark:text-emerald-200 border border-emerald-500/40'
+                                                                : 'bg-surface-highlight text-text-secondary border border-border/60'
+                                                         }`}
+                                                    >
+                                                        {isExpected ? (isMultiple ? '✓' : '●') : choice.id}
+                                                    </div>
+
+                                                    <div className={`flex-1 text-sm leading-relaxed ${isExpected ? 'text-emerald-800 dark:text-emerald-300 font-bold sm:text-base' : 'text-text-primary font-medium'}`}>
+                                                        {choice.text}
+                                                    </div>
+
+                                                    {isExpected && (
+                                                        <span className="shrink-0 flex items-center gap-1.5 font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-500/15 dark:bg-emerald-500/20 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs shadow-xs">
+                                                            <Check className="w-3.5 h-3.5" /> Bonne réponse
+                                                        </span>
+                                                    )}
                                                 </div>
-
-                                                {isExpected && (
-                                                    <span className="shrink-0 flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px]">
-                                                        <Check className="w-3 h-3" /> Bonne réponse
-                                                    </span>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : null}
 
                                 {/* Pedagogical Explanation */}
                                 {question.explanation && (

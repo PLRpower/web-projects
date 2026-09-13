@@ -86,6 +86,8 @@ export interface CCTLExam {
     id: string;
     title: string;
     studentName?: string;
+    authorId?: string;
+    authorEmail?: string;
     evaluationStandard?: string; // ex: "B (% de réussite compris entre 50 et 75%)"
     evaluationWeighted?: string;
     promo: string;               // ex: "A3", "A4", "FISE", "FISA"

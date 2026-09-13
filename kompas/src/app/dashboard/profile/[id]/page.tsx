@@ -2,7 +2,6 @@
 
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/Logo';
 import {
     ArrowLeft,
@@ -22,8 +21,7 @@ import {
     MapPin,
     Edit3,
     Trash2,
-    X,
-    Loader2
+    X
 } from 'lucide-react';
 import { getStudentProfile, StudentProfileData } from '@/lib/student-profiles';
 import { createClient } from '@/utils/supabase/client';
@@ -34,12 +32,10 @@ interface PageProps {
 }
 
 export default function StudentProfilePage({ params }: PageProps) {
-    const router = useRouter();
     const supabase = createClient();
     const resolvedParams = use(params);
     const studentId = resolvedParams.id;
     const [profile, setProfile] = useState<StudentProfileData>(() => getStudentProfile(studentId));
-    const [isLoading, setIsLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
 
     // Admin Edit Modal
@@ -63,7 +59,6 @@ export default function StudentProfilePage({ params }: PageProps) {
     const [isSaving, setIsSaving] = useState(false);
 
     const fetchProfile = async () => {
-        setIsLoading(true);
         try {
             const res = await fetch(`/api/profiles/${studentId}`);
             const data = await res.json();
@@ -74,8 +69,6 @@ export default function StudentProfilePage({ params }: PageProps) {
             }
         } catch {
             setProfile(getStudentProfile(studentId));
-        } finally {
-            setIsLoading(false);
         }
     };
 

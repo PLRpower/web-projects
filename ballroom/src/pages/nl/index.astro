@@ -1,0 +1,9 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Home from '../../components/Home.astro';
+import { nl } from '../../i18n/nl';
+---
+
+<Layout title={nl.meta.title} description={nl.meta.description} htmlLang={nl.htmlLang} currentPath="/nl/">
+  <Home t={nl} />
+</Layout>

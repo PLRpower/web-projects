@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { MapPin } from 'lucide-react';
 
 interface Testimonial {
@@ -63,8 +64,14 @@ export default function Testimonials() {
     return (
         <section className="py-20 sm:py-28 relative overflow-hidden bg-background">
             <div className="container mx-auto px-4 sm:px-6 relative z-10 max-w-7xl mb-12 sm:mb-16">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-6 border-b border-border/70">
+                {/* Header with scroll reveal */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-60px" }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-6 border-b border-border/70"
+                >
                     <div className="space-y-3 max-w-2xl">
                         <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-normal text-text-primary tracking-tight">
                             Ils ont validé <span className="italic font-normal">leurs semestres</span> avec Kompas.
@@ -74,11 +81,17 @@ export default function Testimonials() {
                     <p className="text-sm sm:text-base text-text-secondary max-w-md leading-relaxed">
                         Retours d&apos;expérience d&apos;élèves-ingénieurs sur les 25 campus du CESI.
                     </p>
-                </div>
+                </motion.div>
             </div>
 
-            {/* INFINITE SMOOTH HORIZONTAL MARQUEE */}
-            <div className="relative w-full overflow-hidden py-4">
+            {/* INFINITE SMOOTH HORIZONTAL MARQUEE with scroll reveal */}
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.97 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                className="relative w-full overflow-hidden py-4"
+            >
                 {/* Left & Right Fade Masks */}
                 <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-44 bg-gradient-to-r from-background to-transparent z-20 pointer-events-none" />
                 <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-44 bg-gradient-to-l from-background to-transparent z-20 pointer-events-none" />
@@ -87,7 +100,7 @@ export default function Testimonials() {
                     {MARQUEE_ITEMS.map((t, idx) => (
                         <div
                             key={idx}
-                            className="w-[380px] sm:w-[440px] md:w-[460px] shrink-0 p-7 sm:p-8 rounded-2xl bg-surface-card border border-border shadow-md flex flex-col justify-between space-y-6 group hover:border-accent-yellow/50 transition-all duration-300"
+                            className="w-[380px] sm:w-[440px] md:w-[460px] shrink-0 p-7 sm:p-8 rounded-2xl bg-surface-card border border-border shadow-md flex flex-col justify-between space-y-6 group hover:border-accent-yellow/50 hover:shadow-lg transition-all duration-300"
                         >
                             {/* Quote */}
                             <p className="font-serif text-base sm:text-lg md:text-xl italic text-text-primary leading-relaxed tracking-tight">
@@ -97,7 +110,7 @@ export default function Testimonials() {
                             {/* Student Info Footer */}
                             <div className="pt-4 border-t border-border/50 flex items-center justify-between text-xs gap-3">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center font-bold text-xs sm:text-sm font-mono text-text-primary shrink-0 shadow-2xs">
+                                    <div className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center font-bold text-xs sm:text-sm font-mono text-text-primary shrink-0 shadow-2xs group-hover:border-accent-yellow/50 transition-colors">
                                         {t.name.charAt(0)}
                                     </div>
                                     <div className="space-y-0.5 min-w-0">
@@ -116,7 +129,8 @@ export default function Testimonials() {
                         </div>
                     ))}
                 </div>
-            </div>
+            </motion.div>
         </section>
     );
 }
+

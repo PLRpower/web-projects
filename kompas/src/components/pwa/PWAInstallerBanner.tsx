@@ -6,10 +6,7 @@ import {
     WifiOff,
     Download,
     Smartphone,
-    X,
-    Check,
-    Layers,
-    ArrowRight
+    X
 } from 'lucide-react';
 import { useNetworkStatus } from '@/lib/offline-storage';
 import { Button } from '@/components/ui/button';

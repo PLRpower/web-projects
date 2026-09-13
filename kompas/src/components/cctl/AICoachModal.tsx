@@ -7,16 +7,12 @@ import {
     AlertTriangle,
     CheckCircle2,
     XCircle,
-    Check,
-    HelpCircle,
     ArrowRight,
     Send,
     Bot,
-    User,
     Loader2,
     X,
     Lightbulb,
-    Target,
     RotateCcw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -213,8 +209,8 @@ export function AICoachModal({
                             <span
                                 className={`flex items-center gap-1.5 text-xs font-bold px-3 py-0.5 rounded-full border ${
                                     isCorrect
-                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
-                                        : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30'
+                                        ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
+                                        : 'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/30'
                                 }`}
                             >
                                 {isCorrect ? (
@@ -264,38 +260,40 @@ export function AICoachModal({
                                     const isSelected = isChoiceSelected(choice);
                                     const isExpected = choice.isExpected;
 
-                                    let choiceCardStyle = 'bg-surface-card/60 border-border/60 text-text-secondary opacity-80';
+                                    let choiceCardStyle = 'bg-surface-card/60 border border-border/70 text-text-primary';
+                                    let textStyle = 'text-text-primary font-medium';
                                     let badgeText: string | null = null;
                                     let badgeColor = '';
+                                    let idBadgeStyle = 'bg-surface-highlight text-text-secondary border border-border';
 
                                     if (isExpected && isSelected) {
-                                        choiceCardStyle = 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/50 font-bold';
+                                        choiceCardStyle = 'bg-emerald-500/10 border-2 border-emerald-500 ring-1 ring-emerald-500/30 dark:bg-emerald-500/15 dark:border-emerald-400 shadow-xs';
+                                        textStyle = 'text-emerald-800 dark:text-emerald-300 font-bold';
                                         badgeText = '✓ Votre choix (Bonne réponse)';
-                                        badgeColor = 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40';
+                                        badgeColor = 'bg-emerald-500/15 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30 font-semibold';
+                                        idBadgeStyle = 'bg-emerald-500/20 text-emerald-800 dark:bg-emerald-500/25 dark:text-emerald-200 border border-emerald-500/40';
                                     } else if (isExpected && !isSelected) {
-                                        choiceCardStyle = 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/40 font-bold';
+                                        choiceCardStyle = 'bg-emerald-500/10 border-2 border-emerald-500 ring-1 ring-emerald-500/30 dark:bg-emerald-500/15 dark:border-emerald-400 shadow-xs';
+                                        textStyle = 'text-emerald-800 dark:text-emerald-300 font-bold';
                                         badgeText = '✓ Réponse attendue';
-                                        badgeColor = 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30';
+                                        badgeColor = 'bg-emerald-500/15 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30 font-semibold';
+                                        idBadgeStyle = 'bg-emerald-500/20 text-emerald-800 dark:bg-emerald-500/25 dark:text-emerald-200 border border-emerald-500/40';
                                     } else if (!isExpected && isSelected) {
-                                        choiceCardStyle = 'bg-red-500/10 border-red-500 text-red-600 dark:text-red-400 ring-1 ring-red-500/50 font-bold';
+                                        choiceCardStyle = 'bg-red-500/10 border-2 border-red-500 ring-1 ring-red-500/30 dark:bg-red-500/15 dark:border-red-400 shadow-xs';
+                                        textStyle = 'text-red-800 dark:text-red-300 font-bold';
                                         badgeText = '✗ Votre choix (Incorrect)';
-                                        badgeColor = 'bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30';
+                                        badgeColor = 'bg-red-500/15 text-red-800 dark:bg-red-500/20 dark:text-red-300 border border-red-500/30 font-semibold';
+                                        idBadgeStyle = 'bg-red-500/20 text-red-800 dark:bg-red-500/25 dark:text-red-200 border border-red-500/40';
                                     }
 
                                     return (
                                         <div
                                             key={choice.id}
-                                            className={`p-3.5 rounded-xl border transition-all flex items-start gap-3 text-xs sm:text-sm ${choiceCardStyle}`}
+                                            className={`p-3.5 rounded-xl transition-all flex items-start gap-3 text-xs sm:text-sm ${choiceCardStyle}`}
                                         >
                                             {/* Choice Badge (A, B, C, D) */}
                                             <div
-                                                className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 ${
-                                                    isExpected
-                                                        ? 'bg-emerald-600 dark:bg-emerald-500 text-white'
-                                                        : isSelected
-                                                        ? 'bg-red-600 text-white'
-                                                        : 'bg-surface-highlight text-text-muted border border-border'
-                                                }`}
+                                                className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 shadow-xs ${idBadgeStyle}`}
                                             >
                                                 {choice.id}
                                             </div>
@@ -312,7 +310,7 @@ export function AICoachModal({
                                                         />
                                                     </div>
                                                 ) : (
-                                                    <p className={isExpected || isSelected ? 'font-semibold' : 'text-text-primary'}>
+                                                    <p className={textStyle}>
                                                         {choice.text || `Proposition ${choice.id}`}
                                                     </p>
                                                 )}
@@ -320,7 +318,7 @@ export function AICoachModal({
 
                                             {/* Result Status Badge */}
                                             {badgeText && (
-                                                <span className={`flex items-center gap-1 font-bold text-[11px] px-2.5 py-1 rounded-lg border shrink-0 ${badgeColor}`}>
+                                                <span className={`flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg shrink-0 shadow-xs ${badgeColor}`}>
                                                     {badgeText}
                                                 </span>
                                             )}
@@ -344,9 +342,9 @@ export function AICoachModal({
                                             </span>
                                             <span className="text-text-primary font-semibold">{pair.leftItem}</span>
                                         </div>
-                                        <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold">
+                                        <div className="flex items-center gap-2">
                                             <ArrowRight className="w-3.5 h-3.5 text-accent-yellow" />
-                                            <span>{pair.rightExpected}</span>
+                                            <span className="px-3 py-1 rounded-xl bg-emerald-500/15 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30 font-mono font-semibold text-[11px] shadow-xs">{pair.rightExpected}</span>
                                         </div>
                                     </div>
                                 ))}
@@ -358,15 +356,15 @@ export function AICoachModal({
                             <div className="p-3.5 rounded-xl bg-surface-card border border-border space-y-2 text-xs">
                                 {studentAnswerText && (
                                     <div className="flex items-center justify-between gap-2">
-                                        <span className="text-text-muted font-mono uppercase text-[10px]">Votre réponse saisie :</span>
-                                        <span className={`font-mono font-bold ${isCorrect ? 'text-emerald-500' : 'text-red-500'}`}>
+                                        <span className="text-text-muted font-mono uppercase text-[10px] font-bold">Votre réponse saisie :</span>
+                                        <span className={`font-mono font-bold ${isCorrect ? 'text-emerald-800 dark:text-emerald-300' : 'text-red-800 dark:text-red-300'}`}>
                                             {studentAnswerText}
                                         </span>
                                     </div>
                                 )}
                                 <div className="flex items-center justify-between gap-2 border-t border-border/50 pt-1.5">
-                                    <span className="text-text-muted font-mono uppercase text-[10px]">Réponse attendue :</span>
-                                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                    <span className="text-emerald-700 dark:text-emerald-400 font-mono uppercase text-[10px] font-bold">Réponse attendue :</span>
+                                    <span className="font-mono font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/40 px-2.5 py-0.5 rounded-lg">
                                         {question.fillBlanks?.[0]?.expectedText || question.choices?.find(c => c.isExpected)?.text || 'Réponse officielle'}
                                     </span>
                                 </div>
@@ -393,7 +391,7 @@ export function AICoachModal({
                         <div className="p-6 rounded-2xl bg-red-500/10 border-2 border-red-500/40 text-xs space-y-4">
                             <div className="flex items-center gap-2.5 text-red-600 dark:text-red-400 font-bold text-sm">
                                 <AlertTriangle className="w-5 h-5 shrink-0" />
-                                <span>Échec de la génération par l&apos;IA Google Gemini</span>
+                                <span>Échec de la génération par l&apos;IA</span>
                             </div>
                             <div className="p-3.5 rounded-xl bg-surface/80 border border-red-500/20 font-mono text-[11px] text-text-primary leading-relaxed">
                                 {error}

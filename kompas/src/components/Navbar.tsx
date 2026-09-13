@@ -104,7 +104,7 @@ export default function Navbar() {
                                 className="flex items-center gap-2 focus:outline-none cursor-pointer"
                                 aria-label="Menu utilisateur"
                             >
-                                <div className="w-9 h-9 rounded-xl bg-surface-card flex items-center justify-center font-bold text-accent-yellow border border-border shadow-xs hover:border-accent-yellow transition-colors">
+                                <div className="w-9 h-9 rounded-xl bg-accent-yellow text-black flex items-center justify-center font-bold shadow-xs hover:brightness-105 transition-all">
                                     {user.email?.charAt(0).toUpperCase() || <UserIcon size={16} />}
                                 </div>
                             </button>
@@ -137,7 +137,7 @@ export default function Navbar() {
                                                 className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-surface rounded-xl transition-colors"
                                             >
                                                 <UserIcon size={15} />
-                                                Mon Profil Étudiant
+                                                Profil
                                             </Link>
                                             <Link
                                                 href="/dashboard/settings"

@@ -7,7 +7,6 @@ import {
     Download,
     Check,
     Users,
-    Lightbulb,
     FileText,
     Search,
     BookOpen,
@@ -16,14 +15,13 @@ import {
     Eye,
     X,
     CheckCircle2,
-    Send,
     Loader2,
     Gift,
-    Crown,
-    Sparkles,
     AlertCircle,
     Trash2,
-    Edit3
+    Edit3,
+    Lightbulb,
+    Send
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PrositEntry, PrositPromo, PrositSpecialty } from '@/types/prosit';
@@ -32,13 +30,13 @@ import {
     recordPrositContribution,
     getUserRewardsProfile,
     PROSITS_REWARD_THRESHOLD,
-    MAX_CROWDSOURCED_PREMIUM_MONTHS,
     UserRewardsProfile
 } from '@/lib/rewards-store';
 import { validatePrositSubmission } from '@/lib/contribution-validator';
 import { RewardCelebrationModal } from '@/components/rewards/RewardCelebrationModal';
 import { createClient } from '@/utils/supabase/client';
-import { isAdminUser, isAdminEmail, checkIsAdminClient } from '@/lib/admin';
+import { checkIsAdminClient } from '@/lib/admin';
+import { isItemOwner, recordItemOwnership, removeItemOwnership, OwnershipUser } from '@/lib/user-ownership';
 
 export default function DashboardPrositsPage() {
     const supabase = createClient();
@@ -46,6 +44,7 @@ export default function DashboardPrositsPage() {
     const [prosits, setProsits] = useState<PrositEntry[]>(ALL_SEED_PROSITS);
     const [isLoading, setIsLoading] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [currentUser, setCurrentUser] = useState<OwnershipUser | null>(null);
 
     // Filter states for catalog
     const [searchQuery, setSearchQuery] = useState('');
@@ -118,15 +117,22 @@ export default function DashboardPrositsPage() {
         setRewardsProfile(getUserRewardsProfile());
     };
 
-    const checkAdmin = async () => {
+    const checkAdminAndUser = async () => {
         if (checkIsAdminClient()) {
             setIsAdmin(true);
         }
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            if (user && checkIsAdminClient(user)) {
-                setIsAdmin(true);
+            if (user) {
+                setCurrentUser({
+                    id: user.id,
+                    email: user.email,
+                    name: (user.user_metadata?.name as string) || undefined
+                });
+                if (checkIsAdminClient(user)) {
+                    setIsAdmin(true);
+                }
             }
         } catch {}
     };
@@ -134,18 +140,31 @@ export default function DashboardPrositsPage() {
     useEffect(() => {
         fetchProsits();
         updateRewards();
-        checkAdmin();
+        checkAdminAndUser();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            if (session?.user && checkIsAdminClient(session.user)) {
-                setIsAdmin(true);
+            if (session?.user) {
+                setCurrentUser({
+                    id: session.user.id,
+                    email: session.user.email,
+                    name: (session.user.user_metadata?.name as string) || undefined
+                });
+                if (checkIsAdminClient(session.user)) {
+                    setIsAdmin(true);
+                }
             }
         });
 
+        const handleOwnershipUpdated = () => {
+            setProsits(prev => [...prev]);
+        };
+
         window.addEventListener('kompas_rewards_updated', updateRewards);
+        window.addEventListener('kompas_ownership_updated', handleOwnershipUpdated);
         return () => {
             subscription.unsubscribe();
             window.removeEventListener('kompas_rewards_updated', updateRewards);
+            window.removeEventListener('kompas_ownership_updated', handleOwnershipUpdated);
         };
     }, []);
 
@@ -154,6 +173,7 @@ export default function DashboardPrositsPage() {
         if (!window.confirm('Voulez-vous vraiment supprimer définitivement ce prosit ?')) return;
 
         setProsits(prev => prev.filter(p => p.id !== id));
+        removeItemOwnership('prosit', id);
         if (selectedPrositModal?.id === id) setSelectedPrositModal(null);
 
         try {
@@ -333,6 +353,8 @@ ${deliverables.split('\n').filter(d => d.trim()).map(d => `- [ ] ${d.trim()}`).j
                     subject: subject || title,
                     promo,
                     specialty,
+                    authorId: currentUser?.id,
+                    authorEmail: currentUser?.email,
                     keywords,
                     context,
                     problemStatement: problematic,
@@ -351,6 +373,7 @@ ${deliverables.split('\n').filter(d => d.trim()).map(d => `- [ ] ${d.trim()}`).j
             }
 
             if (data.success && data.published) {
+                recordItemOwnership('prosit', data.published.id);
                 // Record contribution towards 10 prosits = 1 month Premium
                 const rewardResult = recordPrositContribution(title);
                 updateRewards();
@@ -589,13 +612,13 @@ ${deliverables.split('\n').filter(d => d.trim()).map(d => `- [ ] ${d.trim()}`).j
                                             </button>
                                         </div>
 
-                                        {isAdmin && (
+                                        {(isAdmin || isItemOwner('prosit', prosit, currentUser)) && (
                                             <div className="flex items-center gap-1">
                                                 <button
                                                     type="button"
                                                     onClick={(e) => handleStartEditProsit(prosit, e)}
                                                     className="p-2 rounded-xl border border-border bg-surface hover:bg-surface-highlight text-text-secondary hover:text-accent-yellow transition-all cursor-pointer"
-                                                    title="Modifier ce Prosit (Admin)"
+                                                    title={isAdmin && !isItemOwner('prosit', prosit, currentUser) ? "Modifier ce Prosit (Admin)" : "Modifier mon Prosit"}
                                                 >
                                                     <Edit3 className="w-3.5 h-3.5" />
                                                 </button>
@@ -603,7 +626,7 @@ ${deliverables.split('\n').filter(d => d.trim()).map(d => `- [ ] ${d.trim()}`).j
                                                     type="button"
                                                     onClick={(e) => handleDeleteProsit(prosit.id, e)}
                                                     className="p-2 rounded-xl border border-border bg-surface hover:bg-surface-highlight text-text-secondary hover:text-red-400 transition-all cursor-pointer"
-                                                    title="Supprimer ce Prosit (Admin)"
+                                                    title={isAdmin && !isItemOwner('prosit', prosit, currentUser) ? "Supprimer ce Prosit (Admin)" : "Supprimer mon Prosit"}
                                                 >
                                                     <Trash2 className="w-3.5 h-3.5" />
                                                 </button>
@@ -1098,24 +1121,55 @@ ${deliverables.split('\n').filter(d => d.trim()).map(d => `- [ ] ${d.trim()}`).j
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="pt-4 border-t border-border flex items-center justify-end gap-3">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setSelectedPrositModal(null)}
-                                className="text-xs"
-                            >
-                                Fermer
-                            </Button>
-                            <Button
-                                variant="premium"
-                                size="sm"
-                                onClick={() => handleDownloadMarkdown(selectedPrositModal.title, `# PROSIT : ${selectedPrositModal.title}\n\n## 3. Problématique\n${selectedPrositModal.problemStatement}\n\n## 2. Contexte\n${selectedPrositModal.context}\n\n## 6. Plan d'action\n${selectedPrositModal.actionPlan.join('\n')}`)}
-                                className="text-xs bg-accent-yellow text-black hover:brightness-105"
-                            >
-                                <Download className="w-3.5 h-3.5 mr-1.5" />
-                                Télécharger la fiche (.md)
-                            </Button>
+                        <div className="pt-4 border-t border-border flex items-center justify-between gap-3">
+                            <div>
+                                {(isAdmin || isItemOwner('prosit', selectedPrositModal, currentUser)) && (
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                                const p = selectedPrositModal;
+                                                setSelectedPrositModal(null);
+                                                handleStartEditProsit(p);
+                                            }}
+                                            className="text-xs text-accent-yellow border-accent-yellow/30 hover:bg-accent-yellow/10 cursor-pointer"
+                                        >
+                                            <Edit3 className="w-3.5 h-3.5 mr-1" />
+                                            Modifier
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleDeleteProsit(selectedPrositModal.id)}
+                                            className="text-xs text-red-400 border-red-500/30 hover:bg-red-500/10 cursor-pointer"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5 mr-1" />
+                                            Supprimer
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setSelectedPrositModal(null)}
+                                    className="text-xs"
+                                >
+                                    Fermer
+                                </Button>
+                                <Button
+                                    variant="premium"
+                                    size="sm"
+                                    onClick={() => handleDownloadMarkdown(selectedPrositModal.title, `# PROSIT : ${selectedPrositModal.title}\n\n## 3. Problématique\n${selectedPrositModal.problemStatement}\n\n## 2. Contexte\n${selectedPrositModal.context}\n\n## 6. Plan d'action\n${selectedPrositModal.actionPlan.join('\n')}`)}
+                                    className="text-xs bg-accent-yellow text-black hover:brightness-105"
+                                >
+                                    <Download className="w-3.5 h-3.5 mr-1.5" />
+                                    Télécharger la fiche (.md)
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1130,7 +1184,7 @@ ${deliverables.split('\n').filter(d => d.trim()).map(d => `- [ ] ${d.trim()}`).j
                 contributionType="prosit"
             />
 
-            {/* Modal: Edit Prosit (Admin) */}
+            {/* Modal: Edit Prosit */}
             {editingProsit && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto card-editorial p-6 sm:p-8 rounded-3xl bg-surface-card border border-border shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
@@ -1138,7 +1192,7 @@ ${deliverables.split('\n').filter(d => d.trim()).map(d => `- [ ] ${d.trim()}`).j
                             <div className="flex items-center gap-2.5">
                                 <Edit3 className="w-5 h-5 text-accent-yellow" />
                                 <h3 className="font-serif text-lg font-normal text-text-primary">
-                                    Modifier le Prosit (Mode Admin)
+                                    {isAdmin && !isItemOwner('prosit', editingProsit, currentUser) ? "Modifier le Prosit (Mode Admin)" : "Modifier mon Prosit"}
                                 </h3>
                             </div>
                             <button

@@ -10,14 +10,18 @@ interface CCTLCardProps {
     cctl: PublishedCCTLMeta;
     href: string;
     isAdmin?: boolean;
+    canManage?: boolean;
+    isOwner?: boolean;
     onEdit?: (cctl: PublishedCCTLMeta) => void;
     onDelete?: (id: string) => void;
 }
 
-export function CCTLCard({ cctl, href, isAdmin, onEdit, onDelete }: CCTLCardProps) {
+export function CCTLCard({ cctl, href, isAdmin, canManage, isOwner, onEdit, onDelete }: CCTLCardProps) {
     const promoBadgeText = cctl.specialty
         ? (cctl.specialty.includes(cctl.promo) ? cctl.specialty : `${cctl.specialty} • ${cctl.promo}`)
         : cctl.promo;
+
+    const userCanManage = Boolean(canManage || isAdmin);
 
     return (
         <div className="glass group rounded-3xl border border-border/80 hover:border-accent-yellow/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col shadow-lg hover:shadow-accent-yellow/5 relative">
@@ -28,11 +32,15 @@ export function CCTLCard({ cctl, href, isAdmin, onEdit, onDelete }: CCTLCardProp
                         {promoBadgeText}
                     </span>
                     <div className="flex items-center gap-2">
-                        {isAdmin && (
+                        {isAdmin ? (
                             <span className="text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/40">
                                 ADMIN
                             </span>
-                        )}
+                        ) : isOwner ? (
+                            <span className="text-[10px] font-mono font-bold bg-accent-yellow/15 text-text-primary px-1.5 py-0.5 rounded border border-accent-yellow/30">
+                                VOTRE DÉPÔT
+                            </span>
+                        ) : null}
                         <span className="text-text-secondary text-xs font-semibold bg-surface-highlight/70 px-2.5 py-1 rounded-lg border border-border/50 font-mono">
                             {formatAcademicYear(cctl.year)}
                         </span>
@@ -73,7 +81,7 @@ export function CCTLCard({ cctl, href, isAdmin, onEdit, onDelete }: CCTLCardProp
                     </Button>
                 </Link>
 
-                {isAdmin && (
+                {userCanManage && (
                     <div className="flex items-center gap-1.5 shrink-0">
                         {onEdit && (
                             <button
@@ -84,7 +92,7 @@ export function CCTLCard({ cctl, href, isAdmin, onEdit, onDelete }: CCTLCardProp
                                     onEdit(cctl);
                                 }}
                                 className="px-2.5 py-1.5 rounded-xl border border-accent-yellow/40 bg-accent-yellow/10 hover:bg-accent-yellow hover:text-black text-accent-yellow transition-all cursor-pointer text-xs font-bold flex items-center gap-1"
-                                title="Modifier ce CCTL (Mode Administrateur)"
+                                title={isOwner && !isAdmin ? "Modifier mon CCTL" : "Modifier ce CCTL"}
                             >
                                 <Edit3 className="w-3.5 h-3.5" />
                                 <span className="hidden sm:inline">Éditer</span>
@@ -99,7 +107,7 @@ export function CCTLCard({ cctl, href, isAdmin, onEdit, onDelete }: CCTLCardProp
                                     onDelete(cctl.id);
                                 }}
                                 className="p-1.5 rounded-xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all cursor-pointer"
-                                title="Supprimer ce CCTL (Mode Administrateur)"
+                                title={isOwner && !isAdmin ? "Supprimer mon CCTL" : "Supprimer ce CCTL"}
                             >
                                 <Trash2 className="w-3.5 h-3.5" />
                             </button>

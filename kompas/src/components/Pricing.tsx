@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Logo } from '@/components/Logo';
-import { Check, Zap, ArrowRight, ShieldCheck, Loader2, Sparkles } from 'lucide-react';
+import { Check, ArrowRight, ShieldCheck, Loader2, Sparkles } from 'lucide-react';
 
 export default function Pricing() {
     const [isAnnual, setIsAnnual] = useState(true);
@@ -183,7 +182,7 @@ export default function Pricing() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {[
                                         "Générateur IA de CCTL Blancs (Entraînement infini)",
-                                        "Coach IA Pas-à-Pas 24/7 & Drills sur chaque erreur",
+                                        "Coach IA Pas-à-Pas 24/7 sur chaque erreur",
                                         "Archives CCTL illimitées (Promos A1 à A5, FISA/FISE)",
                                         "Simulateur chronométré avec notation CESI (A à D)",
                                         "Générateur IA de Prosits (Méthode 7 étapes)",

@@ -6,7 +6,6 @@ import {
     Search,
     ArrowRight,
     RotateCcw,
-    Loader2,
 } from 'lucide-react';
 import { PrositEntry } from '@/types/prosit';
 
@@ -17,7 +16,6 @@ interface PrositsClientViewProps {
 export default function PrositsClientView({ initialProsits }: PrositsClientViewProps) {
     const router = useRouter();
     const [prosits, setProsits] = useState<PrositEntry[]>(initialProsits);
-    const [isLoading, setIsLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPromo, setSelectedPromo] = useState('Tous');
     const [selectedSpecialty, setSelectedSpecialty] = useState('Tous');
@@ -34,7 +32,9 @@ export default function PrositsClientView({ initialProsits }: PrositsClientViewP
                 console.error('Failed to load prosits dynamically:', e);
             }
         };
-        fetchProsits();
+
+        window.addEventListener('kompas_prosit_published', fetchProsits);
+        return () => window.removeEventListener('kompas_prosit_published', fetchProsits);
     }, []);
 
     const filteredProsits = useMemo(() => {

@@ -10,23 +10,16 @@ import {
     Zap,
     BookOpen,
     ArrowLeft,
-    CheckCircle2,
     Check,
     AlertCircle,
     Loader2,
     SlidersHorizontal,
-    Share2,
-    Download,
-    Eye,
     RotateCcw,
-    Layers,
-    Code2,
     Clock,
-    FileUp,
     FileCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CCTLExam, CCTLQuestion } from '@/types/cctl';
+import { CCTLExam } from '@/types/cctl';
 import { CCTLQuestionCard } from '@/components/cctl/CCTLQuestionCard';
 import { CCTLFlashcards } from '@/components/cctl/CCTLFlashcards';
 import { CCTLExamPressurePlayer } from '@/components/cctl/CCTLExamPressurePlayer';

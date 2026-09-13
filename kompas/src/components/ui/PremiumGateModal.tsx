@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, Zap, Check, X, ArrowRight, Loader2 } from 'lucide-react';
+import { Zap, Check, X, ArrowRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface PremiumGateModalProps {

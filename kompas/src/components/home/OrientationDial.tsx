@@ -355,8 +355,14 @@ export default function OrientationDial() {
         <section className="py-20 sm:py-28 relative overflow-hidden bg-background">
             <div className="container mx-auto px-4 sm:px-6 relative z-10 max-w-7xl space-y-8">
                 
-                {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-6 border-b border-border/70">
+                {/* Header with scroll reveal */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-60px" }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-6 border-b border-border/70"
+                >
                     <div className="space-y-2 max-w-2xl">
                         <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-normal text-text-primary tracking-tight">
                             Quel est votre <span className="italic font-normal">cursus au CESI ?</span>
@@ -366,17 +372,29 @@ export default function OrientationDial() {
                     <p className="text-xs sm:text-sm text-text-secondary max-w-md leading-relaxed">
                         Accédez directement à vos annales de CCTL, fiches Prosits et livrables par niveau d&apos;études.
                     </p>
-                </div>
+                </motion.div>
 
                 {/* PROMOTION SELECTORS DIRECTLY ON PAGE */}
-                <div className="space-y-3.5">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.55, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                    className="space-y-3.5"
+                >
                     <div className="flex flex-wrap items-center justify-start gap-2.5 sm:gap-3">
-                        {PROMO_OPTIONS.map((promo) => {
+                        {PROMO_OPTIONS.map((promo, idx) => {
                             const isSelected = selectedYear === promo.id;
                             return (
-                                <button
+                                <motion.button
                                     key={promo.id}
                                     type="button"
+                                    initial={{ opacity: 0, scale: 0.92 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.35, delay: idx * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                                    whileHover={{ scale: 1.03 }}
+                                    whileTap={{ scale: 0.97 }}
                                     onClick={() => setSelectedYear(promo.id)}
                                     className={`py-2.5 px-4 sm:px-5 rounded-2xl border text-center transition-all cursor-pointer flex items-center justify-center gap-2 text-sm font-mono ${
                                         isSelected
@@ -386,7 +404,7 @@ export default function OrientationDial() {
                                 >
                                     <span className="font-bold">{promo.label}</span>
                                     <span className="text-xs text-text-muted font-normal">({promo.sublabel})</span>
-                                </button>
+                                </motion.button>
                             );
                         })}
                     </div>
@@ -395,22 +413,27 @@ export default function OrientationDial() {
                     <AnimatePresence>
                         {!isA1 && (
                             <motion.div
-                                initial={{ opacity: 0, y: -4 }}
+                                initial={{ opacity: 0, y: -6 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -4 }}
-                                transition={{ duration: 0.16 }}
+                                exit={{ opacity: 0, y: -6 }}
+                                transition={{ duration: 0.2 }}
                                 className="space-y-1.5 pt-1"
                             >
                                 <div className="text-base sm:text-lg font-serif font-normal text-text-primary tracking-tight">
                                     Votre {trackLabel} :
                                 </div>
                                 <div className="flex flex-wrap items-center justify-start gap-2.5 sm:gap-3">
-                                    {SPECIALTY_OPTIONS.map((specialty) => {
+                                    {SPECIALTY_OPTIONS.map((specialty, idx) => {
                                         const isSelected = selectedSpecialty === specialty.id;
                                         return (
-                                            <button
+                                            <motion.button
                                                 key={specialty.id}
                                                 type="button"
+                                                initial={{ opacity: 0, scale: 0.94 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                transition={{ duration: 0.2, delay: idx * 0.04 }}
+                                                whileHover={{ scale: 1.03 }}
+                                                whileTap={{ scale: 0.97 }}
                                                 onClick={() => setSelectedSpecialty(specialty.id)}
                                                 className={`py-2.5 px-4 sm:px-5 rounded-2xl border text-center transition-all cursor-pointer flex items-center justify-center gap-2 text-sm font-medium ${
                                                     isSelected
@@ -420,130 +443,137 @@ export default function OrientationDial() {
                                             >
                                                 <span className="text-base">{specialty.icon}</span>
                                                 <span>{specialty.label}</span>
-                                            </button>
+                                            </motion.button>
                                         );
                                     })}
                                 </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
-                </div>
+                </motion.div>
 
                 {/* TRACK PRESENTATION CARD CONTAINER */}
-                <AnimatePresence mode="wait" initial={false}>
-                    <motion.div
-                        key={isA1 ? 'A1-tronc-commun' : `${selectedYear}-${selectedSpecialty}`}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.2 }}
-                        className="rounded-3xl p-6 sm:p-8 bg-surface-card border border-border shadow-lg"
-                    >
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                            
-                            {/* Left Column: Track Info & Resource Numbers */}
-                            <div className="lg:col-span-5 space-y-5 lg:border-r lg:border-border/60 lg:pr-8">
-                                <div className="space-y-3">
-                                    {/* Badge : Mineure / Majeure ou Tronc Commun */}
-                                    <div className="flex items-center gap-2">
-                                        <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface border border-border text-sm font-semibold text-text-primary shadow-xs">
-                                            {!isA1 && <span className="text-base">{currentSpecialtyMeta.icon}</span>}
-                                            <span>
-                                                {isA1 ? 'Tronc Commun' : `${trackLabel} ${currentSpecialtyMeta.label}`}
+                <motion.div
+                    initial={{ opacity: 0, y: 30, scale: 0.98 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, margin: "-60px" }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                >
+                    <AnimatePresence mode="wait" initial={false}>
+                        <motion.div
+                            key={isA1 ? 'A1-tronc-commun' : `${selectedYear}-${selectedSpecialty}`}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                            className="rounded-3xl p-6 sm:p-8 bg-surface-card border border-border shadow-lg"
+                        >
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                                
+                                {/* Left Column: Track Info & Resource Numbers */}
+                                <div className="lg:col-span-5 space-y-5 lg:border-r lg:border-border/60 lg:pr-8">
+                                    <div className="space-y-3">
+                                        {/* Badge : Mineure / Majeure ou Tronc Commun */}
+                                        <div className="flex items-center gap-2">
+                                            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface border border-border text-sm font-semibold text-text-primary shadow-xs">
+                                                {!isA1 && <span className="text-base">{currentSpecialtyMeta.icon}</span>}
+                                                <span>
+                                                    {isA1 ? 'Tronc Commun' : `${trackLabel} ${currentSpecialtyMeta.label}`}
+                                                </span>
                                             </span>
-                                        </span>
+                                        </div>
+
+                                        {/* Titre simplifié : Année - Cycle */}
+                                        <h3 className="text-2xl sm:text-3xl font-serif font-normal text-text-primary leading-tight">
+                                            {selectedYear} — {cycleName}
+                                        </h3>
+
+                                        <p className="text-xs sm:text-sm text-text-secondary leading-relaxed font-normal">
+                                            {currentTrack.description}
+                                        </p>
                                     </div>
 
-                                    {/* Titre simplifié : Année - Cycle */}
-                                    <h3 className="text-2xl sm:text-3xl font-serif font-normal text-text-primary leading-tight">
-                                        {selectedYear} — {cycleName}
-                                    </h3>
-
-                                    <p className="text-xs sm:text-sm text-text-secondary leading-relaxed font-normal">
-                                        {currentTrack.description}
-                                    </p>
-                                </div>
-
-                                <div className="pt-2">
-                                    <Link href={`/cctl?q=${encodeURIComponent(selectedYear)}`}>
-                                        <button className="w-full sm:w-auto px-6 py-3 rounded-xl bg-accent-yellow text-black font-bold text-xs hover:brightness-105 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                                            <span>Explorer les ressources {selectedYear}</span>
-                                            <ArrowRight size={13} />
-                                        </button>
-                                    </Link>
-                                </div>
-                            </div>
-
-                            {/* Right Column: Top Prosits (1st) & Top CCTLs (2nd) */}
-                            <div className="lg:col-span-7 space-y-6">
-                                {/* 1. Prosits Disponibles (En premier) */}
-                                <div>
-                                    <div className="flex items-center justify-between mb-3">
-                                        <div className="flex items-center gap-2">
-                                            <div className="p-1.5 rounded-lg bg-surface border border-border/80 text-accent-yellow shadow-2xs">
-                                                <Layers size={14} />
-                                            </div>
-                                            <h4 className="text-base sm:text-lg font-serif font-normal text-text-primary tracking-tight">
-                                                Prosits disponibles
-                                            </h4>
-                                        </div>
-                                        <Link 
-                                            href={`/prosits?q=${encodeURIComponent(selectedYear)}`}
-                                            className="text-xs font-mono font-semibold text-accent-yellow hover:underline flex items-center gap-1"
-                                        >
-                                            <span>Voir tous les prosits →</span>
+                                    <div className="pt-2">
+                                        <Link href={`/cctl?q=${encodeURIComponent(selectedYear)}`}>
+                                            <button className="w-full sm:w-auto px-6 py-3 rounded-xl bg-accent-yellow text-black font-bold text-xs hover:brightness-105 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                                                <span>Explorer les ressources {selectedYear}</span>
+                                                <ArrowRight size={13} />
+                                            </button>
                                         </Link>
                                     </div>
-
-                                    <div className="rounded-2xl bg-surface/50 border border-border/70 p-3 sm:p-4 divide-y divide-border/50">
-                                        {currentTrack.topProsits.map((prosit, i) => (
-                                            <div key={i} className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3 text-xs">
-                                                <div className="flex items-center gap-2.5 min-w-0">
-                                                    <span className="font-mono text-[10px] text-text-muted shrink-0">
-                                                        {String(i + 1).padStart(2, '0')}.
-                                                    </span>
-                                                    <span className="text-text-secondary truncate font-normal">
-                                                        {prosit}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
                                 </div>
 
-                                {/* 2. CCTL les Plus Consultés (En deuxième) */}
-                                <div>
-                                    <div className="flex items-center justify-between mb-3">
-                                        <div className="flex items-center gap-2">
-                                            <div className="p-1.5 rounded-lg bg-surface border border-border/80 text-accent-yellow shadow-2xs">
-                                                <FileText size={14} />
+                                {/* Right Column: Top Prosits (1st) & Top CCTLs (2nd) */}
+                                <div className="lg:col-span-7 space-y-6">
+                                    {/* 1. Prosits Disponibles (En premier) */}
+                                    <div>
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center gap-2">
+                                                <div className="p-1.5 rounded-lg bg-surface border border-border/80 text-accent-yellow shadow-2xs">
+                                                    <Layers size={14} />
+                                                </div>
+                                                <h4 className="text-base sm:text-lg font-serif font-normal text-text-primary tracking-tight">
+                                                    Prosits disponibles
+                                                </h4>
                                             </div>
-                                            <h4 className="text-base sm:text-lg font-serif font-normal text-text-primary tracking-tight">
-                                                CCTL les plus consultés
-                                            </h4>
+                                            <Link 
+                                                href={`/prosits?q=${encodeURIComponent(selectedYear)}`}
+                                                className="text-xs font-mono font-semibold text-accent-yellow hover:underline flex items-center gap-1"
+                                            >
+                                                <span>Voir tous les prosits →</span>
+                                            </Link>
+                                        </div>
+
+                                        <div className="rounded-2xl bg-surface/50 border border-border/70 p-3 sm:p-4 divide-y divide-border/50">
+                                            {currentTrack.topProsits.map((prosit, i) => (
+                                                <div key={i} className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3 text-xs">
+                                                    <div className="flex items-center gap-2.5 min-w-0">
+                                                        <span className="font-mono text-[10px] text-text-muted shrink-0">
+                                                            {String(i + 1).padStart(2, '0')}.
+                                                        </span>
+                                                        <span className="text-text-secondary truncate font-normal">
+                                                            {prosit}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        {currentTrack.topCCTLExams.map((exam, i) => (
-                                            <Link
-                                                key={i}
-                                                href={`/cctl?q=${encodeURIComponent(exam.split('•')[1]?.trim() || exam)}`}
-                                                className="p-3 rounded-xl bg-transparent border border-border flex items-center justify-between text-xs group hover:border-accent-yellow/70 hover:bg-surface/40 hover:-translate-y-0.5 transition-all cursor-pointer"
-                                            >
-                                                <span className="font-medium text-text-primary truncate">{exam}</span>
-                                                <span className="font-mono text-xs font-bold text-accent-yellow flex items-center gap-1 opacity-80 group-hover:opacity-100 group-hover:translate-x-1 transition-all shrink-0 ml-2">
-                                                    <span>Consulter →</span>
-                                                </span>
-                                            </Link>
-                                        ))}
+                                    {/* 2. CCTL les Plus Consultés (En deuxième) */}
+                                    <div>
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center gap-2">
+                                                <div className="p-1.5 rounded-lg bg-surface border border-border/80 text-accent-yellow shadow-2xs">
+                                                    <FileText size={14} />
+                                                </div>
+                                                <h4 className="text-base sm:text-lg font-serif font-normal text-text-primary tracking-tight">
+                                                    CCTL les plus consultés
+                                                </h4>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            {currentTrack.topCCTLExams.map((exam, i) => (
+                                                <Link
+                                                    key={i}
+                                                    href={`/cctl?q=${encodeURIComponent(exam.split('•')[1]?.trim() || exam)}`}
+                                                    className="p-3 rounded-xl bg-transparent border border-border flex items-center justify-between text-xs group hover:border-accent-yellow/70 hover:bg-surface/40 hover:-translate-y-0.5 transition-all cursor-pointer"
+                                                >
+                                                    <span className="font-medium text-text-primary truncate">{exam}</span>
+                                                    <span className="font-mono text-xs font-bold text-accent-yellow flex items-center gap-1 opacity-80 group-hover:opacity-100 group-hover:translate-x-1 transition-all shrink-0 ml-2">
+                                                        <span>Consulter →</span>
+                                                    </span>
+                                                </Link>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                        </div>
-                    </motion.div>
-                </AnimatePresence>
+                            </div>
+                        </motion.div>
+                    </AnimatePresence>
+                </motion.div>
 
             </div>
         </section>

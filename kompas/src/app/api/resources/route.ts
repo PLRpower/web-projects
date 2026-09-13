@@ -13,7 +13,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { title, description, category, promo, specialty, author, campus, fileSize, fileType, content } = body;
+        const { title, description, category, promo, specialty, author, authorId, authorEmail, isAnonymous, campus, fileSize, fileType, content } = body;
 
         if (!title || !description || !content) {
             return NextResponse.json({ success: false, error: 'Champs obligatoires manquants.' }, { status: 400 });
@@ -25,7 +25,10 @@ export async function POST(request: NextRequest) {
             category: category || 'Fiche Mémo',
             promo: promo || 'A3',
             specialty: specialty || 'Informatique',
-            author: author || 'Élève-Ingénieur CESI',
+            authorId,
+            authorEmail,
+            author: isAnonymous ? 'Utilisateur Anonyme' : (author || 'Élève-Ingénieur CESI'),
+            isAnonymous: Boolean(isAnonymous),
             campus: campus || 'CESI',
             fileSize: fileSize || '15 KB',
             fileType: fileType || 'MD',

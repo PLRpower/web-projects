@@ -1,0 +1,31 @@
+---
+import type { Dict } from '../i18n';
+
+interface Props {
+  t: Dict;
+}
+
+const { t } = Astro.props;
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="#top" class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>Ballroom <em>Strasbourg</em></span>
+        </a>
+        <p class="footer-tagline">{t.footer.tagline}</p>
+      </div>
+
+      <nav class="footer-links" aria-label="Footer">
+        <span class="footer-label">{t.footer.follow} —</span>
+        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a>
+      </nav>
+    </div>
+
+    <p class="footer-bottom">© 2026 — {t.footer.rights}</p>
+  </div>
+</footer>

@@ -17,8 +17,13 @@ export interface LivrableEntry {
     format: string;
     downloadCount: number;
     viewsCount: number;
+    authorId?: string;
+    authorEmail?: string;
     authorName: string;
     isAnonymous: boolean;
     publishedAt: string;
     markdownTemplate?: string;
+    hasPdf?: boolean;
+    pdfFileName?: string;
+    pdfUrl?: string;
 }

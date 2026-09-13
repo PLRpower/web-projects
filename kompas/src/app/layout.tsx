@@ -1,16 +1,16 @@
 import type { Metadata, Viewport } from 'next'
-import { Newsreader, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google'
+import { Literata, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider';
+import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import { PWAInstallerBanner } from '@/components/pwa/PWAInstallerBanner';
 import { SingleSessionModal } from '@/components/auth/SingleSessionModal';
 
-const serifFont = Newsreader({
+const serifFont = Literata({
   subsets: ['latin'],
   variable: '--font-serif',
   display: 'swap',
   style: ['normal', 'italic'],
-  weight: ['400', '500', '600', '700'],
 })
 
 const sansFont = Plus_Jakarta_Sans({
@@ -147,16 +147,18 @@ export default function RootLayout({
         />
       </head>
       <body className={`${sansFont.className} antialiased bg-background text-text-primary selection:bg-amber-300 selection:text-black min-h-screen`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <PWAInstallerBanner />
-          <SingleSessionModal />
-          {children}
-        </ThemeProvider>
+        <PostHogProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <PWAInstallerBanner />
+            <SingleSessionModal />
+            {children}
+          </ThemeProvider>
+        </PostHogProvider>
       </body>
     </html>
   )

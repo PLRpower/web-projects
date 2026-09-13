@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Logo } from '@/components/Logo';
 import {
-    User,
     Mail,
     MapPin,
     GraduationCap,
@@ -20,7 +18,6 @@ import {
     Check,
     Star
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/client';
 import { isAdminUser, isAdminEmail } from '@/lib/admin';
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link';
 import {
     Sparkles,
     Plus,
@@ -20,16 +19,10 @@ import {
     Shuffle,
     ArrowLeft,
     ArrowRight,
-    Code2,
     Check,
-    HelpCircle,
     User,
-    Share2,
-    Calendar,
-    GraduationCap,
-    Copy,
     Download,
-    WifiOff
+    Copy
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CodeBlock } from '@/components/cctl/CodeBlock';
@@ -44,6 +37,7 @@ import {
 } from '@/lib/offline-storage';
 import { createClient } from '@/utils/supabase/client';
 import { isAdminUser, isAdminEmail } from '@/lib/admin';
+import { isItemOwner, recordItemOwnership, removeItemOwnership, OwnershipUser } from '@/lib/user-ownership';
 
 const PROMO_OPTIONS = ['Tous', 'A1', 'A2', 'A3', 'A4', 'A5'];
 const DOMAIN_OPTIONS = [
@@ -63,6 +57,7 @@ export default function FlashcardsPage() {
     const [userName, setUserName] = useState('Élève-Ingénieur');
     const [userPromo, setUserPromo] = useState('A3');
     const [isAdmin, setIsAdmin] = useState(false);
+    const [currentUser, setCurrentUser] = useState<OwnershipUser | null>(null);
 
     // Decks state
     const [decks, setDecks] = useState<FlashcardDeck[]>(SEED_FLASHCARD_DECKS);
@@ -91,6 +86,7 @@ export default function FlashcardsPage() {
         domain: string;
         tagsInput: string;
         isPublic: boolean;
+        isAnonymous: boolean;
         cards: FlashcardItem[];
     }>({
         title: '',
@@ -100,6 +96,7 @@ export default function FlashcardsPage() {
         domain: 'Sciences & Mathématiques',
         tagsInput: 'Cours, Révision, CESI',
         isPublic: true,
+        isAnonymous: false,
         cards: [
             { id: '1', front: '', back: '' }
         ]
@@ -129,6 +126,11 @@ export default function FlashcardsPage() {
             try {
                 const { data: { user } } = await supabase.auth.getUser();
                 if (user) {
+                    setCurrentUser({
+                        id: user.id,
+                        email: user.email,
+                        name: (user.user_metadata?.name as string) || undefined
+                    });
                     if (isAdminUser(user) || isAdminEmail(user.email)) {
                         setIsAdmin(true);
                     }
@@ -172,9 +174,17 @@ export default function FlashcardsPage() {
             } catch {}
         }
 
+        const handleOwnershipUpdated = () => {
+            setDecks(prev => [...prev]);
+        };
+
         syncOfflineDecks();
         window.addEventListener('kompas_offline_updated', syncOfflineDecks);
-        return () => window.removeEventListener('kompas_offline_updated', syncOfflineDecks);
+        window.addEventListener('kompas_ownership_updated', handleOwnershipUpdated);
+        return () => {
+            window.removeEventListener('kompas_offline_updated', syncOfflineDecks);
+            window.removeEventListener('kompas_ownership_updated', handleOwnershipUpdated);
+        };
     }, []);
 
     // Save decks to localStorage
@@ -198,9 +208,11 @@ export default function FlashcardsPage() {
     // Filtered decks
     const filteredDecks = useMemo(() => {
         return decks.filter(deck => {
-            if (activeTab === 'my_decks' && deck.authorName !== userName) return false;
+            const isOwner = isItemOwner('flashcard', deck, currentUser);
+            const isMyDeck = isOwner || deck.authorName === userName;
+            if (activeTab === 'my_decks' && !isMyDeck) return false;
             if (activeTab === 'offline' && !offlineDeckIds[deck.id]) return false;
-            if (activeTab === 'community' && !deck.isPublic && deck.authorName !== userName) return false;
+            if (activeTab === 'community' && !deck.isPublic && !isMyDeck && !isAdmin) return false;
 
             const promoMatch = selectedPromo === 'Tous' || deck.promo === selectedPromo;
             const domainMatch = selectedDomain === 'Tous' || deck.domain === selectedDomain;
@@ -215,7 +227,7 @@ export default function FlashcardsPage() {
 
             return promoMatch && domainMatch && searchMatch;
         });
-    }, [decks, activeTab, userName, selectedPromo, selectedDomain, searchQuery, offlineDeckIds]);
+    }, [decks, activeTab, userName, currentUser, isAdmin, selectedPromo, selectedDomain, searchQuery, offlineDeckIds]);
 
     // Handle Start Practice
     const handleStartPractice = (deck: FlashcardDeck) => {
@@ -264,6 +276,7 @@ export default function FlashcardsPage() {
             domain: 'Développement Web',
             tagsInput: 'TypeScript, Clean Code, CESI',
             isPublic: true,
+            isAnonymous: false,
             cards: [
                 { id: 'card-1', front: '', back: '', codeSnippet: '', codeLanguage: 'typescript' },
                 { id: 'card-2', front: '', back: '', codeSnippet: '', codeLanguage: 'typescript' }
@@ -285,6 +298,7 @@ export default function FlashcardsPage() {
             domain: deck.domain,
             tagsInput: deck.tags.join(', '),
             isPublic: deck.isPublic,
+            isAnonymous: deck.isAnonymous ?? false,
             cards: deck.cards.map((c, idx) => ({ ...c, id: c.id || `card-${idx + 1}` }))
         });
         setViewMode('creator');
@@ -295,6 +309,7 @@ export default function FlashcardsPage() {
     const handleDeleteDeck = (deckId: string, e: React.MouseEvent) => {
         e.stopPropagation();
         if (confirm('Êtes-vous sûr de vouloir supprimer ce deck de flashcards ?')) {
+            removeItemOwnership('flashcard', deckId);
             const updated = decks.filter(d => d.id !== deckId);
             persistDecks(updated);
         }
@@ -379,6 +394,7 @@ export default function FlashcardsPage() {
                         domain: formData.domain,
                         tags,
                         isPublic: formData.isPublic,
+                        isAnonymous: formData.isAnonymous,
                         updatedAt: new Date().toISOString(),
                         cards: validCards
                     };
@@ -388,15 +404,20 @@ export default function FlashcardsPage() {
             persistDecks(updated);
         } else {
             // Create new
+            const isAnon = formData.isAnonymous;
+            const newDeckId = `deck-${Date.now().toString(36)}`;
             const newDeck: FlashcardDeck = {
-                id: `deck-${Date.now().toString(36)}`,
+                id: newDeckId,
                 title: formData.title.trim(),
                 description: formData.description.trim(),
                 promo: formData.promo,
                 specialty: formData.specialty,
                 domain: formData.domain,
                 tags: tags.length > 0 ? tags : ['Flashcards', 'CESI'],
-                authorName: userName,
+                authorId: currentUser?.id,
+                authorEmail: currentUser?.email,
+                authorName: isAnon ? 'Élève Anonyme' : userName,
+                isAnonymous: isAnon,
                 isPublic: formData.isPublic,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
@@ -404,6 +425,7 @@ export default function FlashcardsPage() {
                 practicesCount: 0,
                 cards: validCards
             };
+            recordItemOwnership('flashcard', newDeckId);
             persistDecks([newDeck, ...decks]);
         }
 
@@ -527,7 +549,8 @@ export default function FlashcardsPage() {
                     {/* Decks Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredDecks.map((deck) => {
-                            const isMyDeck = deck.authorName === userName;
+                            const isOwner = isItemOwner('flashcard', deck, currentUser);
+                            const isMyDeck = isOwner || deck.authorName === userName;
                             const canManage = isMyDeck || isAdmin;
                             const isLiked = likedDecks[deck.id];
 
@@ -858,6 +881,19 @@ export default function FlashcardsPage() {
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     className="w-full bg-surface-highlight/50 border border-border rounded-xl p-3 text-xs sm:text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-yellow/50"
                                 />
+                            </div>
+
+                            <div className="flex items-center gap-2 pt-1">
+                                <input
+                                    type="checkbox"
+                                    id="flashcard-anonymous"
+                                    checked={formData.isAnonymous}
+                                    onChange={(e) => setFormData({ ...formData, isAnonymous: e.target.checked })}
+                                    className="w-4 h-4 rounded border-border text-accent-yellow focus:ring-accent-yellow/40 cursor-pointer"
+                                />
+                                <label htmlFor="flashcard-anonymous" className="text-xs text-text-secondary cursor-pointer select-none">
+                                    Publier anonymement sous le nom &ldquo;Élève Anonyme&rdquo;
+                                </label>
                             </div>
                         </div>
                     </div>

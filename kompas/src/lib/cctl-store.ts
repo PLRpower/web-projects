@@ -3,6 +3,13 @@ import path from 'path';
 import { CCTLExam } from '@/types/cctl';
 import { ALL_SEED_CCTLS } from '@/lib/cctl-seed-data';
 import { generateCCTLBadges } from '@/lib/ai-cctl-badges';
+import { anonymizeCCTLPdf } from '@/lib/cctl-anonymizer';
+import {
+    uploadToSupabaseStorage,
+    downloadFromSupabaseStorage,
+    deleteFromSupabaseStorage,
+    STORAGE_BUCKETS
+} from '@/lib/supabase-storage';
 
 export interface PublishedCCTLMeta {
     id: string;
@@ -17,6 +24,8 @@ export interface PublishedCCTLMeta {
     year: string;
     domain: string;
     totalQuestions: number;
+    authorId?: string;
+    authorEmail?: string;
     authorName?: string;
     isAnonymous: boolean;
     publishedAt: string;
@@ -82,11 +91,24 @@ export async function getCCTLPdfBuffer(id: string): Promise<{ buffer: Buffer; fi
     entry.downloadsCount = (entry.downloadsCount || 0) + 1;
     fs.writeFile(DATA_FILE, JSON.stringify(entries, null, 2), 'utf-8').catch(() => {});
 
+    const cleanName = `${entry.subject.replace(/[^a-zA-Z0-9]/g, '_')}_${entry.promo}_${entry.year}.pdf`;
+    const targetFileName = entry.pdfFileName || cleanName;
+
+    // 1. Try fetching from Supabase Storage bucket 'cctl'
+    try {
+        const supabaseBuffer = await downloadFromSupabaseStorage(STORAGE_BUCKETS.CCTL, `${id}.pdf`);
+        if (supabaseBuffer && supabaseBuffer.length > 0) {
+            return { buffer: supabaseBuffer, fileName: targetFileName };
+        }
+    } catch (e) {
+        console.warn(`[CCTL Store] Supabase download error for ${id}:`, e);
+    }
+
+    // 2. Fallback to local filesystem .data/pdfs
     const pdfPath = path.join(PDFS_DIR, `${id}.pdf`);
     try {
         const buffer = await fs.readFile(pdfPath);
-        const cleanName = `${entry.subject.replace(/[^a-zA-Z0-9]/g, '_')}_${entry.promo}_${entry.year}.pdf`;
-        return { buffer, fileName: entry.pdfFileName || cleanName };
+        return { buffer, fileName: targetFileName };
     } catch {
         // Fallback to example pdf if original not found
         try {
@@ -107,6 +129,9 @@ export async function publishCCTL(
         promo?: string;
         year?: string;
         domain?: string;
+        authorId?: string;
+        authorEmail?: string;
+        authorName?: string;
         isAnonymous?: boolean;
         pdfBase64?: string;
     }
@@ -120,25 +145,65 @@ export async function publishCCTL(
     const subject = customMeta?.subject || exam.subject || exam.title;
     const title = customMeta?.title || `${subject} (${promo} - ${year})`;
     const isAnonymous = customMeta?.isAnonymous ?? false;
+    const authorId = customMeta?.authorId || exam.authorId;
+    const authorEmail = customMeta?.authorEmail || exam.authorEmail;
 
     let hasPdf = false;
-    let pdfFileName = `${subject.replace(/[^a-zA-Z0-9]/g, '_')}_${promo}_${year}.pdf`;
+    const pdfFileName = `${subject.replace(/[^a-zA-Z0-9]/g, '_')}_${promo}_${year}.pdf`;
 
-    // Save PDF if base64 buffer provided
+    // Save PDF to Supabase Storage and local fallback
     if (customMeta?.pdfBase64) {
         try {
-            const pdfBuffer = Buffer.from(customMeta.pdfBase64, 'base64');
-            const destPath = path.join(PDFS_DIR, `${id}.pdf`);
-            await fs.writeFile(destPath, pdfBuffer);
-            hasPdf = true;
+            let pdfBuffer = Buffer.from(customMeta.pdfBase64, 'base64');
+            
+            // Ensure student identity inside PDF is anonymized when publishing anonymously
+            if (isAnonymous) {
+                try {
+                    const anonResult = await anonymizeCCTLPdf(
+                        pdfBuffer,
+                        exam.originalFileName || exam.metadata?.fileName || pdfFileName
+                    );
+                    if (anonResult.success && anonResult.anonymizedBuffer) {
+                        pdfBuffer = Buffer.from(anonResult.anonymizedBuffer);
+                    }
+                } catch (anonErr) {
+                    console.warn('PDF anonymization during publish:', anonErr);
+                }
+            }
+
+            // Upload to Supabase bucket 'cctl'
+            const uploadRes = await uploadToSupabaseStorage(
+                STORAGE_BUCKETS.CCTL,
+                `${id}.pdf`,
+                pdfBuffer,
+                'application/pdf'
+            );
+            if (uploadRes.success) {
+                hasPdf = true;
+            }
+
+            // Local fallback copy
+            try {
+                const destPath = path.join(PDFS_DIR, `${id}.pdf`);
+                await fs.writeFile(destPath, pdfBuffer);
+                hasPdf = true;
+            } catch (e) {
+                console.warn('Error saving local fallback PDF:', e);
+            }
         } catch (e) {
             console.error('Error saving published PDF:', e);
         }
     } else {
-        // Try fallback to example pdf if it's the example
+        // Fallback to example pdf if it's the default example
         try {
             const examplePath = path.join(process.cwd(), 'exemple-cctl.pdf');
             const buffer = await fs.readFile(examplePath);
+            await uploadToSupabaseStorage(
+                STORAGE_BUCKETS.CCTL,
+                `${id}.pdf`,
+                buffer,
+                'application/pdf'
+            );
             const destPath = path.join(PDFS_DIR, `${id}.pdf`);
             await fs.writeFile(destPath, buffer);
             hasPdf = true;
@@ -166,7 +231,9 @@ export async function publishCCTL(
         year,
         domain,
         totalQuestions: exam.questions.length,
-        authorName: isAnonymous ? 'Utilisateur Anonyme' : (exam.studentName || 'Étudiant CESI'),
+        authorId,
+        authorEmail,
+        authorName: isAnonymous ? 'Utilisateur Anonyme' : (customMeta?.authorName || exam.studentName || 'Étudiant CESI'),
         isAnonymous,
         publishedAt: new Date().toISOString(),
         viewsCount: 1,
@@ -182,6 +249,8 @@ export async function publishCCTL(
             subject,
             promo,
             domain,
+            authorId,
+            authorEmail,
             aiBadges
         }
     };
@@ -200,12 +269,15 @@ export async function deleteCCTL(id: string): Promise<boolean> {
     if (filtered.length !== initLen) {
         await fs.writeFile(DATA_FILE, JSON.stringify(filtered, null, 2), 'utf-8');
         
-        // Also remove PDF if exists
+        // Remove from Supabase Storage bucket 'cctl'
+        deleteFromSupabaseStorage(STORAGE_BUCKETS.CCTL, `${id}.pdf`).catch(() => {});
+
+        // Also remove local PDF if exists
         try {
             const pdfPath = path.join(PDFS_DIR, `${id}.pdf`);
             await fs.unlink(pdfPath);
         } catch {
-            // Ignore if pdf doesn't exist
+            // Ignore if local pdf doesn't exist
         }
         return true;
     }

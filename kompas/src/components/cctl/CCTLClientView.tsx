@@ -59,7 +59,10 @@ export default function CCTLClientView({ initialCctls }: CCTLClientViewProps) {
                 console.error('Failed to load cctl dynamically:', e);
             }
         };
-        fetchCctls();
+
+        // Listen for new publications without duplicate mount fetch
+        window.addEventListener('kompas_cctl_published', fetchCctls);
+        return () => window.removeEventListener('kompas_cctl_published', fetchCctls);
     }, []);
 
     const filteredCCTLs = useMemo(() => {

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Logo } from '@/components/Logo';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -11,13 +10,11 @@ import {
     Archive,
     Settings,
     LogOut,
-    User as UserIcon,
     Brain,
     FileText,
     Users,
     FileDown,
-    FolderGit2,
-    Tv
+    FolderGit2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';

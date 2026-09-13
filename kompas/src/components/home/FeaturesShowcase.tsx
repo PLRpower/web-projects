@@ -47,8 +47,14 @@ export default function FeaturesShowcase() {
         <section className="py-20 sm:py-24 relative overflow-hidden bg-background">
             <div className="container mx-auto px-4 sm:px-6 relative z-10 max-w-7xl space-y-12">
                 
-                {/* SECTION HEADER - LARGE & SPACIOUS */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-8 border-b border-border/70">
+                {/* SECTION HEADER - LARGE & SPACIOUS with scroll reveal */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-60px" }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-8 border-b border-border/70"
+                >
                     <div className="space-y-3 max-w-2xl">
                         <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-normal text-text-primary tracking-tight">
                             Tout ce dont vous avez besoin pour <span className="italic font-normal">valider vos semestres.</span>
@@ -58,7 +64,7 @@ export default function FeaturesShowcase() {
                     <p className="text-sm sm:text-base text-text-secondary max-w-md leading-relaxed">
                         Des outils interactifs conçus sur-mesure pour préparer vos examens CCTL, vos fiches Prosits et réviser en toute autonomie.
                     </p>
-                </div>
+                </motion.div>
 
                 {/* 4 LARGE, SPACIOUS INTERACTIVE CARDS */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -66,7 +72,13 @@ export default function FeaturesShowcase() {
                     {/* ======================================================== */}
                     {/* 1. SIMULATEUR CCTL (BTP / Génie Civil - 7 cols) */}
                     {/* ======================================================== */}
-                    <div className="lg:col-span-7 rounded-3xl p-6 sm:p-8 bg-surface-card border border-border shadow-lg flex flex-col justify-between space-y-6">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 32 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                        className="lg:col-span-7 rounded-3xl p-6 sm:p-8 bg-surface-card border border-border shadow-lg flex flex-col justify-between space-y-6 hover:border-accent-yellow/40 transition-colors"
+                    >
                         <div className="space-y-5">
                             {/* Card Header */}
                             <div className="flex items-center gap-3 pb-4 border-b border-border/60">
@@ -99,9 +111,9 @@ export default function FeaturesShowcase() {
 
                                     let btnStyles = "bg-transparent border-border text-text-secondary hover:border-accent-yellow hover:text-text-primary cursor-pointer";
                                     if (showStatus) {
-                                        if (isOptionCorrect) btnStyles = "bg-emerald-500/10 border-emerald-500 text-emerald-500 dark:text-emerald-400 font-semibold";
-                                        else if (isChosen) btnStyles = "bg-rose-500/10 border-rose-500 text-rose-500 dark:text-rose-400";
-                                        else btnStyles = "bg-transparent border-border/40 text-text-muted opacity-40 cursor-not-allowed";
+                                        if (isOptionCorrect) btnStyles = "bg-emerald-500/10 border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold";
+                                        else if (isChosen) btnStyles = "bg-rose-500/10 border-rose-500 text-rose-800 dark:text-rose-300 font-bold";
+                                        else btnStyles = "bg-transparent border-border/40 text-text-secondary cursor-not-allowed";
                                     }
 
                                     const handleToggle = () => {
@@ -156,12 +168,18 @@ export default function FeaturesShowcase() {
                                 <ArrowRight size={14} className="text-accent-yellow group-hover/link:translate-x-1 transition-transform" />
                             </Link>
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* ======================================================== */}
                     {/* 2. FLASHCARDS 3D (Systèmes Embarqués - 5 cols) */}
                     {/* ======================================================== */}
-                    <div className="lg:col-span-5 rounded-3xl p-6 sm:p-8 bg-surface-card border border-border shadow-lg flex flex-col justify-between space-y-6">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 32 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+                        className="lg:col-span-5 rounded-3xl p-6 sm:p-8 bg-surface-card border border-border shadow-lg flex flex-col justify-between space-y-6 hover:border-accent-yellow/40 transition-colors"
+                    >
                         <div className="space-y-5">
                             {/* Card Header */}
                             <div className="flex items-center gap-3 pb-4 border-b border-border/60">
@@ -261,12 +279,18 @@ export default function FeaturesShowcase() {
                                 <ArrowRight size={14} className="text-accent-yellow group-hover/link:translate-x-1 transition-transform" />
                             </Link>
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* ======================================================== */}
                     {/* 3. CHAT INTER-PROMOS (Informatique - 6 cols) */}
                     {/* ======================================================== */}
-                    <div className="lg:col-span-6 rounded-3xl p-6 sm:p-8 bg-surface-card border border-border shadow-lg flex flex-col justify-between space-y-6">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 32 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                        className="lg:col-span-6 rounded-3xl p-6 sm:p-8 bg-surface-card border border-border shadow-lg flex flex-col justify-between space-y-6 hover:border-accent-yellow/40 transition-colors"
+                    >
                         <div className="space-y-5">
                             {/* Card Header */}
                             <div className="flex items-center gap-3 pb-4 border-b border-border/60">
@@ -281,10 +305,16 @@ export default function FeaturesShowcase() {
                                 </div>
                             </div>
 
-                            {/* Clean mock chat - Inverted conversation bubbles */}
+                            {/* Clean mock chat - Staggered scroll animation for bubbles */}
                             <div className="space-y-3">
                                 {/* Message 1: Antoine (Sent by user) */}
-                                <div className="p-4 rounded-2xl bg-surface border border-accent-yellow/70 space-y-1.5 max-w-[92%] sm:max-w-[85%] ml-auto shadow-xs">
+                                <motion.div 
+                                    initial={{ opacity: 0, x: 20 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                                    className="p-4 rounded-2xl bg-surface border border-accent-yellow/70 space-y-1.5 max-w-[92%] sm:max-w-[85%] ml-auto shadow-xs"
+                                >
                                     <div className="flex items-center justify-between gap-3 text-xs sm:text-sm">
                                         <div className="flex items-center gap-2 min-w-0">
                                             <div className="w-6 h-6 rounded-full bg-accent-yellow text-black flex items-center justify-center font-bold text-[10px] font-mono shrink-0">
@@ -297,10 +327,16 @@ export default function FeaturesShowcase() {
                                     <p className="text-text-secondary text-xs sm:text-sm leading-relaxed pl-8">
                                         Quelqu&apos;un a les précisions sur le barème de l&apos;exercice 3 du CCTL d&apos;Architecture Distribuée ?
                                     </p>
-                                </div>
+                                </motion.div>
 
                                 {/* Message 2: Sarah (Received from peer) */}
-                                <div className="p-4 rounded-2xl bg-surface border border-border space-y-1.5 max-w-[92%] sm:max-w-[85%] mr-auto">
+                                <motion.div 
+                                    initial={{ opacity: 0, x: -20 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                                    className="p-4 rounded-2xl bg-surface border border-border space-y-1.5 max-w-[92%] sm:max-w-[85%] mr-auto"
+                                >
                                     <div className="flex items-center justify-between gap-3 text-xs sm:text-sm">
                                         <div className="flex items-center gap-2 min-w-0">
                                             <div className="w-6 h-6 rounded-full bg-accent-yellow/20 text-accent-yellow flex items-center justify-center font-bold text-[10px] font-mono shrink-0">
@@ -314,7 +350,7 @@ export default function FeaturesShowcase() {
                                     <p className="text-text-secondary text-xs sm:text-sm leading-relaxed pl-8">
                                         Le corrigé complet avec les diagrammes de séquence et le pattern Saga est déjà en ligne sur Kompas 📌
                                     </p>
-                                </div>
+                                </motion.div>
                             </div>
                         </div>
 
@@ -324,12 +360,18 @@ export default function FeaturesShowcase() {
                                 <ArrowRight size={14} className="text-accent-yellow group-hover/link:translate-x-1 transition-transform" />
                             </Link>
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* ======================================================== */}
                     {/* 4. GÉNÉRATEUR PROSIT (Généraliste / Génie Industriel - 6 cols) */}
                     {/* ======================================================== */}
-                    <div className="lg:col-span-6 rounded-3xl p-6 sm:p-8 bg-surface-card border border-border shadow-lg flex flex-col justify-between space-y-6">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 32 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+                        className="lg:col-span-6 rounded-3xl p-6 sm:p-8 bg-surface-card border border-border shadow-lg flex flex-col justify-between space-y-6 hover:border-accent-yellow/40 transition-colors"
+                    >
                         <div className="space-y-5">
                             {/* Card Header */}
                             <div className="flex items-center gap-3 pb-4 border-b border-border/60">
@@ -385,7 +427,7 @@ export default function FeaturesShowcase() {
                                 <ArrowRight size={14} className="text-accent-yellow group-hover/link:translate-x-1 transition-transform" />
                             </Link>
                         </div>
-                    </div>
+                    </motion.div>
 
                 </div>
 

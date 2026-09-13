@@ -1,0 +1,64 @@
+---
+import { Image } from 'astro:assets';
+import viniiPortrait from '../assets/vinii/vinii-02.jpg';
+import boStage from '../assets/gallery/ballroom-04.jpg';
+import type { Dict } from '../i18n';
+
+interface Props {
+  t: Dict;
+}
+
+const { t } = Astro.props;
+
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('');
+---
+
+<section class="section" id="artists">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">{t.artists.eyebrow}</p>
+      <h2 class="section-title">{t.artists.title}</h2>
+    </div>
+
+    <div class="artists-grid">
+      <article class="artist-card artist-card--featured">
+        <figure class="artist-photo">
+          <Image src={viniiPortrait} alt={t.artists.vini.photoAlt} width={840} format="webp" />
+        </figure>
+        <div class="artist-top">
+          <div class="monogram" aria-hidden="true">{initials(t.artists.vini.name)}</div>
+          <div>
+            <h3>{t.artists.vini.name}</h3>
+            <span class="artist-role">{t.artists.vini.role}</span>
+          </div>
+        </div>
+        <ul class="credits">
+          {t.artists.vini.credits.map((c) => <li>{c}</li>)}
+        </ul>
+      </article>
+
+      <article class="artist-card artist-card--featured">
+        <figure class="artist-photo artist-photo--landscape">
+          <Image src={boStage} alt={t.artists.bo.photoAlt} width={840} format="webp" />
+        </figure>
+        <div class="artist-top">
+          <div class="monogram" aria-hidden="true">{initials(t.artists.bo.name)}</div>
+          <div>
+            <h3>{t.artists.bo.name}</h3>
+            <span class="artist-role">{t.artists.bo.role}</span>
+          </div>
+        </div>
+        <ul class="credits">
+          {t.artists.bo.credits.map((c) => <li>{c}</li>)}
+        </ul>
+      </article>
+
+      <p class="judges-note">{t.artists.judges}</p>
+    </div>
+  </div>
+</section>

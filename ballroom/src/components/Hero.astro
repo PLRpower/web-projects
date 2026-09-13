@@ -1,0 +1,58 @@
+---
+import { TICKET_URL } from '../i18n';
+import type { Dict } from '../i18n';
+
+interface Props {
+  t: Dict;
+}
+
+const { t } = Astro.props;
+---
+
+<section class="hero" id="top">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="container hero-inner">
+    <p class="hero-eyebrow" set:html={t.hero.eyebrow}></p>
+    <h1 class="hero-title">
+      <span class="hero-title-main">{t.hero.title}</span>
+      <span class="hero-subtitle">
+        <span class="hero-title-code">{t.hero.code}</span>
+        <span class="hero-title-sub">{t.hero.subtitle}</span>
+      </span>
+    </h1>
+    <p class="hero-tagline">{t.hero.tagline}</p>
+
+    <div class="hero-meta">
+      <span><strong>{t.hero.date}</strong></span>
+      <span class="dot" aria-hidden="true">✦</span>
+      <span>{t.hero.city}</span>
+      <span class="dot" aria-hidden="true">✦</span>
+      <span>{t.hero.audience}</span>
+    </div>
+
+    <div class="hero-cta">
+      <a href={TICKET_URL} class="btn btn-primary">{t.hero.ctaPrimary}</a>
+      <a href="#about" class="btn btn-ghost">{t.hero.ctaSecondary}</a>
+    </div>
+
+    <p class="hero-deadline">{t.hero.deadline}</p>
+  </div>
+  <a href="#about" class="hero-scroll" aria-hidden="true">↓</a>
+</section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    {
+      Array.from({ length: 2 }).map(() => (
+        <>
+          <span>Red Light Special</span>
+          <span>24.10.2026</span>
+          <span>Strasbourg</span>
+          <span>Vinii Revlon</span>
+          <span>10 catégories</span>
+          <span>Ballroom</span>
+        </>
+      ))
+    }
+  </div>
+</div>

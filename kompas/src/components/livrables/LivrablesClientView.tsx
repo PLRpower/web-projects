@@ -7,8 +7,7 @@ import {
     ArrowRight,
     RotateCcw,
     Download,
-    CheckCircle2,
-    Loader2
+    CheckCircle2
 } from 'lucide-react';
 import { LivrableEntry } from '@/types/livrable';
 
@@ -19,7 +18,6 @@ interface LivrablesClientViewProps {
 export default function LivrablesClientView({ initialLivrables }: LivrablesClientViewProps) {
     const router = useRouter();
     const [livrables, setLivrables] = useState<LivrableEntry[]>(initialLivrables);
-    const [isLoading, setIsLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPromo, setSelectedPromo] = useState('Tous');
     const [selectedSpecialty, setSelectedSpecialty] = useState('Tous');
@@ -37,7 +35,9 @@ export default function LivrablesClientView({ initialLivrables }: LivrablesClien
                 console.error('Failed to load livrables dynamically:', e);
             }
         };
-        fetchLivrables();
+
+        window.addEventListener('kompas_livrable_published', fetchLivrables);
+        return () => window.removeEventListener('kompas_livrable_published', fetchLivrables);
     }, []);
 
     const filteredLivrables = useMemo(() => {

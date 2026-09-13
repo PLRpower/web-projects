@@ -11,6 +11,8 @@ export async function POST(request: NextRequest) {
             promo,
             specialty,
             year,
+            authorId,
+            authorEmail,
             authorName,
             isAnonymous,
             keywords,
@@ -48,6 +50,8 @@ export async function POST(request: NextRequest) {
             promo: promo || 'A3',
             specialty: specialty || 'Informatique',
             year: year || new Date().getFullYear().toString(),
+            authorId,
+            authorEmail,
             authorName,
             isAnonymous,
             keywords: Array.isArray(keywords) ? keywords : typeof keywords === 'string' ? keywords.split(',').map((k: string) => k.trim()).filter(Boolean) : [],
@@ -57,7 +61,10 @@ export async function POST(request: NextRequest) {
             hypotheses: Array.isArray(hypotheses) ? hypotheses : typeof hypotheses === 'string' ? hypotheses.split('\n').map((h: string) => h.trim()).filter(Boolean) : [],
             actionPlan: Array.isArray(actionPlan) ? actionPlan : typeof actionPlan === 'string' ? actionPlan.split('\n').map((a: string) => a.trim()).filter(Boolean) : [],
             deliverables: Array.isArray(deliverables) ? deliverables : typeof deliverables === 'string' ? deliverables.split('\n').map((d: string) => d.trim()).filter(Boolean) : [],
-            roles
+            roles,
+            markdownContent: body.markdownContent,
+            pdfBase64: body.pdfBase64,
+            pdfFileName: body.pdfFileName
         });
 
         return NextResponse.json({

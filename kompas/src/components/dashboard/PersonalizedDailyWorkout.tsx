@@ -1,17 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import {
     Brain,
     Flame,
     Zap,
     CheckCircle2,
-    XCircle,
     ArrowRight,
     Sparkles,
     RotateCcw,
-    Award,
-    Target
+    Award
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,8 +18,11 @@ import {
     recordDailyWorkoutCompletion,
     DailyWorkoutPlan
 } from '@/lib/personal-revision-engine';
-import { AICoachModal } from '@/components/cctl/AICoachModal';
 import { CCTLQuestion } from '@/types/cctl';
+
+const AICoachModal = dynamic(() => import('@/components/cctl/AICoachModal').then(mod => mod.AICoachModal), {
+    ssr: false
+});
 
 export function PersonalizedDailyWorkout() {
     const [workout, setWorkout] = useState<DailyWorkoutPlan | null>(null);
@@ -208,11 +210,11 @@ export function PersonalizedDailyWorkout() {
                                     key={q.id}
                                     className={`p-4 rounded-2xl border flex items-start justify-between gap-4 text-xs ${
                                         isCorrect
-                                            ? 'bg-surface border-emerald-500/30'
+                                            ? 'bg-surface border-emerald-500/40'
                                             : 'bg-surface border-red-500/40'
                                     }`}
                                 >
-                                    <div className="space-y-1 flex-1">
+                                    <div className="space-y-2 flex-1">
                                         <div className="flex items-center gap-2">
                                             <span className="font-mono font-bold px-2 py-0.5 rounded bg-surface-highlight text-text-primary">
                                                 Q{idx + 1}
@@ -221,6 +223,14 @@ export function PersonalizedDailyWorkout() {
                                                 {q.prompt}
                                             </span>
                                         </div>
+
+                                        {!isCorrect && expectedChoice && (
+                                            <div className="pl-6 text-[11px] font-mono text-emerald-800 dark:text-emerald-300 font-semibold flex items-center gap-1.5">
+                                                <span>✓ Réponse attendue :</span>
+                                                <strong className="text-emerald-950 dark:text-emerald-100 font-bold">{expectedChoice.id}. {expectedChoice.text}</strong>
+                                            </div>
+                                        )}
+
                                         {q.explanation && (
                                             <p className="text-text-secondary pl-6 text-[11px] leading-relaxed">
                                                 💡 {q.explanation}
@@ -278,20 +288,20 @@ export function PersonalizedDailyWorkout() {
                                     onClick={() => handleSelectChoice(choice.id)}
                                     className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-start gap-3 text-xs sm:text-sm cursor-pointer ${
                                         isSelected
-                                            ? 'bg-accent-yellow/15 border-accent-yellow text-text-primary font-bold shadow-xs'
-                                            : 'bg-surface border-border hover:border-accent-yellow/50 text-text-secondary'
+                                            ? 'bg-accent-yellow/15 border-2 border-accent-yellow text-text-primary font-bold shadow-xs'
+                                            : 'bg-surface border-border hover:border-accent-yellow/50 text-text-primary'
                                     }`}
                                 >
                                     <div
-                                        className={`w-5 h-5 rounded-lg flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 ${
+                                        className={`w-5 h-5 rounded-lg flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 shadow-xs ${
                                             isSelected
-                                                ? 'bg-accent-yellow text-black'
-                                                : 'bg-surface-highlight text-text-muted border border-border'
+                                                ? 'bg-accent-yellow text-black font-bold'
+                                                : 'bg-surface-highlight text-text-secondary border border-border'
                                         }`}
                                     >
                                         {choice.id}
                                     </div>
-                                    <span className="flex-1 leading-relaxed">
+                                    <span className={`flex-1 leading-relaxed ${isSelected ? 'font-bold text-text-primary' : 'font-medium text-text-primary'}`}>
                                         {choice.text}
                                     </span>
                                 </button>

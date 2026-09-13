@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -12,10 +12,9 @@ import {
     Loader2,
     Shuffle,
     Clock,
-    Trash2,
-    Edit3
+    Trash2
 } from 'lucide-react';
-import { CCTLExam, CCTLQuestion, formatAcademicYear } from '@/types/cctl';
+import { CCTLExam, CCTLQuestion, CCTLChoice, CCTLMatchingPair, formatAcademicYear } from '@/types/cctl';
 import { CCTLQuestionCard } from '@/components/cctl/CCTLQuestionCard';
 import { CCTLFlashcards } from '@/components/cctl/CCTLFlashcards';
 import { CCTLExamPressurePlayer } from '@/components/cctl/CCTLExamPressurePlayer';
@@ -23,6 +22,47 @@ import { Button } from '@/components/ui/button';
 import { PublishedCCTLEntry } from '@/lib/cctl-store';
 import { createClient } from '@/utils/supabase/client';
 import { isAdminUser, isAdminEmail } from '@/lib/admin';
+import { isItemOwner, removeItemOwnership, OwnershipUser } from '@/lib/user-ownership';
+
+function shuffleArray<T>(array: T[]): T[] {
+    const copy = [...array];
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
+
+function shuffleChoices(choices: CCTLChoice[]): CCTLChoice[] {
+    if (!choices || choices.length <= 1) return choices;
+    const originalIds = choices.map(c => c.id);
+    const shuffled = shuffleArray(choices);
+    return shuffled.map((c, idx) => ({
+        ...c,
+        id: originalIds[idx] || String.fromCharCode(65 + idx)
+    }));
+}
+
+function shuffleMatchingPairs(pairs: CCTLMatchingPair[]): CCTLMatchingPair[] {
+    if (!pairs || pairs.length <= 1) return pairs;
+    const originalIds = pairs.map(p => p.id);
+    const shuffled = shuffleArray(pairs);
+    return shuffled.map((p, idx) => ({
+        ...p,
+        id: originalIds[idx] || String(idx + 1)
+    }));
+}
+
+function shuffleQuestionAnswers(q: CCTLQuestion): CCTLQuestion {
+    let updated = { ...q };
+    if (updated.choices && updated.choices.length > 1) {
+        updated.choices = shuffleChoices(updated.choices);
+    }
+    if (updated.matchingPairs && updated.matchingPairs.length > 1) {
+        updated.matchingPairs = shuffleMatchingPairs(updated.matchingPairs);
+    }
+    return updated;
+}
 
 export default function DashboardCCTLDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
@@ -31,10 +71,12 @@ export default function DashboardCCTLDetailPage({ params }: { params: Promise<{ 
     const [cctlEntry, setCctlEntry] = useState<PublishedCCTLEntry | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [currentUser, setCurrentUser] = useState<OwnershipUser | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'practice' | 'flashcards' | 'review' | 'pressure'>('review');
-    const [isShuffled, setIsShuffled] = useState(false);
-    const [shuffledQuestions, setShuffledQuestions] = useState<CCTLQuestion[]>([]);
+    const [isQuestionsShuffled, setIsQuestionsShuffled] = useState(false);
+    const [isAnswersShuffled, setIsAnswersShuffled] = useState(false);
+    const [shuffleKey, setShuffleKey] = useState(0);
 
     useEffect(() => {
         fetchCCTL();
@@ -44,9 +86,16 @@ export default function DashboardCCTLDetailPage({ params }: { params: Promise<{ 
     const checkAdmin = async () => {
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            if (user && (isAdminUser(user) || isAdminEmail(user.email))) {
-                setIsAdmin(true);
-                return;
+            if (user) {
+                setCurrentUser({
+                    id: user.id,
+                    email: user.email,
+                    name: (user.user_metadata?.name as string) || undefined
+                });
+                if (isAdminUser(user) || isAdminEmail(user.email)) {
+                    setIsAdmin(true);
+                    return;
+                }
             }
         } catch {}
 
@@ -66,6 +115,7 @@ export default function DashboardCCTLDetailPage({ params }: { params: Promise<{ 
         try {
             const res = await fetch(`/api/cctl/${id}`, { method: 'DELETE' });
             if (res.ok) {
+                removeItemOwnership('cctl', id);
                 router.push('/dashboard/cctl');
             } else {
                 alert('Erreur lors de la suppression');
@@ -92,6 +142,42 @@ export default function DashboardCCTLDetailPage({ params }: { params: Promise<{ 
         }
     };
 
+    const exam = cctlEntry?.exam;
+
+    const handleToggleShuffleQuestions = () => {
+        if (!isQuestionsShuffled) {
+            setIsQuestionsShuffled(true);
+            setShuffleKey(k => k + 1);
+        } else {
+            setIsQuestionsShuffled(false);
+        }
+    };
+
+    const handleToggleShuffleAnswers = () => {
+        if (!isAnswersShuffled) {
+            setIsAnswersShuffled(true);
+            setShuffleKey(k => k + 1);
+        } else {
+            setIsAnswersShuffled(false);
+        }
+    };
+
+    const displayedQuestions = useMemo(() => {
+        if (!exam || !exam.questions) return [];
+
+        let list = [...exam.questions];
+
+        if (isQuestionsShuffled) {
+            list = shuffleArray(list);
+        }
+
+        if (isAnswersShuffled) {
+            list = list.map(q => shuffleQuestionAnswers(q));
+        }
+
+        return list;
+    }, [exam, isQuestionsShuffled, isAnswersShuffled, shuffleKey]);
+
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center py-32 space-y-4">
@@ -101,7 +187,7 @@ export default function DashboardCCTLDetailPage({ params }: { params: Promise<{ 
         );
     }
 
-    if (error || !cctlEntry) {
+    if (error || !cctlEntry || !exam) {
         return (
             <div className="glass p-12 text-center rounded-3xl border border-border space-y-4 max-w-md mx-auto my-12">
                 <h2 className="text-xl font-bold font-syne text-text-primary">Sujet non disponible</h2>
@@ -114,25 +200,6 @@ export default function DashboardCCTLDetailPage({ params }: { params: Promise<{ 
             </div>
         );
     }
-
-    const exam: CCTLExam = cctlEntry.exam;
-
-    const handleToggleShuffle = () => {
-        if (!isShuffled) {
-            const array = [...exam.questions];
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            setShuffledQuestions(array);
-            setIsShuffled(true);
-        } else {
-            setIsShuffled(false);
-            setShuffledQuestions([]);
-        }
-    };
-
-    const displayedQuestions = isShuffled && shuffledQuestions.length > 0 ? shuffledQuestions : exam.questions;
 
     return (
         <div className="space-y-8 pb-12">
@@ -169,7 +236,7 @@ export default function DashboardCCTLDetailPage({ params }: { params: Promise<{ 
                             {cctlEntry.subject || cctlEntry.title}
                         </h1>
                         <p className="text-xs sm:text-sm text-text-secondary font-normal">
-                            Banque officielle de <strong>{exam.totalQuestions} questions</strong> avec corrigés et explications.
+                            CCTL officiel de <strong>{exam.totalQuestions} questions</strong> avec corrigés et explications.
                         </p>
 
                         {/* AI Badges */}
@@ -187,17 +254,17 @@ export default function DashboardCCTLDetailPage({ params }: { params: Promise<{ 
                         )}
                     </div>
 
-                    {/* Download PDF Action & Admin Actions */}
+                    {/* Download PDF Action & Admin/Owner Actions */}
                     <div className="flex items-center gap-2.5">
-                        {isAdmin && (
+                        {(isAdmin || isItemOwner('cctl', cctlEntry, currentUser)) && (
                             <button
                                 type="button"
                                 onClick={handleDeleteCCTL}
                                 className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 font-bold text-xs transition-all cursor-pointer"
-                                title="Supprimer ce CCTL (Admin)"
+                                title={isAdmin && !isItemOwner('cctl', cctlEntry, currentUser) ? "Supprimer ce CCTL (Admin)" : "Supprimer mon CCTL"}
                             >
                                 <Trash2 className="w-4 h-4" />
-                                <span>Supprimer (Admin)</span>
+                                <span>{isAdmin && !isItemOwner('cctl', cctlEntry, currentUser) ? "Supprimer (Admin)" : "Supprimer mon CCTL"}</span>
                             </button>
                         )}
                         <a
@@ -268,26 +335,43 @@ export default function DashboardCCTLDetailPage({ params }: { params: Promise<{ 
                     </button>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2.5">
                     {/* Shuffle Questions Button */}
                     {activeTab !== 'pressure' && (
                         <button
                             type="button"
-                            onClick={handleToggleShuffle}
+                            onClick={handleToggleShuffleQuestions}
                             className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                                isShuffled
+                                isQuestionsShuffled
                                     ? 'bg-accent-yellow text-black border-accent-yellow shadow-md shadow-accent-yellow/20'
                                     : 'bg-surface-highlight/40 hover:bg-surface-highlight text-text-secondary hover:text-text-primary border-border/60'
                             }`}
                             title="Mélanger l'ordre des questions et masquer les numéros"
                         >
                             <Shuffle className="w-3.5 h-3.5" />
-                            <span>{isShuffled ? 'Ordre Aléatoire (Actif)' : 'Mélanger les questions'}</span>
+                            <span>{isQuestionsShuffled ? 'Questions mélangées' : 'Mélanger les questions'}</span>
+                        </button>
+                    )}
+
+                    {/* Shuffle Answers Button */}
+                    {activeTab !== 'pressure' && (
+                        <button
+                            type="button"
+                            onClick={handleToggleShuffleAnswers}
+                            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                                isAnswersShuffled
+                                    ? 'bg-accent-yellow text-black border-accent-yellow shadow-md shadow-accent-yellow/20'
+                                    : 'bg-surface-highlight/40 hover:bg-surface-highlight text-text-secondary hover:text-text-primary border-border/60'
+                            }`}
+                            title="Mélanger l'ordre des propositions et réponses au sein de chaque question"
+                        >
+                            <Shuffle className="w-3.5 h-3.5" />
+                            <span>{isAnswersShuffled ? 'Réponses mélangées' : 'Mélanger les réponses'}</span>
                         </button>
                     )}
 
                     {activeTab !== 'flashcards' && activeTab !== 'pressure' && (
-                        <span className="text-xs text-text-secondary hidden md:inline">
+                        <span className="text-xs text-text-secondary hidden md:inline ml-1">
                             <strong>{exam.totalQuestions}</strong> questions
                         </span>
                     )}
@@ -311,10 +395,10 @@ export default function DashboardCCTLDetailPage({ params }: { params: Promise<{ 
                     <div className="space-y-6">
                         {displayedQuestions.map((question, idx) => (
                             <CCTLQuestionCard
-                                key={isShuffled ? `shuffled-${question.id}-${idx}` : question.id}
+                                key={`${isQuestionsShuffled ? 'sq' : 'oq'}-${isAnswersShuffled ? 'sa' : 'oa'}-${shuffleKey}-${question.id}-${idx}`}
                                 question={question}
                                 mode={activeTab === 'practice' ? 'practice' : 'review'}
-                                hideQuestionNumber={isShuffled}
+                                hideQuestionNumber={isQuestionsShuffled}
                                 displayIndex={idx}
                             />
                         ))}

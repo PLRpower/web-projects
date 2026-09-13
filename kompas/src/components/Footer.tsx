@@ -27,6 +27,9 @@ export default function Footer() {
                     <Link href="/livrables" className="text-text-secondary hover:text-text-primary transition-colors">
                         Livrables
                     </Link>
+                    <Link href="/blog" className="text-text-secondary hover:text-text-primary transition-colors">
+                        Blog & Nouveautés
+                    </Link>
                     <Link href="/privacy" className="text-text-secondary hover:text-text-primary transition-colors">
                         Confidentialité
                     </Link>

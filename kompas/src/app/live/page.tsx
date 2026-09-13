@@ -4,19 +4,13 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
-    Smartphone,
-    Zap,
-    Trophy,
-    CheckCircle2,
     XCircle,
-    ArrowRight,
-    Sparkles,
     Gift,
     ShieldAlert,
-    Brain,
-    Lock,
-    HelpCircle,
-    QrCode
+    Smartphone,
+    CheckCircle2,
+    Trophy,
+    Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {

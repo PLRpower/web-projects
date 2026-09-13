@@ -130,10 +130,48 @@ export function detectStudentNameFromFilename(
         };
     }
 
+    // 4. Pattern: [nom]-[prenom]-[sujet...] (general 3+ parts where first 2 are words)
+    const parts = raw.split(/[-_]+/);
+    if (parts.length >= 3) {
+        if (/^[a-zA-ZÀ-ÿ']+$/.test(parts[0]) && /^[a-zA-ZÀ-ÿ']+$/.test(parts[1])) {
+            const namePart = `${parts[0]}-${parts[1]}`;
+            const rest = parts.slice(2).join('-');
+            return {
+                detected: true,
+                namePart,
+                tokens: [parts[0], parts[1]],
+                cleanFileName: `${rest}.pdf`,
+                subjectSuggestion: rest.replace(/[-_]/g, ' '),
+                detectedName: `${parts[0]} ${parts[1]}`
+            };
+        }
+    }
+
+    if (parts.length === 2 && /^[a-zA-ZÀ-ÿ']+$/.test(parts[0]) && /^[a-zA-ZÀ-ÿ']+$/.test(parts[1])) {
+        return {
+            detected: true,
+            namePart: `${parts[0]}-${parts[1]}`,
+            tokens: [parts[0], parts[1]],
+            cleanFileName: 'cctl-anonyme.pdf',
+            subjectSuggestion: 'CCTL Anonyme',
+            detectedName: `${parts[0]} ${parts[1]}`
+        };
+    }
+
     return {
         detected: false,
         error: `Impossible d'anonymiser : nom et prénom non détectés au début du fichier "${fileName}". Le format attendu commence par "nom-prenom-..." (ex: thomas-paul-2494516-sujet.pdf).`
     };
+}
+
+/**
+ * Returns a clean anonymized filename by stripping student name if detected.
+ */
+export function getAnonymizedFileName(fileName: string, candidateHeaderName?: string): string {
+    if (!fileName) return 'cctl-anonyme.pdf';
+    const detection = detectStudentNameFromFilename(fileName, candidateHeaderName);
+    if (detection.cleanFileName) return detection.cleanFileName;
+    return fileName;
 }
 
 /**

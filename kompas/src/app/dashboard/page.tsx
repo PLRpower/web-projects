@@ -4,26 +4,15 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
-    TrendingUp,
-    Clock,
-    CheckCircle,
-    BookOpen,
-    FileUp,
     ArrowRight,
     FileText,
     Users,
-    Award,
-    FolderGit2,
-    Brain,
     Sparkles,
-    CheckCircle2,
     Target,
     ShieldAlert,
     Zap,
     X,
-    Tv,
-    Flame,
-    RotateCcw
+    Tv
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {

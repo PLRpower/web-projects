@@ -15,7 +15,10 @@ export interface FlashcardDeck {
     domain: string;
     tags: string[];
     cards: FlashcardItem[];
+    authorId?: string;
+    authorEmail?: string;
     authorName: string;
+    isAnonymous?: boolean;
     isPublic: boolean;
     createdAt: string;
     updatedAt: string;

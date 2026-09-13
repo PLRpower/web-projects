@@ -1,0 +1,77 @@
+---
+import { TICKET_URL } from '../i18n';
+import type { Dict } from '../i18n';
+import LanguageSwitch from './LanguageSwitch.astro';
+
+interface Props {
+  t: Dict;
+}
+
+const { t } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="#top" class="brand" aria-label="Ballroom Strasbourg">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Ballroom <em>Strasbourg</em></span>
+    </a>
+
+    <nav class="main-nav" aria-label="Navigation">
+      <a href="#about">{t.nav.about}</a>
+      <a href="#artists">{t.nav.artists}</a>
+      <a href="#programme">{t.nav.programme}</a>
+      <a href="#gallery">{t.nav.gallery}</a>
+    </nav>
+
+    <div class="header-actions">
+      <LanguageSwitch current={t.code} />
+      <a href={TICKET_URL} class="btn btn-primary btn-sm header-cta">{t.nav.tickets}</a>
+      <button
+        class="nav-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+        aria-label={t.nav.menu}
+      >
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Navigation">
+    <a href="#about">{t.nav.about}</a>
+    <a href="#artists">{t.nav.artists}</a>
+    <a href="#devices">{t.nav.devices}</a>
+    <a href="#programme">{t.nav.programme}</a>
+    <a href="#gallery">{t.nav.gallery}</a>
+    <a href="#partners">{t.nav.partners}</a>
+    <a href="#values">{t.nav.values}</a>
+    <a href={TICKET_URL} class="btn btn-primary mobile-nav-cta">{t.nav.tickets}</a>
+  </nav>
+</header>
+
+<script>
+  const toggle = document.querySelector('.nav-toggle');
+  const mobileNav = document.getElementById('mobile-nav');
+
+  const closeMenu = () => {
+    mobileNav?.classList.remove('open');
+    toggle?.setAttribute('aria-expanded', 'false');
+  };
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = mobileNav?.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(Boolean(isOpen)));
+  });
+
+  mobileNav?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', closeMenu);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeMenu();
+  });
+</script>

@@ -1,10 +1,12 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  --font-serif: var(--font-serif), "Newsreader", "Georgia", serif;
+  --font-serif: var(--font-serif), "Literata", "Georgia", serif;
   --font-sans: var(--font-sans), "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: var(--font-mono), "JetBrains Mono", "SF Mono", monospace;
-  --font-syne: var(--font-serif), "Newsreader", "Georgia", serif;
+  --font-syne: var(--font-serif), "Literata", "Georgia", serif;
   --font-dm: var(--font-sans), "Plus Jakarta Sans", sans-serif;
 
   /* Map Tailwind colors to CSS variables */
@@ -97,7 +99,37 @@ h4,
 .font-syne {
   font-family: var(--font-serif);
   letter-spacing: -0.02em;
-  font-weight: 400;
+  font-weight: 300;
+}
+
+.font-serif.font-normal,
+.font-syne.font-normal,
+.font-serif .font-normal,
+.font-syne .font-normal,
+h1.font-normal,
+h2.font-normal,
+h3.font-normal,
+h4.font-normal,
+h1 .font-normal,
+h2 .font-normal,
+h3 .font-normal,
+h4 .font-normal {
+  font-weight: 300;
+}
+
+.font-serif.font-medium,
+.font-syne.font-medium {
+  font-weight: 450;
+}
+
+.font-serif.font-semibold,
+.font-syne.font-semibold {
+  font-weight: 550;
+}
+
+.font-serif.font-bold,
+.font-syne.font-bold {
+  font-weight: 600;
 }
 
 body {

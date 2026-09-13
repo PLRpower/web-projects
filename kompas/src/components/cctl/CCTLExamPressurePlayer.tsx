@@ -2,28 +2,26 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import {
     Clock,
-    AlertTriangle,
     CheckCircle2,
     XCircle,
-    Check,
     ArrowRight,
     ArrowLeft,
     Sparkles,
     RotateCcw,
-    ShieldAlert,
-    Target,
-    Zap,
     Lock,
-    Eye,
     TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CCTLExam, CCTLQuestion } from '@/types/cctl';
 import { CodeBlock } from './CodeBlock';
-import { AICoachModal } from './AICoachModal';
 import { recordExamSession } from '@/lib/skills-diagnostic';
+
+const AICoachModal = dynamic(() => import('./AICoachModal').then(mod => mod.AICoachModal), {
+    ssr: false
+});
 
 interface CCTLExamPressurePlayerProps {
     exam: CCTLExam;
@@ -62,7 +60,6 @@ export function CCTLExamPressurePlayer({ exam, onExit }: CCTLExamPressurePlayerP
             setSecondsRemaining(prev => {
                 if (prev <= 1) {
                     clearInterval(timer);
-                    setTimeExpired(true);
                     handleAutoFinish();
                     return 0;
                 }
@@ -402,20 +399,20 @@ export function CCTLExamPressurePlayer({ exam, onExit }: CCTLExamPressurePlayerP
                                             onClick={() => handleToggleChoice(choice.id)}
                                             className={`w-full text-left p-4 rounded-2xl border transition-all flex items-start gap-3.5 cursor-pointer ${
                                                 isSelected
-                                                    ? 'bg-accent-yellow/15 border-accent-yellow text-text-primary font-bold shadow-xs'
-                                                    : 'bg-surface border-border/70 hover:border-accent-yellow/50 text-text-secondary'
+                                                    ? 'bg-accent-yellow/15 border-2 border-accent-yellow text-text-primary font-bold shadow-xs'
+                                                    : 'bg-surface border-border/80 hover:border-accent-yellow/50 text-text-primary'
                                             }`}
                                         >
                                             <div
-                                                className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 ${
+                                                className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 shadow-xs ${
                                                     isSelected
-                                                        ? 'bg-accent-yellow text-black'
-                                                        : 'bg-surface-highlight text-text-muted border border-border'
+                                                        ? 'bg-accent-yellow text-black font-bold'
+                                                        : 'bg-surface-highlight text-text-secondary border border-border'
                                                 }`}
                                             >
                                                 {isSelected ? (isMultiple ? '✓' : '●') : choice.id}
                                             </div>
-                                            <span className="flex-1 leading-relaxed text-sm">
+                                            <span className={`flex-1 leading-relaxed text-sm ${isSelected ? 'font-bold text-text-primary' : 'font-medium text-text-primary'}`}>
                                                 {choice.text}
                                             </span>
                                         </button>
@@ -543,7 +540,7 @@ export function CCTLExamPressurePlayer({ exam, onExit }: CCTLExamPressurePlayerP
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto pt-2 relative z-10">
                             <div className="p-3.5 rounded-2xl bg-surface border border-border/80 text-center">
                                 <span className="text-[10px] font-mono uppercase text-text-muted block">Questions Réussies</span>
-                                <span className="text-lg font-bold text-emerald-500 font-mono">
+                                <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono">
                                     {results.correctCount} / {results.totalQuestions}
                                 </span>
                             </div>
@@ -631,8 +628,8 @@ export function CCTLExamPressurePlayer({ exam, onExit }: CCTLExamPressurePlayerP
                                                 <span
                                                     className={`text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
                                                         isCorrect
-                                                            ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                                                            : 'bg-red-500/15 text-red-600 dark:text-red-400'
+                                                            ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400'
+                                                            : 'bg-red-500/15 text-red-700 dark:text-red-400'
                                                     }`}
                                                 >
                                                     {isCorrect ? (
@@ -664,19 +661,34 @@ export function CCTLExamPressurePlayer({ exam, onExit }: CCTLExamPressurePlayerP
                                         </p>
 
                                         {/* Your Answer Recap */}
-                                        <div className="p-3 rounded-xl bg-surface border border-border/70 text-xs flex items-center justify-between gap-2">
-                                            <span className="text-text-muted font-mono text-[10px] uppercase">Votre réponse :</span>
-                                            <span className={`font-mono font-bold ${isCorrect ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                {item.formattedStudentAnswer}
-                                            </span>
+                                        <div className="p-3.5 rounded-2xl bg-surface border border-border/80 text-xs space-y-2">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="text-text-muted font-mono text-[10px] uppercase font-bold">Votre réponse :</span>
+                                                <span className={`font-mono font-bold ${isCorrect ? 'text-emerald-800 dark:text-emerald-300' : 'text-red-800 dark:text-red-300'}`}>
+                                                    {item.formattedStudentAnswer}
+                                                </span>
+                                            </div>
+
+                                            {!isCorrect && (
+                                                <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/50">
+                                                    <span className="text-emerald-700 dark:text-emerald-400 font-mono text-[10px] uppercase font-bold">Réponse officielle :</span>
+                                                    <span className="font-mono font-bold text-emerald-800 dark:text-emerald-300 text-right">
+                                                        {q.choices?.filter(c => c.isExpected).map(c => `${c.id}. ${c.text}`).join(', ') ||
+                                                         q.choices?.find(c => c.isExpected)?.text ||
+                                                         q.fillBlanks?.[0]?.expectedText ||
+                                                         q.matchingPairs?.map(p => `${p.id} -> ${p.rightExpected}`).join(', ') ||
+                                                         'Voir correction ci-dessous'}
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
 
                                         {q.explanation && (
-                                            <div className="p-3.5 rounded-2xl bg-surface text-xs text-text-secondary leading-relaxed border border-border/60">
-                                                <strong className="text-text-primary block mb-0.5">
-                                                    Correction officielle :
+                                            <div className="p-4 rounded-2xl bg-surface text-xs text-text-secondary leading-relaxed border border-border/80 space-y-1">
+                                                <strong className="text-text-primary font-bold block">
+                                                    💡 Explication officielle :
                                                 </strong>
-                                                {q.explanation}
+                                                <p className="text-text-secondary leading-relaxed">{q.explanation}</p>
                                             </div>
                                         )}
                                     </div>

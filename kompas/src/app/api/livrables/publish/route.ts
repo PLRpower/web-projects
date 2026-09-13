@@ -17,6 +17,8 @@ export async function POST(request: NextRequest) {
             tags,
             gradeHint,
             format,
+            authorId,
+            authorEmail,
             authorName,
             isAnonymous,
             markdownTemplate
@@ -50,9 +52,13 @@ export async function POST(request: NextRequest) {
             tags: Array.isArray(tags) ? tags : typeof tags === 'string' ? tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
             gradeHint,
             format,
+            authorId,
+            authorEmail,
             authorName,
             isAnonymous,
-            markdownTemplate
+            markdownTemplate,
+            pdfBase64: body.pdfBase64,
+            pdfFileName: body.pdfFileName
         });
 
         return NextResponse.json({

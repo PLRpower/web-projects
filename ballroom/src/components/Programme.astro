@@ -1,0 +1,57 @@
+---
+import { Image } from 'astro:assets';
+import danceFloor from '../assets/gallery/ballroom-15.jpg';
+import type { Dict } from '../i18n';
+
+interface Props {
+  t: Dict;
+}
+
+const { t } = Astro.props;
+---
+
+<section class="section programme-section" id="programme">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">{t.programme.eyebrow}</p>
+      <h2 class="section-title">{t.programme.title}</h2>
+    </div>
+
+    <div class="programme-grid">
+      <ol class="timeline">
+        {t.programme.timeline.map((slot) => (
+          <li>
+            <span class="time">{slot.time}</span>
+            <div>
+              <h3>{slot.title}</h3>
+              {slot.desc && <p>{slot.desc}</p>}
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <div class="categories">
+        <h3>{t.programme.categoriesTitle}</h3>
+        <div class="categories-grid">
+          {t.programme.categories.map((c) => (
+            <div class="category-tile">
+              <strong>{c.name}</strong>
+              <em>{c.theme}</em>
+            </div>
+          ))}
+        </div>
+
+        <figure class="section-photo section-photo--portrait">
+          <Image
+            src={danceFloor}
+            alt={t.programme.photoAlt}
+            widths={[480, 760]}
+            sizes="(min-width: 900px) 450px, 96vw"
+            format="webp"
+          />
+          <figcaption>{t.programme.photoCaption}</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>

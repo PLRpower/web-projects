@@ -1,25 +1,24 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import {
     CheckCircle2,
     XCircle,
-    AlertTriangle,
-    HelpCircle,
-    Code2,
-    Layers,
     ArrowRight,
-    ArrowRightLeft,
     Check,
     RotateCcw,
     Sparkles,
     Eye,
     EyeOff
 } from 'lucide-react';
-import { CCTLQuestion, CCTLChoice } from '@/types/cctl';
+import { CCTLQuestion } from '@/types/cctl';
 import { CodeBlock } from './CodeBlock';
 import { Button } from '@/components/ui/button';
-import { AICoachModal } from './AICoachModal';
+
+const AICoachModal = dynamic(() => import('./AICoachModal').then(mod => mod.AICoachModal), {
+    ssr: false
+});
 
 interface CCTLQuestionCardProps {
     question: CCTLQuestion;
@@ -201,8 +200,8 @@ export function CCTLQuestionCard({
                             <span
                                 className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full border ${
                                     isPracticeFullyCorrect
-                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
-                                        : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30'
+                                        ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
+                                        : 'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/30'
                                 }`}
                             >
                                 {isPracticeFullyCorrect ? (
@@ -271,12 +270,12 @@ export function CCTLQuestionCard({
                                         }}
                                         disabled={hasSubmittedPractice}
                                         placeholder="Tapez votre réponse ici..."
-                                        className={`flex-1 h-12 rounded-2xl bg-surface border px-4 text-sm font-medium text-text-primary focus:outline-none transition-all ${
+                                        className={`flex-1 h-12 rounded-2xl bg-surface border px-4 text-sm font-medium focus:outline-none transition-all ${
                                             hasSubmittedPractice
                                                 ? isPracticeFullyCorrect
-                                                    ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                                                    : 'border-red-500 bg-red-500/10 text-red-600 dark:text-red-400'
-                                                : 'border-border focus:border-accent-yellow focus:ring-2 focus:ring-accent-yellow/20'
+                                                    ? 'border-emerald-500 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-bold'
+                                                    : 'border-red-500 bg-red-500/10 text-red-800 dark:text-red-300 font-bold'
+                                                : 'border-border text-text-primary focus:border-accent-yellow focus:ring-2 focus:ring-accent-yellow/20'
                                         }`}
                                     />
                                 </div>
@@ -284,9 +283,11 @@ export function CCTLQuestionCard({
 
                             {/* Practice Correction for Short Answer */}
                             {showCorrectionInPractice && (
-                                <div className="p-4 rounded-2xl bg-surface border border-border space-y-1.5 text-xs">
-                                    <span className="font-mono text-[10px] uppercase text-text-muted">Réponse attendue :</span>
-                                    <p className="text-sm font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                                <div className="p-4 rounded-2xl bg-emerald-500/10 border-2 border-emerald-500 dark:bg-emerald-500/15 dark:border-emerald-400 space-y-1.5 text-xs shadow-xs">
+                                    <span className="font-mono text-[11px] font-bold uppercase text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                                        <Check className="w-3.5 h-3.5" /> Réponse attendue :
+                                    </span>
+                                    <p className="text-base font-bold font-mono text-emerald-800 dark:text-emerald-300 select-text">
                                         {expectedAnswerText}
                                     </p>
                                 </div>
@@ -294,15 +295,17 @@ export function CCTLQuestionCard({
                         </div>
                     ) : (
                         /* Review Mode for Short Answer */
-                        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 dark:bg-emerald-500/15 flex items-start justify-between gap-3">
+                        <div className="p-4 sm:p-5 rounded-2xl bg-emerald-500/10 border-2 border-emerald-500 dark:bg-emerald-500/15 dark:border-emerald-400 flex items-start justify-between gap-3 shadow-xs">
                             <div className="space-y-1">
-                                <span className="text-[10px] font-mono uppercase text-text-muted">Réponse attendue</span>
-                                <p className="text-base font-bold font-mono text-emerald-700 dark:text-emerald-400">
+                                <span className="text-[11px] font-mono font-bold uppercase text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                                    <Check className="w-3.5 h-3.5" /> Réponse attendue
+                                </span>
+                                <p className="text-base sm:text-lg font-bold font-mono text-emerald-800 dark:text-emerald-300 select-text">
                                     {expectedAnswerText}
                                 </p>
                             </div>
-                            <span className="flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-xs shrink-0">
-                                <Check className="w-4 h-4" /> Réponse attendue
+                            <span className="flex items-center gap-1.5 font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-500/15 dark:bg-emerald-500/20 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs shrink-0 shadow-xs">
+                                <Check className="w-3.5 h-3.5" /> Réponse attendue
                             </span>
                         </div>
                     )}
@@ -322,11 +325,11 @@ export function CCTLQuestionCard({
                                     key={pair.id}
                                     className={`p-4 rounded-2xl border transition-all ${
                                         mode === 'review'
-                                            ? 'bg-surface/80 border-border/80 hover:border-emerald-500/40'
+                                            ? 'bg-surface/80 border-border/80 hover:border-emerald-500/50'
                                             : hasSubmittedPractice
                                             ? isItemPracticeCorrect
-                                                ? 'bg-emerald-500/10 border-emerald-500/40'
-                                                : 'bg-red-500/10 border-red-500/40'
+                                                ? 'bg-emerald-500/10 border-2 border-emerald-500 dark:bg-emerald-500/15 dark:border-emerald-400'
+                                                : 'bg-red-500/10 border-2 border-red-500 dark:bg-red-500/15 dark:border-red-400'
                                             : 'bg-surface border-border/70 hover:border-accent-yellow/40'
                                     }`}
                                 >
@@ -350,8 +353,8 @@ export function CCTLQuestionCard({
                                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 shrink-0 md:justify-end">
                                             {mode === 'review' ? (
                                                 /* Bonne Association Attendue */
-                                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-bold font-mono">
-                                                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30 text-xs font-semibold font-mono shadow-xs">
+                                                    <Check className="w-3.5 h-3.5 shrink-0" />
                                                     <span>{pair.rightExpected}</span>
                                                 </div>
                                             ) : (
@@ -360,19 +363,19 @@ export function CCTLQuestionCard({
                                                     <select
                                                         value={studentSelection}
                                                         onChange={(e) => {
-                                                            if (hasSubmittedPractice) return;
+                                                             if (hasSubmittedPractice) return;
                                                             setMatchingAnswers(prev => ({
                                                                 ...prev,
                                                                 [pair.id]: e.target.value
                                                             }));
                                                         }}
                                                         disabled={hasSubmittedPractice}
-                                                        className={`w-full sm:w-64 h-10 bg-surface border rounded-xl px-3 text-xs font-mono font-semibold focus:outline-none transition-all cursor-pointer ${
+                                                        className={`w-full sm:w-64 h-10 border rounded-xl px-3 text-xs font-mono font-semibold focus:outline-none transition-all cursor-pointer ${
                                                             hasSubmittedPractice
                                                                 ? isItemPracticeCorrect
-                                                                    ? 'border-emerald-500 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                                                                    : 'border-red-500 bg-red-500/15 text-red-600 dark:text-red-400'
-                                                                : 'border-border focus:border-accent-yellow focus:ring-2 focus:ring-accent-yellow/20 text-text-primary'
+                                                                    ? 'border-emerald-500 bg-white dark:bg-zinc-900 text-emerald-800 dark:text-emerald-300 font-bold ring-1 ring-emerald-500/30'
+                                                                    : 'border-red-500 bg-white dark:bg-zinc-900 text-red-800 dark:text-red-300 font-bold ring-1 ring-red-500/30'
+                                                                : 'bg-surface border-border focus:border-accent-yellow focus:ring-2 focus:ring-accent-yellow/20 text-text-primary'
                                                         }`}
                                                     >
                                                         <option value="" disabled>Associer à...</option>
@@ -382,7 +385,7 @@ export function CCTLQuestionCard({
                                                     </select>
 
                                                     {showCorrectionInPractice && !isItemPracticeCorrect && (
-                                                        <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-mono font-bold shrink-0">
+                                                        <div className="flex items-center gap-1 px-3 py-1 rounded-xl bg-emerald-500/15 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30 text-[11px] font-mono font-semibold shrink-0 shadow-xs">
                                                             <span>Attendu : {pair.rightExpected}</span>
                                                         </div>
                                                     )}
@@ -410,19 +413,19 @@ export function CCTLQuestionCard({
                                     key={choice.id}
                                     className={`p-4 rounded-2xl border transition-all flex items-start gap-3.5 ${
                                         isExpected
-                                            ? 'bg-emerald-500/10 border-emerald-500/40 dark:bg-emerald-500/15'
-                                            : 'bg-surface border-border/70 text-text-secondary'
+                                            ? 'bg-emerald-500/10 border-2 border-emerald-500 dark:bg-emerald-500/15 dark:border-emerald-400 shadow-sm ring-1 ring-emerald-500/30'
+                                            : 'bg-surface/60 border-border/70 text-text-primary hover:bg-surface'
                                     }`}
                                 >
                                     {/* Choice ID Badge */}
                                     <div
-                                        className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 ${
+                                        className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 shadow-xs ${
                                             isExpected
-                                                ? 'bg-emerald-600 dark:bg-emerald-500 text-white font-bold'
+                                                ? 'bg-emerald-500/20 text-emerald-800 dark:bg-emerald-500/25 dark:text-emerald-200 border border-emerald-500/40'
                                                 : 'bg-surface-highlight text-text-secondary border border-border'
                                         }`}
                                     >
-                                        {choice.id}
+                                        {isExpected ? (isMultiple ? '✓' : '●') : choice.id}
                                     </div>
 
                                     {/* Choice Text & Formula Image */}
@@ -437,7 +440,7 @@ export function CCTLQuestionCard({
                                                 />
                                             </div>
                                         ) : choice.text ? (
-                                            <p className={`font-semibold ${isExpected ? 'text-emerald-700 dark:text-emerald-300 font-bold' : 'text-neutral-900 dark:text-neutral-100'}`}>
+                                            <p className={`${isExpected ? 'text-emerald-800 dark:text-emerald-300 font-bold text-sm sm:text-base' : 'text-text-primary font-medium'}`}>
                                                 {choice.text}
                                             </p>
                                         ) : (
@@ -451,7 +454,7 @@ export function CCTLQuestionCard({
 
                                     {/* Badges / Correction Indicators */}
                                     {isExpected && (
-                                        <span className="flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-xs shrink-0">
+                                        <span className="flex items-center gap-1.5 font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-500/15 dark:bg-emerald-500/20 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs shrink-0 shadow-xs">
                                             <Check className="w-3.5 h-3.5" /> Bonne réponse
                                         </span>
                                     )}
@@ -463,17 +466,26 @@ export function CCTLQuestionCard({
                             const isExpected = choice.isExpected;
 
                             let practiceStyle = 'bg-surface border-border/70 hover:bg-surface-highlight text-text-primary';
+                            let textStyle = 'text-text-primary font-medium';
+                            let badgeStyle = 'bg-surface-highlight text-text-secondary border border-border';
 
                             if (showCorrectionInPractice) {
                                 if (isExpected) {
-                                    practiceStyle = 'bg-emerald-500/10 border-emerald-500 text-neutral-900 dark:text-neutral-100 ring-1 ring-emerald-500/50 dark:bg-emerald-500/15';
+                                    practiceStyle = 'bg-emerald-500/10 border-2 border-emerald-500 ring-1 ring-emerald-500/30 dark:bg-emerald-500/15 dark:border-emerald-400 shadow-sm';
+                                    textStyle = 'text-emerald-800 dark:text-emerald-300 font-bold';
+                                    badgeStyle = 'bg-emerald-500/20 text-emerald-800 dark:bg-emerald-500/25 dark:text-emerald-200 border border-emerald-500/40';
                                 } else if (isSelected && !isExpected) {
-                                    practiceStyle = 'bg-red-500/10 border-red-500 text-neutral-900 dark:text-neutral-100 ring-1 ring-red-500/50 dark:bg-red-500/15';
+                                    practiceStyle = 'bg-red-500/10 border-2 border-red-500 ring-1 ring-red-500/30 dark:bg-red-500/15 dark:border-red-400 shadow-sm';
+                                    textStyle = 'text-red-800 dark:text-red-300 font-bold';
+                                    badgeStyle = 'bg-red-500/20 text-red-800 dark:bg-red-500/25 dark:text-red-200 border border-red-500/40';
                                 } else {
-                                    practiceStyle = 'opacity-40 bg-surface/30 border-border/30 text-text-secondary';
+                                    practiceStyle = 'bg-surface/40 border-border/60 text-text-secondary';
+                                    textStyle = 'text-text-secondary font-medium';
                                 }
                             } else if (isSelected) {
-                                practiceStyle = 'bg-accent-yellow/15 border-accent-yellow text-neutral-900 dark:text-neutral-100 shadow-xs shadow-accent-yellow/10';
+                                practiceStyle = 'bg-accent-yellow/15 border-2 border-accent-yellow shadow-xs shadow-accent-yellow/10';
+                                textStyle = 'text-text-primary font-bold';
+                                badgeStyle = 'bg-accent-yellow text-black font-bold';
                             }
 
                             return (
@@ -482,19 +494,15 @@ export function CCTLQuestionCard({
                                     type="button"
                                     onClick={() => handleTogglePracticeChoice(choice.id)}
                                     disabled={hasSubmittedPractice}
-                                    className={`w-full text-left p-4 rounded-2xl border transition-all flex items-start gap-3.5 cursor-pointer ${practiceStyle}`}
+                                    className={`w-full text-left p-4 rounded-2xl transition-all flex items-start gap-3.5 cursor-pointer ${practiceStyle}`}
                                 >
                                     <div
-                                        className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 transition-all ${
-                                            isSelected
-                                                ? 'bg-accent-yellow text-black font-bold'
-                                                : 'bg-surface-highlight text-text-secondary border border-border'
-                                        }`}
+                                        className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 transition-all shadow-xs ${badgeStyle}`}
                                     >
                                         {isSelected ? (isMultiple ? '✓' : '●') : choice.id}
                                     </div>
 
-                                    <div className="flex-1 text-sm leading-relaxed font-semibold text-neutral-900 dark:text-neutral-100">
+                                    <div className={`flex-1 text-sm leading-relaxed ${textStyle}`}>
                                         {choice.imageUrl && !choice.text ? (
                                             <div className="py-0.5 flex items-center">
                                                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -516,8 +524,13 @@ export function CCTLQuestionCard({
                                     </div>
 
                                     {showCorrectionInPractice && isExpected && (
-                                        <span className="shrink-0 flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-[11px]">
+                                        <span className="shrink-0 flex items-center gap-1.5 font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-500/15 dark:bg-emerald-500/20 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-[11px] shadow-xs">
                                             <Check className="w-3.5 h-3.5" /> Bonne réponse
+                                        </span>
+                                    )}
+                                    {showCorrectionInPractice && isSelected && !isExpected && (
+                                        <span className="shrink-0 flex items-center gap-1.5 font-semibold text-red-800 dark:text-red-300 bg-red-500/15 dark:bg-red-500/20 border border-red-500/30 px-2.5 py-1 rounded-lg text-[11px] shadow-xs">
+                                            <XCircle className="w-3.5 h-3.5" /> Votre choix (Incorrect)
                                         </span>
                                     )}
                                 </button>
@@ -535,7 +548,7 @@ export function CCTLQuestionCard({
                         <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                             <div className="flex items-center gap-2.5 text-amber-600 dark:text-amber-400 font-medium">
                                 <Sparkles className="w-4 h-4 text-accent-yellow shrink-0" />
-                                <span>Question non validée : Le Coach IA vous explique le piège et vous propose 2 exercices similaires.</span>
+                                <span>Question non validée : le coach IA vous explique le piège.</span>
                             </div>
                             <Button
                                 type="button"
@@ -560,7 +573,7 @@ export function CCTLQuestionCard({
                                 className="border-accent-yellow/50 bg-accent-yellow/10 hover:bg-accent-yellow/20 text-text-primary text-xs font-bold"
                             >
                                 <Sparkles className="w-3.5 h-3.5 mr-1.5 text-accent-yellow" />
-                                Coach IA : Explication &amp; Drills
+                                Explication sur la réponse
                             </Button>
                         ) : <div />}
 

@@ -6,15 +6,7 @@ import {
     Search,
     Download,
     BookOpen,
-    Filter,
-    Sparkles,
     Check,
-    FolderGit2,
-    Code2,
-    Cpu,
-    FileText,
-    Building2,
-    GraduationCap,
     Plus,
     Edit3,
     Trash2,
@@ -23,7 +15,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/client';
-import { isAdminUser, isAdminEmail, checkIsAdminClient } from '@/lib/admin';
+import { checkIsAdminClient } from '@/lib/admin';
+import { isItemOwner, recordItemOwnership, removeItemOwnership, OwnershipUser } from '@/lib/user-ownership';
 
 export interface ResourceItem {
     id: string;
@@ -32,7 +25,10 @@ export interface ResourceItem {
     category: 'Fiche Mémo' | 'Cheat Sheet' | 'Template Soutenance' | 'Code & Infra' | 'Méthodologie PBL' | 'Maths & Physique';
     promo: string;
     specialty: string;
+    authorId?: string;
+    authorEmail?: string;
     author: string;
+    isAnonymous?: boolean;
     campus: string;
     downloads: number;
     fileSize: string;
@@ -55,13 +51,14 @@ export default function ResourcesPage() {
     const [resources, setResources] = useState<ResourceItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [currentUser, setCurrentUser] = useState<OwnershipUser | null>(null);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('Toutes');
     const [selectedPromo, setSelectedPromo] = useState<string>('Toutes');
     const [downloadedIds, setDownloadedIds] = useState<Record<string, boolean>>({});
 
-    // Modal state for Admin Edit/Create
+    // Modal state for Admin/Owner Edit/Create
     const [editingResource, setEditingResource] = useState<ResourceItem | null>(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [formState, setFormState] = useState({
@@ -70,7 +67,8 @@ export default function ResourcesPage() {
         category: 'Fiche Mémo' as ResourceItem['category'],
         promo: 'A3',
         specialty: 'Informatique',
-        author: 'Administrateur Kompas',
+        author: 'Élève CESI',
+        isAnonymous: false,
         campus: 'Nanterre',
         fileSize: '15 KB',
         fileType: 'MD' as ResourceItem['fileType'],
@@ -93,30 +91,52 @@ export default function ResourcesPage() {
         }
     };
 
-    const checkAdmin = async () => {
+    const checkAdminAndUser = async () => {
         if (checkIsAdminClient()) {
             setIsAdmin(true);
         }
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            if (user && checkIsAdminClient(user)) {
-                setIsAdmin(true);
+            if (user) {
+                setCurrentUser({
+                    id: user.id,
+                    email: user.email,
+                    name: (user.user_metadata?.name as string) || undefined
+                });
+                if (checkIsAdminClient(user)) {
+                    setIsAdmin(true);
+                }
             }
         } catch {}
     };
 
     useEffect(() => {
         fetchResources();
-        checkAdmin();
+        checkAdminAndUser();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            if (session?.user && checkIsAdminClient(session.user)) {
-                setIsAdmin(true);
+            if (session?.user) {
+                setCurrentUser({
+                    id: session.user.id,
+                    email: session.user.email,
+                    name: (session.user.user_metadata?.name as string) || undefined
+                });
+                if (checkIsAdminClient(session.user)) {
+                    setIsAdmin(true);
+                }
             }
         });
 
-        return () => subscription.unsubscribe();
+        const handleOwnershipUpdated = () => {
+            setResources(prev => [...prev]);
+        };
+
+        window.addEventListener('kompas_ownership_updated', handleOwnershipUpdated);
+        return () => {
+            subscription.unsubscribe();
+            window.removeEventListener('kompas_ownership_updated', handleOwnershipUpdated);
+        };
     }, []);
 
     const handleDeleteResource = async (id: string, e?: React.MouseEvent) => {
@@ -124,6 +144,7 @@ export default function ResourcesPage() {
         if (!window.confirm('Voulez-vous vraiment supprimer cette fiche ?')) return;
 
         setResources(prev => prev.filter(r => r.id !== id));
+        removeItemOwnership('resource', id);
         try {
             await fetch(`/api/resources/${id}`, { method: 'DELETE' });
         } catch (err) {
@@ -142,6 +163,7 @@ export default function ResourcesPage() {
             promo: item.promo,
             specialty: item.specialty,
             author: item.author,
+            isAnonymous: item.isAnonymous ?? false,
             campus: item.campus,
             fileSize: item.fileSize,
             fileType: item.fileType,
@@ -158,7 +180,10 @@ export default function ResourcesPage() {
             const res = await fetch(`/api/resources/${editingResource.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formState)
+                body: JSON.stringify({
+                    ...formState,
+                    author: formState.isAnonymous ? 'Utilisateur Anonyme' : (formState.author || 'Élève CESI')
+                })
             });
             const data = await res.json();
             if (data.success && data.resource) {
@@ -181,10 +206,16 @@ export default function ResourcesPage() {
             const res = await fetch('/api/resources', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formState)
+                body: JSON.stringify({
+                    ...formState,
+                    authorId: currentUser?.id,
+                    authorEmail: currentUser?.email,
+                    author: formState.isAnonymous ? 'Utilisateur Anonyme' : (formState.author || 'Élève CESI')
+                })
             });
             const data = await res.json();
             if (data.success && data.resource) {
+                recordItemOwnership('resource', data.resource.id);
                 setResources(prev => [data.resource, ...prev]);
                 setIsCreateModalOpen(false);
             }
@@ -247,30 +278,29 @@ export default function ResourcesPage() {
                         </p>
                     </div>
 
-                    {isAdmin && (
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setFormState({
-                                    title: '',
-                                    description: '',
-                                    category: 'Fiche Mémo',
-                                    promo: 'A3',
-                                    specialty: 'Informatique',
-                                    author: 'Administrateur Kompas',
-                                    campus: 'Nanterre',
-                                    fileSize: '15 KB',
-                                    fileType: 'MD',
-                                    content: ''
-                                });
-                                setIsCreateModalOpen(true);
-                            }}
-                            className="px-4 py-2.5 rounded-xl bg-accent-yellow text-black font-bold text-xs hover:brightness-105 transition-all shadow-md shadow-accent-yellow/20 flex items-center gap-2 cursor-pointer shrink-0"
-                        >
-                            <Plus className="w-4 h-4" />
-                            <span>Ajouter une fiche (Admin)</span>
-                        </button>
-                    )}
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setFormState({
+                                title: '',
+                                description: '',
+                                category: 'Fiche Mémo',
+                                promo: 'A3',
+                                specialty: 'Informatique',
+                                author: currentUser?.name || 'Élève CESI',
+                                isAnonymous: false,
+                                campus: 'Nanterre',
+                                fileSize: '15 KB',
+                                fileType: 'MD',
+                                content: ''
+                            });
+                            setIsCreateModalOpen(true);
+                        }}
+                        className="px-4 py-2.5 rounded-xl bg-accent-yellow text-black font-bold text-xs hover:brightness-105 transition-all shadow-md shadow-accent-yellow/20 flex items-center gap-2 cursor-pointer shrink-0"
+                    >
+                        <Plus className="w-4 h-4" />
+                        <span>Ajouter une fiche</span>
+                    </button>
                 </div>
 
                 {/* Bottom: Search, Promo Selector & Category Tags */}
@@ -376,13 +406,13 @@ export default function ResourcesPage() {
                                     </div>
 
                                     <div className="flex items-center gap-2">
-                                        {isAdmin && (
+                                        {(isAdmin || isItemOwner('resource', item, currentUser)) && (
                                             <>
                                                 <button
                                                     type="button"
                                                     onClick={(e) => handleStartEdit(item, e)}
                                                     className="p-2 rounded-xl border border-border bg-surface hover:bg-surface-highlight text-text-secondary hover:text-accent-yellow transition-all cursor-pointer"
-                                                    title="Modifier cette fiche (Admin)"
+                                                    title={isAdmin && !isItemOwner('resource', item, currentUser) ? "Modifier cette fiche (Admin)" : "Modifier ma fiche"}
                                                 >
                                                     <Edit3 className="w-3.5 h-3.5" />
                                                 </button>
@@ -390,7 +420,7 @@ export default function ResourcesPage() {
                                                     type="button"
                                                     onClick={(e) => handleDeleteResource(item.id, e)}
                                                     className="p-2 rounded-xl border border-border bg-surface hover:bg-surface-highlight text-text-secondary hover:text-red-400 transition-all cursor-pointer"
-                                                    title="Supprimer cette fiche (Admin)"
+                                                    title={isAdmin && !isItemOwner('resource', item, currentUser) ? "Supprimer cette fiche (Admin)" : "Supprimer ma fiche"}
                                                 >
                                                     <Trash2 className="w-3.5 h-3.5" />
                                                 </button>
@@ -431,7 +461,9 @@ export default function ResourcesPage() {
                             <div className="flex items-center gap-2.5">
                                 <FileDown className="w-5 h-5 text-accent-yellow" />
                                 <h3 className="font-serif text-lg font-normal text-text-primary">
-                                    {editingResource ? 'Modifier la Fiche (Admin)' : 'Ajouter une Fiche (Admin)'}
+                                    {editingResource
+                                        ? (isItemOwner('resource', editingResource, currentUser) && !isAdmin ? "Modifier ma Fiche" : "Modifier la Fiche")
+                                        : "Ajouter une Fiche"}
                                 </h3>
                             </div>
                             <button
@@ -525,6 +557,19 @@ export default function ResourcesPage() {
                                     placeholder="# Titre du document..."
                                     className="w-full font-mono bg-surface border border-border rounded-xl p-3 text-xs text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-yellow/40 resize-y"
                                 />
+                            </div>
+
+                            <div className="flex items-center gap-2 pt-1">
+                                <input
+                                    type="checkbox"
+                                    id="resource-anonymous"
+                                    checked={formState.isAnonymous}
+                                    onChange={(e) => setFormState({ ...formState, isAnonymous: e.target.checked })}
+                                    className="w-4 h-4 rounded border-border text-accent-yellow focus:ring-accent-yellow/40 cursor-pointer"
+                                />
+                                <label htmlFor="resource-anonymous" className="text-xs text-text-secondary cursor-pointer select-none">
+                                    Publier anonymement sous le nom &ldquo;Utilisateur Anonyme&rdquo;
+                                </label>
                             </div>
 
                             <div className="flex items-center justify-end gap-2 pt-2">

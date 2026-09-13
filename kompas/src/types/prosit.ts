@@ -15,6 +15,8 @@ export interface PrositEntry {
     promo: PrositPromo;
     specialty: PrositSpecialty;
     year: string;
+    authorId?: string;
+    authorEmail?: string;
     authorName: string;
     isAnonymous: boolean;
     publishedAt: string;
@@ -29,4 +31,7 @@ export interface PrositEntry {
     deliverables: string[];
     roles?: PrositRoles;
     markdownContent?: string;
+    hasPdf?: boolean;
+    pdfFileName?: string;
+    pdfUrl?: string;
 }

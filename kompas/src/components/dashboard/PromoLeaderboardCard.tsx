@@ -1,18 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import {
-    TrendingUp,
-    Trophy,
-    Medal,
-    Award,
-    Sparkles,
-    Shield,
-    Users,
-    ArrowRight,
-    Lock
-} from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { getCampusLeaderboard, CampusLeaderboardStats } from '@/lib/personal-revision-engine';
 
 interface PromoLeaderboardCardProps {

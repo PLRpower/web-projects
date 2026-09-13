@@ -15,8 +15,9 @@ import { Button } from '@/components/ui/button';
 import { CCTLCard } from '@/components/cctl/CCTLCard';
 import { formatAcademicYear } from '@/types/cctl';
 import { createClient } from '@/utils/supabase/client';
-import { isAdminUser, isAdminEmail, checkIsAdminClient } from '@/lib/admin';
-import { X, Edit3, Check } from 'lucide-react';
+import { checkIsAdminClient } from '@/lib/admin';
+import { isItemOwner, removeItemOwnership, OwnershipUser } from '@/lib/user-ownership';
+import { X, Edit3 } from 'lucide-react';
 
 export default function DashboardCCTLPage() {
     const supabase = createClient();
@@ -27,6 +28,7 @@ export default function DashboardCCTLPage() {
     const [selectedYear, setSelectedYear] = useState('Tous');
     const [selectedSpecialty, setSelectedSpecialty] = useState('Tous');
     const [isAdmin, setIsAdmin] = useState(false);
+    const [currentUser, setCurrentUser] = useState<OwnershipUser | null>(null);
 
     // Editing modal state
     const [editingCCTL, setEditingCCTL] = useState<PublishedCCTLMeta | null>(null);
@@ -40,30 +42,54 @@ export default function DashboardCCTLPage() {
     });
     const [isSavingEdit, setIsSavingEdit] = useState(false);
 
-    const checkAdmin = async () => {
+    const checkAdminAndUser = async () => {
         if (checkIsAdminClient()) {
             setIsAdmin(true);
         }
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            if (user && checkIsAdminClient(user)) {
-                setIsAdmin(true);
+            if (user) {
+                setCurrentUser({
+                    id: user.id,
+                    email: user.email,
+                    name: (user.user_metadata?.name as string) || undefined
+                });
+                if (checkIsAdminClient(user)) {
+                    setIsAdmin(true);
+                }
             }
         } catch {}
     };
 
     useEffect(() => {
         fetchCCTLs();
-        checkAdmin();
+        checkAdminAndUser();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            if (session?.user && checkIsAdminClient(session.user)) {
-                setIsAdmin(true);
+            if (session?.user) {
+                setCurrentUser({
+                    id: session.user.id,
+                    email: session.user.email,
+                    name: (session.user.user_metadata?.name as string) || undefined
+                });
+                if (checkIsAdminClient(session.user)) {
+                    setIsAdmin(true);
+                }
             }
         });
 
-        return () => subscription.unsubscribe();
+        const handleOwnershipUpdated = () => {
+            // Trigger state re-evaluation
+            setCctls(prev => [...prev]);
+        };
+
+        window.addEventListener('kompas_ownership_updated', handleOwnershipUpdated);
+
+        return () => {
+            subscription.unsubscribe();
+            window.removeEventListener('kompas_ownership_updated', handleOwnershipUpdated);
+        };
     }, []);
 
     const fetchCCTLs = async () => {
@@ -87,6 +113,7 @@ export default function DashboardCCTLPage() {
         }
 
         setCctls(prev => prev.filter(c => c.id !== id));
+        removeItemOwnership('cctl', id);
         try {
             await fetch(`/api/cctl/${id}`, { method: 'DELETE' });
         } catch (e) {
@@ -301,16 +328,22 @@ export default function DashboardCCTLPage() {
             ) : (
                 /* Grid of CCTLs */
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredCCTLs.map((cctl) => (
-                        <CCTLCard
-                            key={cctl.id}
-                            cctl={cctl}
-                            href={`/dashboard/cctl/${cctl.id}`}
-                            isAdmin={isAdmin}
-                            onEdit={handleStartEdit}
-                            onDelete={handleDeleteCCTL}
-                        />
-                    ))}
+                    {filteredCCTLs.map((cctl) => {
+                        const isOwner = isItemOwner('cctl', cctl, currentUser);
+                        const canManage = isAdmin || isOwner;
+                        return (
+                            <CCTLCard
+                                key={cctl.id}
+                                cctl={cctl}
+                                href={`/dashboard/cctl/${cctl.id}`}
+                                isAdmin={isAdmin}
+                                canManage={canManage}
+                                isOwner={isOwner}
+                                onEdit={handleStartEdit}
+                                onDelete={handleDeleteCCTL}
+                            />
+                        );
+                    })}
                 </div>
             )}
 
@@ -322,7 +355,7 @@ export default function DashboardCCTLPage() {
                             <div className="flex items-center gap-2">
                                 <Edit3 className="w-5 h-5 text-accent-yellow" />
                                 <h3 className="font-serif text-lg font-normal text-text-primary">
-                                    Modifier le CCTL (Mode Admin)
+                                    {isAdmin && !isItemOwner('cctl', editingCCTL, currentUser) ? "Modifier le CCTL (Mode Admin)" : "Modifier mon CCTL"}
                                 </h3>
                             </div>
                             <button

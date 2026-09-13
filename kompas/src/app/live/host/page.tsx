@@ -1,23 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
 import {
     Trophy,
     Users,
     Play,
-    Zap,
-    Sparkles,
-    ArrowRight,
     RotateCcw,
+    Tv,
     QrCode,
-    Smartphone,
-    CheckCircle2,
-    Clock,
-    Award,
-    Flame,
-    Share2,
-    Tv
+    ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {

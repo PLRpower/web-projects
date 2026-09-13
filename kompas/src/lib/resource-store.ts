@@ -8,7 +8,10 @@ export interface ResourceItem {
     category: 'Fiche Mémo' | 'Cheat Sheet' | 'Template Soutenance' | 'Code & Infra' | 'Méthodologie PBL' | 'Maths & Physique';
     promo: string;
     specialty: string;
+    authorId?: string;
+    authorEmail?: string;
     author: string;
+    isAnonymous?: boolean;
     campus: string;
     downloads: number;
     fileSize: string;

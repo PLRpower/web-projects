@@ -5,20 +5,17 @@ import {
     Search,
     Plus,
     Download,
-    FolderGit2,
     CheckCircle2,
     BookOpen,
     Eye,
     X,
     RotateCcw,
-    Send,
     Loader2,
     Gift,
-    Crown,
-    Sparkles,
     AlertCircle,
     Trash2,
-    Edit3
+    Edit3,
+    Send
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LivrableEntry, LivrableCategory, LivrablePromo, LivrableSpecialty } from '@/types/livrable';
@@ -27,19 +24,20 @@ import {
     recordLivrableContribution,
     getUserRewardsProfile,
     LIVRABLES_REWARD_THRESHOLD,
-    MAX_CROWDSOURCED_PREMIUM_MONTHS,
     UserRewardsProfile
 } from '@/lib/rewards-store';
 import { validateLivrableSubmission } from '@/lib/contribution-validator';
 import { RewardCelebrationModal } from '@/components/rewards/RewardCelebrationModal';
 import { createClient } from '@/utils/supabase/client';
-import { isAdminUser, isAdminEmail, checkIsAdminClient } from '@/lib/admin';
+import { checkIsAdminClient } from '@/lib/admin';
+import { isItemOwner, recordItemOwnership, removeItemOwnership, OwnershipUser } from '@/lib/user-ownership';
 
 export default function DashboardLivrablesPage() {
     const supabase = createClient();
     const [livrables, setLivrables] = useState<LivrableEntry[]>(ALL_SEED_LIVRABLES);
     const [isLoading, setIsLoading] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [currentUser, setCurrentUser] = useState<OwnershipUser | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPromo, setSelectedPromo] = useState('Tous');
     const [selectedSpecialty, setSelectedSpecialty] = useState('Tous');
@@ -100,15 +98,22 @@ export default function DashboardLivrablesPage() {
         setRewardsProfile(getUserRewardsProfile());
     };
 
-    const checkAdmin = async () => {
+    const checkAdminAndUser = async () => {
         if (checkIsAdminClient()) {
             setIsAdmin(true);
         }
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            if (user && checkIsAdminClient(user)) {
-                setIsAdmin(true);
+            if (user) {
+                setCurrentUser({
+                    id: user.id,
+                    email: user.email,
+                    name: (user.user_metadata?.name as string) || undefined
+                });
+                if (checkIsAdminClient(user)) {
+                    setIsAdmin(true);
+                }
             }
         } catch {}
     };
@@ -116,18 +121,31 @@ export default function DashboardLivrablesPage() {
     useEffect(() => {
         fetchLivrables();
         updateRewards();
-        checkAdmin();
+        checkAdminAndUser();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            if (session?.user && checkIsAdminClient(session.user)) {
-                setIsAdmin(true);
+            if (session?.user) {
+                setCurrentUser({
+                    id: session.user.id,
+                    email: session.user.email,
+                    name: (session.user.user_metadata?.name as string) || undefined
+                });
+                if (checkIsAdminClient(session.user)) {
+                    setIsAdmin(true);
+                }
             }
         });
 
+        const handleOwnershipUpdated = () => {
+            setLivrables(prev => [...prev]);
+        };
+
         window.addEventListener('kompas_rewards_updated', updateRewards);
+        window.addEventListener('kompas_ownership_updated', handleOwnershipUpdated);
         return () => {
             subscription.unsubscribe();
             window.removeEventListener('kompas_rewards_updated', updateRewards);
+            window.removeEventListener('kompas_ownership_updated', handleOwnershipUpdated);
         };
     }, []);
 
@@ -136,6 +154,7 @@ export default function DashboardLivrablesPage() {
         if (!window.confirm('Voulez-vous vraiment supprimer définitivement ce livrable ?')) return;
 
         setLivrables(prev => prev.filter(l => l.id !== id));
+        removeItemOwnership('livrable', id);
         if (previewLivrable?.id === id) setPreviewLivrable(null);
 
         try {
@@ -255,6 +274,8 @@ export default function DashboardLivrablesPage() {
                     category: shareCategory,
                     promo: sharePromo,
                     specialty: shareSpecialty,
+                    authorId: currentUser?.id,
+                    authorEmail: currentUser?.email,
                     summary: shareSummary,
                     keySections: shareSections.split('\n').map(s => s.trim()).filter(Boolean),
                     tags: shareTags.split(',').map(t => t.trim()).filter(Boolean),
@@ -269,6 +290,7 @@ export default function DashboardLivrablesPage() {
             }
 
             if (data.success && data.published) {
+                recordItemOwnership('livrable', data.published.id);
                 // Record contribution towards 5 livrables = 1 month Premium
                 const rewardResult = recordLivrableContribution(shareTitle);
                 updateRewards();
@@ -567,13 +589,13 @@ ${livrable.tags.map(t => `- \`${t}\``).join('\n')}
                                             </button>
                                         </div>
 
-                                        {isAdmin && (
+                                        {(isAdmin || isItemOwner('livrable', livrable, currentUser)) && (
                                             <div className="flex items-center gap-1">
                                                 <button
                                                     type="button"
                                                     onClick={(e) => handleStartEditLivrable(livrable, e)}
                                                     className="p-2 rounded-xl border border-border bg-surface hover:bg-surface-highlight text-text-secondary hover:text-accent-yellow transition-all cursor-pointer"
-                                                    title="Modifier ce Livrable (Admin)"
+                                                    title={isAdmin && !isItemOwner('livrable', livrable, currentUser) ? "Modifier ce Livrable (Admin)" : "Modifier mon Livrable"}
                                                 >
                                                     <Edit3 className="w-3.5 h-3.5" />
                                                 </button>
@@ -581,7 +603,7 @@ ${livrable.tags.map(t => `- \`${t}\``).join('\n')}
                                                     type="button"
                                                     onClick={(e) => handleDeleteLivrable(livrable.id, e)}
                                                     className="p-2 rounded-xl border border-border bg-surface hover:bg-surface-highlight text-text-secondary hover:text-red-400 transition-all cursor-pointer"
-                                                    title="Supprimer ce Livrable (Admin)"
+                                                    title={isAdmin && !isItemOwner('livrable', livrable, currentUser) ? "Supprimer ce Livrable (Admin)" : "Supprimer mon Livrable"}
                                                 >
                                                     <Trash2 className="w-3.5 h-3.5" />
                                                 </button>
@@ -871,15 +893,43 @@ ${livrable.tags.map(t => `- \`${t}\``).join('\n')}
                             </div>
                         </div>
 
-                        <div className="pt-4 border-t border-border flex items-center justify-between">
-                            <span className="text-xs font-mono text-text-muted">
-                                {previewLivrable.tags.join(' • ')}
-                            </span>
+                        <div className="pt-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                                <span className="text-xs font-mono text-text-muted">
+                                    {previewLivrable.tags.join(' • ')}
+                                </span>
+                                {(isAdmin || isItemOwner('livrable', previewLivrable, currentUser)) && (
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                                const l = previewLivrable;
+                                                setPreviewLivrable(null);
+                                                handleStartEditLivrable(l);
+                                            }}
+                                            className="text-xs text-accent-yellow border-accent-yellow/30 hover:bg-accent-yellow/10 cursor-pointer"
+                                        >
+                                            <Edit3 className="w-3.5 h-3.5 mr-1" />
+                                            Modifier
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleDeleteLivrable(previewLivrable.id)}
+                                            className="text-xs text-red-400 border-red-500/30 hover:bg-red-500/10 cursor-pointer"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5 mr-1" />
+                                            Supprimer
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
 
                             <button
                                 type="button"
                                 onClick={() => handleDownloadTemplate(previewLivrable)}
-                                className="px-5 py-2.5 rounded-xl bg-accent-yellow text-black font-bold text-xs hover:brightness-105 transition-all shadow-md shadow-accent-yellow/20 flex items-center gap-2 cursor-pointer"
+                                className="px-5 py-2.5 rounded-xl bg-accent-yellow text-black font-bold text-xs hover:brightness-105 transition-all shadow-md shadow-accent-yellow/20 flex items-center gap-2 cursor-pointer shrink-0"
                             >
                                 <Download className="w-4 h-4" />
                                 <span>Télécharger le modèle (.md)</span>
@@ -898,7 +948,7 @@ ${livrable.tags.map(t => `- \`${t}\``).join('\n')}
                 contributionType="livrable"
             />
 
-            {/* Modal: Edit Livrable (Admin) */}
+            {/* Modal: Edit Livrable */}
             {editingLivrable && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto card-editorial p-6 sm:p-8 rounded-3xl bg-surface-card border border-border shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
@@ -906,7 +956,7 @@ ${livrable.tags.map(t => `- \`${t}\``).join('\n')}
                             <div className="flex items-center gap-2.5">
                                 <Edit3 className="w-5 h-5 text-accent-yellow" />
                                 <h3 className="font-serif text-lg font-normal text-text-primary">
-                                    Modifier le Livrable (Mode Admin)
+                                    {isAdmin && !isItemOwner('livrable', editingLivrable, currentUser) ? "Modifier le Livrable (Mode Admin)" : "Modifier mon Livrable"}
                                 </h3>
                             </div>
                             <button

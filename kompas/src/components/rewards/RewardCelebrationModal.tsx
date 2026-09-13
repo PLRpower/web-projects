@@ -1,16 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
 import {
     Sparkles,
     Gift,
     Award,
-    CheckCircle2,
     Zap,
     X,
     ArrowRight,
-    Star,
     Crown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

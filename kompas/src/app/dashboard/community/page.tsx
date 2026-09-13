@@ -8,7 +8,6 @@ import {
     MessageSquare,
     Send,
     Hash,
-    GraduationCap,
     Building2,
     Globe2,
     UserCheck,
@@ -21,7 +20,6 @@ import {
     FolderPlus,
     Trash2,
     Edit3,
-    Crown,
     User as UserIcon,
     ArrowUpRight,
     Tv
