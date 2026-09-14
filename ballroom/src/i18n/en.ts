@@ -79,7 +79,11 @@ export const en: Dict = {
       name: 'Bo The Qu-inG',
       role: 'Artistic direction & live performances',
       photoAlt: 'Bo The Qu-inG — on-stage performance',
-      credits: ['Opening live: Red Awakening', 'Closing live: Red Ascension', 'Overall artistic direction'],
+      credits: [
+        'International multidisciplinary artist, vocalist & artistic director',
+        'Opening live: Red Awakening',
+        'Closing live: Red Ascension',
+      ],
     },
   },
   gallery: {

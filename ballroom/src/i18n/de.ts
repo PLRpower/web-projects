@@ -80,9 +80,9 @@ export const de: Dict = {
       role: 'Künstlerische Leitung & Live-Performances',
       photoAlt: 'Bo The Qu-inG — Performance auf der Bühne',
       credits: [
+        'Internationale*r multidisziplinäre*r Künstler*in, Vokalist*in & künstlerische Leitung',
         'Live-Opening: Red Awakening',
         'Live-Closing: Red Ascension',
-        'Gesamtkünstlerische Leitung',
       ],
     },
   },

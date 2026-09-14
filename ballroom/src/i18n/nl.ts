@@ -80,9 +80,9 @@ export const nl: Dict = {
       role: 'Artistieke leiding & live performances',
       photoAlt: 'Bo The Qu-inG — performance op het podium',
       credits: [
+        'Internationaal multidisciplinair artiest, vocalist & artistiek leider',
         'Live-opening: Red Awakening',
         'Live-afsluiting: Red Ascension',
-        'Algemene artistieke leiding',
       ],
     },
   },
