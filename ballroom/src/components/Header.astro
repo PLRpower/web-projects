@@ -26,7 +26,7 @@ const { t } = Astro.props;
 
     <div class="header-actions">
       <LanguageSwitch current={t.code} />
-      <a href={TICKET_URL} class="btn btn-primary btn-sm header-cta">{t.nav.tickets}</a>
+      <a href={TICKET_URL} class="btn btn-primary btn-sm header-cta" target="_blank" rel="noopener noreferrer">{t.nav.tickets}</a>
       <button
         class="nav-toggle"
         type="button"
@@ -49,7 +49,7 @@ const { t } = Astro.props;
     <a href="#gallery">{t.nav.gallery}</a>
     <a href="#partners">{t.nav.partners}</a>
     <a href="#values">{t.nav.values}</a>
-    <a href={TICKET_URL} class="btn btn-primary mobile-nav-cta">{t.nav.tickets}</a>
+    <a href={TICKET_URL} class="btn btn-primary mobile-nav-cta" target="_blank" rel="noopener noreferrer">{t.nav.tickets}</a>
   </nav>
 </header>
 

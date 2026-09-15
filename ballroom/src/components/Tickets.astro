@@ -30,7 +30,7 @@ const placeholder = TICKET_URL === '#tickets';
         </div>
       </div>
 
-      <a href={TICKET_URL} class="btn btn-primary" aria-disabled={placeholder ? 'true' : undefined}>
+      <a href={TICKET_URL} class="btn btn-primary" target="_blank" rel="noopener noreferrer" aria-disabled={placeholder ? 'true' : undefined}>
         {t.tickets.cta}
       </a>
       {placeholder && <p class="tickets-legal">{t.tickets.legal}</p>}

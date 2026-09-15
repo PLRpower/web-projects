@@ -6,8 +6,7 @@ import type { Dict } from './fr';
 
 export type { Dict };
 
-/** Lien d'inscription — à remplacer par l'URL réelle dès qu'elle est connue. */
-export const TICKET_URL = '#tickets';
+export const TICKET_URL = 'https://www.billetweb.fr/the-red-light-special-ballroom';
 
 export interface LanguageEntry {
   code: 'fr' | 'de' | 'nl' | 'en';
