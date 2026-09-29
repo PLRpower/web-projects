@@ -10,7 +10,7 @@ export const nl: Dict = {
   meta: {
     title: 'Ballroom Straatsburg — RED LIGHT SPECIAL 2026',
     description:
-      'Op 24 oktober 2026 in Straatsburg: institutionele Tea Time, Master Class met Vinii Revlon, het Rode Forum en de grote Ballroom Night. Een groot cultureel, inclusief en artistiek evenement.',
+      'Op 24 oktober 2026 in Studio du Rhin te Straatsburg (2 rue du Rhin Napoléon): institutionele Tea Time, Master Class met Vinii Revlon, Rood Forum en grote Ballroom-avond. Een belangrijk cultureel, inclusief en artistiek evenement.',
   },
   nav: {
     about: 'Het evenement',
@@ -31,6 +31,8 @@ export const nl: Dict = {
     tagline:
       'Een evenement dat de ballroomcultuur, diversiteit, artistieke uitmuntendheid, inclusie en overdracht viert.',
     date: '24 oktober 2026',
+    venue: 'Studio du Rhin',
+    address: '2 rue du Rhin Napoléon, Straatsburg',
     city: 'Straatsburg — Frankrijk',
     audience: '300 deelnemers verwacht',
     ctaPrimary: 'Reserveer je ticket',
@@ -41,7 +43,7 @@ export const nl: Dict = {
     eyebrow: 'Voorstelling',
     title: 'Een ambitieuze en diep gedragen editie',
     lead: 'Ballroom Straatsburg presenteert in 2026 een ambitieuze en diep gedragen editie: RED LIGHT SPECIAL. Een evenement dat de ballroomcultuur, diversiteit, artistieke uitmuntendheid, inclusie en overdracht viert.',
-    body: 'RED LIGHT SPECIAL positioneert Straatsburg als een queer culturele hoofdstad van Europa — een grondgebied waar kunst, sport, burgerschap en inclusie elkaar ontmoeten.',
+    body: 'RED LIGHT SPECIAL positioneert Straatsburg als een queer culturele hoofdstad van Europa — een grondgebied waar kunst, sport, burgerschap en inclusie elkaar ontmoeten in Studio du Rhin.',
     pillarsTitle: 'Hoogtepunten, één legendarische nacht',
     pillars: [
       { name: 'Institutionele Tea Time', desc: 'met Vinii Revlon' },
@@ -61,11 +63,11 @@ export const nl: Dict = {
     eyebrow: 'Gasten & artistiek team',
     title: 'Legenden op het podium',
     judges:
-      '2 juryleden (nationale en internationale persoonlijkheden) en 2 lokale juryleden vervolledigen het panel (nog in bevestiging).',
+      'Een uitzonderlijk jurypanel met legendes en toonaangevende figuren uit Parijs, Montréal, Australië en de internationale ballroomscene.',
     vini: {
       name: 'Vinii Revlon',
-      role: 'Officiële MC',
-      photoAlt: 'Vinii Revlon — portret',
+      role: 'Officiële MC · The Legendary',
+      photoAlt: 'The Legendary Vinii Revlon',
       credits: [
         'Eerste vogue-legende van Europa, Father van het House of Revlon',
         'Danser in Les Indes Galantes (Opéra Bastille)',
@@ -78,11 +80,51 @@ export const nl: Dict = {
     bo: {
       name: 'Bo The Qu-inG',
       role: 'Artistieke leiding & live performances',
-      photoAlt: 'Bo The Qu-inG — performance op het podium',
+      photoAlt: 'Bo The Qu-inG',
       credits: [
         'Internationaal multidisciplinair artiest, vocalist & artistiek leider',
         'Live-opening: Red Awakening',
         'Live-afsluiting: Red Ascension',
+      ],
+    },
+    vivi: {
+      name: 'Vivi Gorgeous Gucci',
+      role: 'The Paris Princess · Jury',
+      photoAlt: 'The Paris Princess Vivi Gorgeous Gucci',
+      credits: [
+        'The Paris Princess — House of Gorgeous Gucci',
+        'Toonaangevend figuur in de Parijse en internationale ballroomscene',
+        'Officieel jurylid van The Red Light Special Ball',
+      ],
+    },
+    toshiro: {
+      name: 'Toshiro "Vodou Sankofa" Kamara',
+      role: 'Jury & Guest · Montréal',
+      photoAlt: 'Toshiro Vodou Sankofa Kamara — Montréal',
+      credits: [
+        'Internationaal artiest & toonaangevend figuur in de ballroomgemeenschap',
+        '"Vodou Sankofa" (Montréal)',
+        'Officieel jurylid van The Red Light Special Ball',
+      ],
+    },
+    body: {
+      name: 'Body Kennedy',
+      role: 'The Legendary · Jury',
+      photoAlt: 'The Legendary Body Kennedy',
+      credits: [
+        'The Legendary Body Kennedy',
+        'Internationale referentie voor de categorieën Body & Sex Siren',
+        'Officieel jurylid van The Red Light Special Ball',
+      ],
+    },
+    tony: {
+      name: 'Tony Revlon',
+      role: 'Father Tony Revlon · Australië · Jury',
+      photoAlt: 'Father Tony Revlon — Australië',
+      credits: [
+        'Father van het House of Revlon Australië',
+        'Belangrijk internationaal figuur binnen het House of Revlon',
+        'Officieel jurylid van The Red Light Special Ball',
       ],
     },
   },
@@ -292,6 +334,8 @@ export const nl: Dict = {
   tickets: {
     eyebrow: 'Ticketverkoop',
     title: 'Word deel van de legende',
+    venue: 'Studio du Rhin',
+    address: '2 rue du Rhin Napoléon, Straatsburg',
     note: 'Reservering aanbevolen — beperkt aantal plaatsen.',
     standard: { name: 'Standaardtarief', price: '17 €', note: 'Tot 20 oktober, daarna 20 €.' },
     student: { name: 'Studenten & verenigingen', price: '14 €', note: 'Op vertoon van een bewijs.' },
@@ -300,6 +344,7 @@ export const nl: Dict = {
   },
   footer: {
     tagline: 'RED LIGHT SPECIAL — Ballroom Straatsburg Come Back',
+    venue: 'Studio du Rhin — 2 rue du Rhin Napoléon, Straatsburg',
     contact: 'Contacteer ons',
     follow: 'Volg ons',
     rights: 'Ballroom Straatsburg — RED LIGHT SPECIAL 2026',

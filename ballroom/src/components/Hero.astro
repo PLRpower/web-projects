@@ -25,18 +25,20 @@ const { t } = Astro.props;
     <div class="hero-meta">
       <span><strong>{t.hero.date}</strong></span>
       <span class="dot" aria-hidden="true">✦</span>
-      <span>{t.hero.city}</span>
+      <span class="hero-venue"><strong>{t.hero.venue}</strong> · {t.hero.address}</span>
       <span class="dot" aria-hidden="true">✦</span>
       <span>{t.hero.audience}</span>
     </div>
 
     <div class="hero-cta">
       <a href={TICKET_URL} class="btn btn-primary" target="_blank" rel="noopener noreferrer">{t.hero.ctaPrimary}</a>
+      <!-- noinspection HtmlUnknownAnchorTarget -->
       <a href="#about" class="btn btn-ghost">{t.hero.ctaSecondary}</a>
     </div>
 
     <p class="hero-deadline">{t.hero.deadline}</p>
   </div>
+  <!-- noinspection HtmlUnknownAnchorTarget -->
   <a href="#about" class="hero-scroll" aria-hidden="true">↓</a>
 </section>
 
@@ -47,6 +49,7 @@ const { t } = Astro.props;
         <>
           <span>Red Light Special</span>
           <span>24.10.2026</span>
+          <span>Studio du Rhin</span>
           <span>Strasbourg</span>
           <span>Vinii Revlon</span>
           <span>10 catégories</span>

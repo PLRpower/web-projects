@@ -15,6 +15,10 @@ const placeholder = TICKET_URL === '#tickets';
     <div class="tickets-panel">
       <p class="eyebrow" style="justify-content: center; display: inline-flex;">{t.tickets.eyebrow}</p>
       <h2 class="section-title">{t.tickets.title}</h2>
+      <div class="tickets-venue-badge">
+        <span class="pin" aria-hidden="true">📍</span>
+        <span><strong>{t.tickets.venue}</strong> — {t.tickets.address}</span>
+      </div>
       <p class="tickets-note">{t.tickets.note}</p>
 
       <div class="tickets-cards">

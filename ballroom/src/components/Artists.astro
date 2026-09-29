@@ -1,7 +1,11 @@
 ---
 import { Image } from 'astro:assets';
-import viniiPortrait from '../assets/vinii/vinii-02.jpg';
-import boStage from '../assets/gallery/ballroom-04.jpg';
+import viniiPoster from '../assets/artists/vinii-revlon.png';
+import boPoster from '../assets/artists/bo-the-qu-ing.png';
+import viviPoster from '../assets/artists/vivi-gorgeous-gucci.png';
+import toshiroPoster from '../assets/artists/toshiro-kamara.png';
+import bodyPoster from '../assets/artists/body-kennedy.png';
+import tonyPoster from '../assets/artists/tony-revlon.png';
 import type { Dict } from '../i18n';
 
 interface Props {
@@ -10,12 +14,23 @@ interface Props {
 
 const { t } = Astro.props;
 
-const initials = (name: string) =>
-  name
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join('');
+const initials = (name: string) => {
+  const clean = name.replace(/["«»]/g, '').trim();
+  const words = clean.split(/\s+/);
+  if (words.length >= 2) {
+    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+  }
+  return clean.slice(0, 2).toUpperCase();
+};
+
+const artists = [
+  { ...t.artists.vini, photo: viniiPoster },
+  { ...t.artists.bo, photo: boPoster },
+  { ...t.artists.vivi, photo: viviPoster },
+  { ...t.artists.toshiro, photo: toshiroPoster },
+  { ...t.artists.body, photo: bodyPoster },
+  { ...t.artists.tony, photo: tonyPoster },
+];
 ---
 
 <section class="section" id="artists">
@@ -26,37 +41,29 @@ const initials = (name: string) =>
     </div>
 
     <div class="artists-grid">
-      <article class="artist-card artist-card--featured">
-        <figure class="artist-photo">
-          <Image src={viniiPortrait} alt={t.artists.vini.photoAlt} width={840} format="webp" />
-        </figure>
-        <div class="artist-top">
-          <div class="monogram" aria-hidden="true">{initials(t.artists.vini.name)}</div>
-          <div>
-            <h3>{t.artists.vini.name}</h3>
-            <span class="artist-role">{t.artists.vini.role}</span>
-          </div>
-        </div>
-        <ul class="credits">
-          {t.artists.vini.credits.map((c) => <li>{c}</li>)}
-        </ul>
-      </article>
-
-      <article class="artist-card artist-card--featured">
-        <figure class="artist-photo artist-photo--landscape">
-          <Image src={boStage} alt={t.artists.bo.photoAlt} width={840} format="webp" />
-        </figure>
-        <div class="artist-top">
-          <div class="monogram" aria-hidden="true">{initials(t.artists.bo.name)}</div>
-          <div>
-            <h3>{t.artists.bo.name}</h3>
-            <span class="artist-role">{t.artists.bo.role}</span>
-          </div>
-        </div>
-        <ul class="credits">
-          {t.artists.bo.credits.map((c) => <li>{c}</li>)}
-        </ul>
-      </article>
+      {
+        artists.map((artist) => (
+          <article class="artist-card artist-card--featured">
+            <figure class="artist-photo artist-photo--landscape">
+              <Image src={artist.photo} alt={artist.photoAlt} width={840} format="webp" />
+            </figure>
+            <div class="artist-top">
+              <div class="monogram" aria-hidden="true">
+                {initials(artist.name)}
+              </div>
+              <div>
+                <h3>{artist.name}</h3>
+                <span class="artist-role">{artist.role}</span>
+              </div>
+            </div>
+            <ul class="credits">
+              {artist.credits.map((c) => (
+                <li>{c}</li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
 
       <p class="judges-note">{t.artists.judges}</p>
     </div>

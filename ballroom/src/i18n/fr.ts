@@ -8,7 +8,7 @@ export const fr = {
   meta: {
     title: 'Ballroom Strasbourg — RED LIGHT SPECIAL 2026',
     description:
-      'Le 24 octobre 2026 à Strasbourg : Tea Time institutionnel, Master Class avec Vinii Revlon, Forum Rouge et grande soirée Ballroom. Un événement culturel, inclusif et artistique majeur.',
+      'Le 24 octobre 2026 au Studio du Rhin à Strasbourg (2 rue du Rhin Napoléon) : Tea Time institutionnel, Master Class avec Vinii Revlon, Forum Rouge et grande soirée Ballroom. Un événement culturel, inclusif et artistique majeur.',
   },
   nav: {
     about: "L'événement",
@@ -29,6 +29,8 @@ export const fr = {
     tagline:
       'Un événement qui célèbre la culture Ballroom, la diversité, l’excellence artistique, l’inclusion et la transmission.',
     date: '24 octobre 2026',
+    venue: 'Studio du Rhin',
+    address: '2 rue du Rhin Napoléon, Strasbourg',
     city: 'Strasbourg — France',
     audience: '300 participant.es attendu.es',
     ctaPrimary: 'Réserver ma place',
@@ -39,7 +41,7 @@ export const fr = {
     eyebrow: 'Présentation',
     title: 'Une édition ambitieuse et profondément engagée',
     lead: 'Ballroom Strasbourg signe en 2026 une édition ambitieuse et profondément engagée : RED LIGHT SPECIAL. Un événement qui célèbre la culture Ballroom, la diversité, l’excellence artistique, l’inclusion et la transmission.',
-    body: 'RED LIGHT SPECIAL affirme Strasbourg comme une capitale culturelle queer européenne — un territoire où l’art, le sport, la citoyenneté et l’inclusion se rencontrent.',
+    body: 'RED LIGHT SPECIAL affirme Strasbourg comme une capitale culturelle queer européenne — un territoire où l’art, le sport, la citoyenneté et l’inclusion se rencontrent au cœur du Studio du Rhin.',
     pillarsTitle: 'Des temps forts, une soirée légendaire',
     pillars: [
       { name: 'Tea Time institutionnel', desc: 'avec Vinii Revlon' },
@@ -59,11 +61,11 @@ export const fr = {
     eyebrow: 'Invités & équipe artistique',
     title: 'Des légendes sur scène',
     judges:
-      '2 juges personnalités nationales et internationales et 2 juges locaux·ales complètent le panel (en cours de confirmation).',
+      'Un jury d’exception réunissant des légendes et figures majeures venues de Paris, Montréal, Australie et de la scène internationale.',
     vini: {
       name: 'Vinii Revlon',
-      role: 'MC officiel',
-      photoAlt: 'Vinii Revlon — portrait',
+      role: 'MC officiel · The Legendary',
+      photoAlt: 'The Legendary Vinii Revlon',
       credits: [
         'Première Légende du voguing en Europe, Father de la House of Revlon',
         'Danseur dans Les Indes Galantes (Opéra Bastille)',
@@ -76,11 +78,51 @@ export const fr = {
     bo: {
       name: 'Bo The Qu-inG',
       role: 'Direction artistique & performances live',
-      photoAlt: 'Bo The Qu-inG — performance sur scène',
+      photoAlt: 'Bo The Qu-inG',
       credits: [
         'Artiste pluridisciplinaire internationale, vocaliste et directeur·rice artistique',
         'Opening live : Red Awakening',
         'Closing live : Red Ascension',
+      ],
+    },
+    vivi: {
+      name: 'Vivi Gorgeous Gucci',
+      role: 'The Paris Princess · Juge',
+      photoAlt: 'The Paris Princess Vivi Gorgeous Gucci',
+      credits: [
+        'The Paris Princess — House of Gorgeous Gucci',
+        'Figure incontournable de la scène ballroom parisienne et internationale',
+        'Juge officielle du Red Light Special Ball',
+      ],
+    },
+    toshiro: {
+      name: 'Toshiro « Vodou Sankofa » Kamara',
+      role: 'Juge & Guest · Montréal',
+      photoAlt: 'Toshiro « Vodou Sankofa » Kamara — Montréal',
+      credits: [
+        'Artiste international & figure majeure de la communauté Ballroom',
+        '« Vodou Sankofa » (Montréal)',
+        'Juge officiel du Red Light Special Ball',
+      ],
+    },
+    body: {
+      name: 'Body Kennedy',
+      role: 'The Legendary · Juge',
+      photoAlt: 'The Legendary Body Kennedy',
+      credits: [
+        'The Legendary Body Kennedy',
+        'Référence internationale des catégories Body & Sex Siren',
+        'Juge officiel du Red Light Special Ball',
+      ],
+    },
+    tony: {
+      name: 'Tony Revlon',
+      role: 'Father Tony Revlon · Australie · Juge',
+      photoAlt: 'Father Tony Revlon — Australie',
+      credits: [
+        'Father de la House of Revlon Australie',
+        'Figure internationale majeure de la House of Revlon',
+        'Juge officiel du Red Light Special Ball',
       ],
     },
   },
@@ -290,6 +332,8 @@ export const fr = {
   tickets: {
     eyebrow: 'Billetterie',
     title: 'Rejoignez la légende',
+    venue: 'Studio du Rhin',
+    address: '2 rue du Rhin Napoléon, Strasbourg',
     note: 'Réservation conseillée — places limitées.',
     standard: { name: 'Tarif général', price: '17 €', note: 'Jusqu’au 20 octobre, puis 20 €.' },
     student: { name: 'Étudiants & associations', price: '14 €', note: 'Sur présentation d’un justificatif.' },
@@ -298,6 +342,7 @@ export const fr = {
   },
   footer: {
     tagline: 'RED LIGHT SPECIAL — Ballroom Strasbourg Come Back',
+    venue: 'Studio du Rhin — 2 rue du Rhin Napoléon, Strasbourg',
     contact: 'Nous contacter',
     follow: 'Suivez-nous',
     rights: 'Ballroom Strasbourg — RED LIGHT SPECIAL 2026',

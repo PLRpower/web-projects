@@ -39,7 +39,7 @@ body {
     radial-gradient(900px 500px at -10% 30%, rgba(110, 11, 29, 0.16), transparent 60%),
     var(--bg);
   color: var(--text);
-  font-family: var(--font-body);
+  font-family: var(--font-body), sans-serif;
   font-size: 1rem;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
@@ -114,7 +114,7 @@ a {
 
 .section-title {
   margin: 0 0 1.2rem;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-weight: 700;
   font-size: clamp(2rem, 4.6vw, 3.1rem);
   line-height: 1.12;
@@ -142,7 +142,7 @@ a {
   padding: 0.9rem 1.9rem;
   border-radius: 999px;
   border: 1px solid transparent;
-  font-family: var(--font-body);
+  font-family: var(--font-body), sans-serif;
   font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -207,7 +207,7 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -457,7 +457,7 @@ a {
 }
 
 .hero-title-main {
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-weight: 900;
   font-size: clamp(1.6rem, 5.5vw, 4.2rem);
   letter-spacing: 0.035em;
@@ -478,7 +478,7 @@ a {
 }
 
 .hero-title-code {
-  font-family: var(--font-body);
+  font-family: var(--font-body), sans-serif;
   font-size: clamp(0.85rem, 1.6vw, 1.15rem);
   font-weight: 600;
   letter-spacing: 0.22em;
@@ -487,7 +487,7 @@ a {
 }
 
 .hero-title-sub {
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-weight: 700;
   font-size: clamp(1.1rem, 2.3vw, 1.65rem);
   letter-spacing: 0.12em;
@@ -583,7 +583,7 @@ a {
   gap: 3rem;
   width: max-content;
   animation: marquee 28s linear infinite;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-size: 0.95rem;
   font-style: italic;
   letter-spacing: 0.28em;
@@ -616,7 +616,7 @@ a {
 
 .about-lead {
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-size: clamp(1.25rem, 2.6vw, 1.6rem);
   font-weight: 500;
   line-height: 1.45;
@@ -644,7 +644,7 @@ a {
 }
 
 .pillars .num {
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-style: italic;
   color: var(--red-bright);
   font-size: 0.95rem;
@@ -673,7 +673,7 @@ a {
 
 .identity h3 {
   margin: 0 0 0.8rem;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-style: italic;
   font-size: clamp(1.4rem, 3vw, 1.9rem);
   color: var(--red-bright);
@@ -752,7 +752,7 @@ a {
   height: 74px;
   flex: none;
   border-radius: 50%;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-weight: 700;
   font-size: 1.5rem;
   color: #fff;
@@ -762,7 +762,7 @@ a {
 
 .artist-card h3 {
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-size: clamp(1.5rem, 3vw, 2rem);
   line-height: 1.1;
 }
@@ -777,10 +777,10 @@ a {
   color: var(--red-bright);
 }
 
-/* Rôle sur une ligne dès qu'il y a la place à côté du monogramme */
+/* Rôle avec respiration et passage à la ligne propre */
 @media (min-width: 640px) {
   .artist-role {
-    white-space: nowrap;
+    text-wrap: balance;
   }
 }
 
@@ -894,14 +894,14 @@ a {
 
 .device-card h3 {
   margin: 0 0 0.4rem;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-size: 1.45rem;
   line-height: 1.2;
 }
 
 .device-tagline {
   margin: 0 0 0.8rem;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-style: italic;
   font-size: 1.02rem;
   color: var(--red-bright);
@@ -988,7 +988,7 @@ a {
 }
 
 .timeline .time {
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-weight: 700;
   font-size: 1.05rem;
   color: var(--red-bright);
@@ -1010,7 +1010,7 @@ a {
 
 .categories h3 {
   margin: 0 0 1.2rem;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-style: italic;
   font-size: 1.4rem;
   color: var(--red-bright);
@@ -1045,7 +1045,7 @@ a {
 .category-tile em {
   display: block;
   margin-top: 0.15rem;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-style: italic;
   font-size: 0.85rem;
   color: var(--red-bright);
@@ -1090,7 +1090,7 @@ a {
   margin: 0 0 1.1rem;
   padding-bottom: 0.9rem;
   border-bottom: 2px solid var(--red);
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-size: 1.25rem;
   line-height: 1.25;
 }
@@ -1163,7 +1163,7 @@ a {
 
 .value-card h3 {
   margin: 0 0 0.6rem;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-size: 1.25rem;
   color: var(--text);
 }
@@ -1178,7 +1178,7 @@ a {
   margin: 0 auto;
   max-width: 52ch;
   text-align: center;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-style: italic;
   font-weight: 500;
   font-size: clamp(1.4rem, 3.4vw, 2.1rem);
@@ -1219,6 +1219,23 @@ a {
     var(--bg-soft);
 }
 
+.tickets-venue-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.9rem auto 1.2rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  background: rgba(226, 24, 54, 0.12);
+  border: 1px solid rgba(255, 46, 77, 0.35);
+  color: var(--text);
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+}
+
+.tickets-venue-badge strong {
+  color: var(--red-bright);
+}
+
 .tickets-note {
   margin: 0 0 2.2rem;
   color: var(--muted);
@@ -1253,7 +1270,7 @@ a {
 
 .ticket-card .price {
   margin: 0 0 0.5rem;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-weight: 800;
   font-size: clamp(2.6rem, 6vw, 3.4rem);
   line-height: 1;
@@ -1314,10 +1331,16 @@ a {
 
 .footer-tagline {
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-style: italic;
   font-size: 1rem;
   color: var(--muted);
+}
+
+.footer-venue {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted-2);
 }
 
 .footer-links {
@@ -1375,8 +1398,11 @@ a {
   transform: scale(1.03);
 }
 
-/* Photo paysage (Bo The Queen) : recadrage centré */
+/* Photo paysage / affiches artistes : ratio 16/9 fluide et recadrage centré */
 .artist-photo--landscape img {
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
   object-position: center;
   transform-origin: center;
 }
@@ -1385,7 +1411,7 @@ a {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 62%, rgba(10, 4, 6, 0.6));
+  background: linear-gradient(180deg, transparent 70%, rgba(10, 4, 6, 0.65));
   pointer-events: none;
 }
 
@@ -1426,7 +1452,7 @@ a {
   position: absolute;
   left: 1.4rem;
   bottom: 1.1rem;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-style: italic;
   font-size: 0.8rem;
   letter-spacing: 0.22em;
