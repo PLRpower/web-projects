@@ -1,9 +1,12 @@
 # Multi-stage Dockerfile optimisé ARM64 (Raspberry Pi 4) et AMD64
 
-# Stage 1: Build front-end Vite
-FROM node:22-bookworm-slim AS builder
+# Stage 1: Builder (compilation assets Vite + modules natifs)
+FROM node:24-bookworm-slim AS builder
 
 WORKDIR /app
+
+# Outils de compilation nécessaires pour better-sqlite3
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
 RUN npm ci
@@ -11,8 +14,11 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
+# Élagage des dépendances de développement
+RUN npm prune --omit=dev
+
 # Stage 2: Runtime production allégé
-FROM node:22-bookworm-slim AS runner
+FROM node:24-bookworm-slim AS runner
 
 WORKDIR /app
 
@@ -20,10 +26,8 @@ ENV NODE_ENV=production \
     PORT=3333 \
     HOST=0.0.0.0
 
-COPY package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
-
-# Fichiers compilés et sources serveur
+# Copie des dépendances de production précompilées
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/public ./public
 COPY app ./app
 COPY bin ./bin
@@ -31,7 +35,7 @@ COPY config ./config
 COPY database ./database
 COPY resources ./resources
 COPY start ./start
-COPY ace.js adonisrc.js ./
+COPY ace.js adonisrc.js package.json ./
 
 # Dossiers d'accueil pour volumes montés
 RUN mkdir -p uploads tmp
