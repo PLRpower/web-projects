@@ -1,0 +1,19 @@
+services:
+  cesi-drop:
+    image: ghcr.io/plrpower/cesi-drop:latest
+    container_name: cesi-drop
+    restart: unless-stopped
+    ports:
+      - "3333:3333"
+    environment:
+      - NODE_ENV=production
+      - PORT=3333
+      - HOST=0.0.0.0
+      - UPLOADS_PATH=/app/uploads
+    env_file:
+      - .env
+    volumes:
+      - ./tmp/db.sqlite3:/app/tmp/db.sqlite3
+      - ./uploads:/app/uploads
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"

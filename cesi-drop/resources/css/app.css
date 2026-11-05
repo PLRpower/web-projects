@@ -1,0 +1,310 @@
+
+@font-face {
+  font-family: 'Mona Sans';
+  src: url('/fonts/Mona-Sans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Mona Sans';
+  src: url('/fonts/Mona-Sans-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Mona Sans';
+  src: url('/fonts/Mona-Sans-BoldWide.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Mona Sans';
+  src: url('/fonts/Mona-Sans-ExtraBoldWide.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --neutral-800: #060606;
+  --neutral-700: #2f2f2f;
+  --neutral-600: #717172;
+  --neutral-500: #aaaaaa;
+  --neutral-400: #c0c0c0;
+  --neutral-100: #ffffff;
+  --secondary-color-1: #0f0f0f;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #060606;
+    color: #c0c0c0;
+    font-family: 'Mona Sans', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.6em;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #ffffff;
+    font-weight: 700;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #060606;
+}
+::-webkit-scrollbar-thumb {
+  background: #2f2f2f;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #505050;
+}
+
+/* Typography styles matching original */
+.display-1 {
+  color: #ffffff;
+  font-size: clamp(48px, 9vw, 130px);
+  font-weight: 700;
+  line-height: 1em;
+}
+
+.display-2 {
+  color: #ffffff;
+  font-size: clamp(36px, 6vw, 80px);
+  font-weight: 700;
+  line-height: 1.05em;
+}
+
+.display-3 {
+  color: #ffffff;
+  font-size: clamp(28px, 4.5vw, 64px);
+  font-weight: 700;
+  line-height: 1.15em;
+}
+
+.display-4 {
+  color: #ffffff;
+  font-size: clamp(22px, 3vw, 40px);
+  font-weight: 700;
+  line-height: 1.182em;
+}
+
+/* Title bar underline */
+.title-line {
+  height: 4px;
+  background-color: #ffffff;
+  flex-shrink: 0;
+}
+.title-line.size-150px {
+  width: 150px;
+}
+.title-line.size-100px {
+  width: 100px;
+}
+.title-line.footer {
+  height: 1px;
+  width: 80px;
+}
+
+
+/* Buttons matching original Webflow .btn-primary */
+.btn-primary {
+  border-bottom: 2px solid #505050;
+  color: #ffffff;
+  background-color: transparent;
+  padding: 0 0 12px;
+  font-weight: 700;
+  line-height: 1.112em;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.3s ease, color 0.3s ease;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  border-bottom-color: #ffffff;
+  color: #ffffff;
+}
+.btn-primary.no-hover {
+  border-bottom-color: #ffffff;
+}
+.btn-primary.danger-button {
+  border-bottom-color: #dc2b2b;
+  color: #dc2b2b;
+}
+.btn-primary.danger-button:hover {
+  border-bottom-color: #ff5a65;
+  color: #ff5a65;
+}
+
+/* Category cards hover animation (identical to original Webflow ix2) */
+.category-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: #c0c0c0;
+  background-color: #0d0d0d;
+  border: 1px solid #222222;
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.category-card:hover {
+  border-color: #404040;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+}
+.category-card .card-picture {
+  position: relative;
+  overflow: hidden;
+  background-color: #060606;
+}
+.category-card .service-link-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 300ms ease;
+  transform-origin: center;
+}
+.category-card:hover .service-link-image {
+  transform: scale(1.06);
+}
+.category-card .rectangle-gradient-bg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 220px;
+  background-image: linear-gradient(to top, #060606, transparent);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+.category-card:hover .rectangle-gradient-bg {
+  opacity: 1;
+}
+.category-card .arrow-inside-picture {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translate3d(-10px, 10px, 0);
+  transition: transform 300ms ease, opacity 300ms ease;
+  pointer-events: none;
+}
+.category-card:hover .arrow-inside-picture {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+.category-card .card-body {
+  padding: 20px;
+  background-color: #121212;
+  border-top: 1px solid #222222;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Portfolio / Gallery photo card hover animation (identical to original Webflow ix2) */
+.portfolio-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  cursor: pointer;
+  background-color: #0d0d0d;
+  border: 1px solid #1a1a1a;
+  transition: border-color 0.3s ease;
+}
+.portfolio-wrapper:hover {
+  border-color: #383838;
+}
+.portfolio-wrapper .card-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  transition: transform 300ms ease;
+  transform-origin: center;
+}
+.portfolio-wrapper:hover .card-image {
+  transform: scale(1.05);
+}
+.portfolio-wrapper .portfolio-project-gradient {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 80%;
+  background-image: linear-gradient(to top, #060606, transparent);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+.portfolio-wrapper:hover .portfolio-project-gradient {
+  opacity: 1;
+}
+.portfolio-wrapper .portfolio-link-btn-wrapper {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  opacity: 0;
+  transform: translate3d(0, 15px, 0);
+  transition: transform 300ms ease, opacity 300ms ease;
+  pointer-events: none;
+  z-index: 10;
+}
+.portfolio-wrapper:hover .portfolio-link-btn-wrapper {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Modern Photo Wall (uncropped masonry with multi-column hero spans) */
+.photo-wall {
+  position: relative;
+  width: 100%;
+}
+
+.photo-wall .brick {
+  position: absolute;
+  transition: opacity 250ms ease;
+}
+
+.photo-wall .portfolio-wrapper {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background-color: #0d0d0d;
+}
+
+.photo-wall .portfolio-wrapper .card-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}

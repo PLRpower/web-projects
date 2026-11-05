@@ -1,0 +1,58 @@
+@component('layouts/main', { 
+  title: 'Mentions Légales', 
+  description: 'Mentions légales du site CESI Drop, conformément à la loi pour la confiance dans l\'économie numérique.' 
+})
+  <article class="max-w-3xl mx-auto px-6 py-16 sm:py-24 text-[#cccccc] leading-relaxed">
+    <header class="border-b border-[#222222] pb-8 mb-10">
+      <p class="text-xs uppercase tracking-widest text-[#888888] font-semibold mb-2">Cadre juridique</p>
+      <h1 class="text-3xl sm:text-4xl font-bold text-white mb-4">Mentions Légales</h1>
+      <p class="text-sm text-[#999999] m-0">
+        Informations obligatoires en application de l'article 6 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN).
+      </p>
+    </header>
+
+    <section class="mb-10">
+      <h2 class="text-xl font-bold text-white mb-3">1. Éditeur de la plateforme</h2>
+      <p class="mb-3">
+        Le site internet <strong>CESI Drop'</strong> est un service de communication au public en ligne à vocation non commerciale, conçu et administré par les membres du club étudiant <strong>Studio CESI</strong>, association de fait d'étudiants rattachée à la vie associative du CESI.
+      </p>
+      <ul class="list-disc list-inside space-y-1 text-sm text-[#aaaaaa]">
+        <li><strong>Dénomination :</strong> Club Studio CESI</li>
+        <li><strong>Finalité :</strong> Archivage, partage et valorisation des événements associatifs et étudiants</li>
+        <li><strong>Directeur de la publication :</strong> Le Responsable de publication désigné du club Studio CESI</li>
+        <li><strong>Courriel de contact :</strong> <a href="mailto:studio.cesi@outlook.com" class="text-white underline">studio.cesi@outlook.com</a></li>
+        <li><strong>Réseaux et communauté :</strong> Serveur officiel Discord (<a href="https://discord.gg/xUJ3AYv3xb" target="_blank" rel="noopener noreferrer" class="text-white underline">discord.gg/xUJ3AYv3xb</a>) et compte Instagram (<a href="https://www.instagram.com/studio.cesi/" target="_blank" rel="noopener noreferrer" class="text-white underline">@studio.cesi</a>).</li>
+      </ul>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-xl font-bold text-white mb-3">2. Hébergement</h2>
+      <p class="mb-3">
+        Conformément aux dispositions de l'article 6-III-2 de la loi n° 2004-575 du 21 juin 2004, le service est opéré à titre non professionnel sur une infrastructure privée dédiée auto-gérée, située sur le territoire de la République française (Union Européenne).
+      </p>
+      <p class="text-sm text-[#aaaaaa]">
+        Tout signalement technique, notification d'incident ou réclamation doit être transmis directement à l'administration du site via les coordonnées mentionnées à l'article 1.
+      </p>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-xl font-bold text-white mb-3">3. Propriété intellectuelle et droits d'auteur</h2>
+      <p class="mb-3">
+        L'ensemble des composants techniques, graphismes, logos, codes sources et structures de bases de données de la plateforme constituent des œuvres protégées par les dispositions du Code de la propriété intellectuelle.
+      </p>
+      <p>
+        Les photographies et enregistrements audiovisuels mis à disposition demeurent la propriété intellectuelle exclusive de leurs auteurs respectifs. Les contributeurs concèdent à la plateforme une licence d'utilisation non commerciale, non exclusive et à titre gratuit, limitée aux besoins d'affichage, de consultation et d'archivage des événements de la communauté étudiante.
+      </p>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-xl font-bold text-white mb-3">4. Protection de la vie privée et droit à l'image</h2>
+      <p class="mb-3">
+        En application de l'article 9 du Code civil et de la réglementation européenne relative à la protection des données (RGPD), toute personne apparaissant sur une photographie dispose du droit de s'opposer à sa publication et d'en demander le retrait sans condition.
+      </p>
+      <p>
+        La procédure de retrait est consultable en détail sur notre page dédiée <a href="{{ route('confidentialite') }}" class="text-white underline">Confidentialité & RGPD</a>.
+      </p>
+    </section>
+  </article>
+@end

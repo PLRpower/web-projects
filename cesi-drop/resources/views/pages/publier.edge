@@ -1,0 +1,146 @@
+@component('layouts/main', { title: 'Publier des photos' })
+  <section class="py-16 sm:py-24"
+           x-data="{
+             dragging: false,
+             uploading: false,
+             progress: 0,
+             success: false,
+             errorMsg: null,
+             filesCount: 0,
+             acceptedTerms: true,
+             async handleFiles(files) {
+               if (!files || files.length === 0) return;
+               
+               if (!this.acceptedTerms) {
+                 this.errorMsg = 'Veuillez valider le respect des conditions d\'utilisation et du droit à l\'image avant de publier.';
+                 return;
+               }
+
+               this.uploading = true;
+               this.progress = 10;
+               this.success = false;
+               this.errorMsg = null;
+               this.filesCount = files.length;
+
+               const formData = new FormData();
+               for (let i = 0; i < files.length; i++) {
+                 formData.append('files[]', files[i]);
+               }
+
+               try {
+                 const res = await fetch('{{ route('publier.post') }}', {
+                   method: 'POST',
+                   headers: {
+                     'X-CSRF-TOKEN': '{{ csrfToken }}',
+                     'Accept': 'application/json'
+                   },
+                   body: formData
+                 });
+
+                 this.progress = 100;
+                 if (res.ok) {
+                   this.success = true;
+                 } else {
+                   const data = await res.json().catch(() => ({}));
+                   this.errorMsg = data.message || 'Une erreur est survenue lors de l\'envoi.';
+                 }
+               } catch (e) {
+                 this.errorMsg = 'Erreur réseau lors du téléversement.';
+               } finally {
+                 this.uploading = false;
+               }
+             }
+           }">
+    <div class="max-w-[800px] mx-auto px-6">
+      
+      <div class="text-center mb-12">
+        <h1 class="display-2 mb-4">Publier des photos</h1>
+        <div class="max-w-[596px] mx-auto">
+          <p class="text-base text-[#aaaaaa] font-medium leading-relaxed">
+            Partagez vos photos des différents évènements du CESI. Chaque cliché fait l'objet d'une modération préalable avant d'être rendu public.
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-[#0f0f0f] border border-[#222222] rounded-2xl p-8 sm:p-12 shadow-2xl">
+        
+        <div class="border-2 border-dashed rounded-xl p-10 sm:p-16 text-center transition-all duration-200 cursor-pointer"
+             :class="dragging ? 'border-white bg-[#161616]' : 'border-[#333333] hover:border-white bg-[#060606]'"
+             @dragover.prevent="dragging = true"
+             @dragleave.prevent="dragging = false"
+             @drop.prevent="dragging = false; handleFiles($event.dataTransfer.files)"
+             @click="$refs.fileInput.click()">
+          
+          <input type="file" 
+                 x-ref="fileInput" 
+                 @change="handleFiles($event.target.files)" 
+                 multiple 
+                 accept="image/*" 
+                 class="hidden" />
+
+          <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-[#141414] border border-[#2a2a2a] flex items-center justify-center text-white">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+          </div>
+
+          <h3 class="text-base font-bold text-white mb-2">
+            Glissez vos photos ici ou <span class="underline">parcourez vos fichiers</span>
+          </h3>
+          <p class="text-xs text-[#777777] m-0">
+            Formats acceptés : JPG, PNG, WebP (jusqu'à 20 Mo par image)
+          </p>
+        </div>
+
+        <!-- Information légale et consentement (Art. 13 RGPD) -->
+        <fieldset class="mt-6 pt-6 border-t border-[#1f1f1f] text-xs text-[#888888]">
+          <label class="flex items-start gap-3 cursor-pointer select-none leading-relaxed">
+            <input type="checkbox" 
+                   x-model="acceptedTerms" 
+                   class="mt-0.5 rounded bg-neutral-900 border-neutral-700 text-white focus:ring-0 cursor-pointer" />
+            <span>
+              Je certifie disposer des droits d'auteur sur ces clichés et de l'accord des personnes photographiées. J'accepte les <a href="{{ route('cgu') }}" target="_blank" class="text-white underline hover:text-neutral-300">CGU</a> et la <a href="{{ route('confidentialite') }}" target="_blank" class="text-white underline hover:text-neutral-300">Politique de Confidentialité</a>.
+            </span>
+          </label>
+          <p class="mt-3 text-[11px] text-[#666666] m-0">
+            Suppression automatique des métadonnées EXIF/GPS lors du traitement • Modération préalable avant publication • Retrait sur simple demande.
+          </p>
+        </fieldset>
+
+        <div x-show="uploading" class="mt-6 space-y-2" style="display: none;">
+          <div class="flex items-center justify-between text-xs text-[#aaaaaa]">
+            <span>Envoi et optimisation en cours (<span x-text="filesCount"></span> fichiers)...</span>
+            <span x-text="progress + '%'"></span>
+          </div>
+          <div class="w-full bg-[#1c1c1c] rounded-full h-1.5 overflow-hidden">
+            <div class="bg-white h-1.5 rounded-full transition-all duration-300" :style="`width: ${progress}%`"></div>
+          </div>
+        </div>
+
+        <div x-show="success" 
+             x-transition
+             class="mt-6 p-4 rounded-xl border border-emerald-800/60 bg-emerald-950/30 text-emerald-300 text-sm flex items-center gap-3"
+             style="display: none;">
+          <svg class="w-5 h-5 flex-shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <div>
+            <strong class="text-white">Photos envoyées avec succès !</strong> Vos photos ont été reçues et sont en attente de modération par l'équipe.
+          </div>
+        </div>
+
+        <div x-show="errorMsg" 
+             x-transition
+             class="mt-6 p-4 rounded-xl border border-red-800/60 bg-red-950/30 text-red-300 text-sm flex items-center gap-3"
+             style="display: none;">
+          <svg class="w-5 h-5 flex-shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span x-text="errorMsg"></span>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+@end

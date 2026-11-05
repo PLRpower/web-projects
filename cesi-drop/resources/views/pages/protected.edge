@@ -1,0 +1,66 @@
+@component('layouts/main', { title: 'Connexion Administration' })
+  <div class="flex-grow flex items-center justify-center py-16 sm:py-24">
+    <div class="max-w-md w-full mx-auto px-6">
+      
+      <div class="bg-[#0f0f0f] border border-[#262626] rounded-2xl p-8 sm:p-10 shadow-2xl text-center">
+        
+        <div class="w-14 h-14 mx-auto mb-6 rounded-xl bg-[#161616] border border-[#333333] flex items-center justify-center text-white">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+        </div>
+
+        <h1 class="text-2xl font-bold text-white mb-2">Espace Administration</h1>
+        <p class="text-sm text-[#aaaaaa] mb-8 font-normal">
+          Veuillez renseigner le mot de passe administrateur pour accéder à la modération.
+        </p>
+
+        @if(flashMessages.has('errorsBag.E_INVALID_CREDENTIALS'))
+        <div class="mb-6 p-3 rounded-lg bg-red-950/40 border border-red-800/60 text-red-300 text-xs flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Le mot de passe saisi est incorrect.
+        </div>
+        @endif
+
+        <form action="{{ route('protege.post') }}" method="POST" class="space-y-4"
+              x-data="{ showPass: false }">
+          {{ csrfField() }}
+          <input type="hidden" name="email" value="admin@admin.com" />
+
+          <div class="relative text-left">
+            <label for="password" class="block text-xs font-semibold text-[#aaaaaa] uppercase tracking-wider mb-2">Mot de passe</label>
+            <div class="relative">
+              <input :type="showPass ? 'text' : 'password'" 
+                     id="password" 
+                     name="password" 
+                     required
+                     placeholder="••••••••••••"
+                     class="w-full px-4 py-3 rounded-xl bg-[#060606] border border-[#2a2a2a] text-white placeholder-[#555555] focus:outline-none focus:border-white text-sm transition-all pr-10" />
+              <button type="button" 
+                      @click="showPass = !showPass"
+                      class="absolute right-3 top-3 text-[#777777] hover:text-white transition-colors"
+                      title="Afficher/Masquer le mot de passe">
+                <svg x-show="!showPass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                <svg x-show="showPass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" 
+                  class="w-full py-3.5 px-4 rounded-xl bg-white hover:bg-[#e0e0e0] text-black font-bold text-sm transition-all shadow-lg hover:scale-[1.01] active:scale-95 cursor-pointer">
+            Accéder à l'administration
+          </button>
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+@end

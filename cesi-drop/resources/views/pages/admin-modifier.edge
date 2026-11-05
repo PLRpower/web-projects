@@ -1,0 +1,75 @@
+@component('layouts/main', { title: 'Modifier la catégorie' })
+  <div class="py-12 sm:py-16">
+    <div class="max-w-2xl mx-auto px-6">
+      
+      <div class="mb-10">
+        <a href="{{ route('admin.modifier.cat') }}" class="btn-primary no-hover text-xs mb-3 inline-flex items-center gap-2">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+          <span>Retour aux catégories</span>
+        </a>
+        <h1 class="text-3xl font-extrabold text-white tracking-tight">Modifier la catégorie</h1>
+        <p class="text-sm text-[#aaaaaa] mt-1">Mettez à jour le titre, la description ou la bannière de l'évènement.</p>
+      </div>
+
+      <div class="bg-[#0f0f0f] border border-[#222222] rounded-2xl p-8 sm:p-10 shadow-2xl">
+        <form action="{{ route('admin.modifier.post', [categorie.id]) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+          {{ csrfField() }}
+
+          <div>
+            <label for="title" class="block text-xs font-bold text-white uppercase tracking-wider mb-2">
+              Titre de la catégorie <span class="text-red-400">*</span>
+            </label>
+            <input type="text" 
+                   id="title" 
+                   name="title" 
+                   required
+                   value="{{ categorie.title }}"
+                   class="w-full px-4 py-3 rounded-xl bg-[#060606] border border-[#2a2a2a] text-white text-sm focus:outline-none focus:border-white" />
+          </div>
+
+          <div>
+            <label for="description" class="block text-xs font-bold text-white uppercase tracking-wider mb-2">
+              Description
+            </label>
+            <textarea id="description" 
+                      name="description" 
+                      rows="4"
+                      class="w-full px-4 py-3 rounded-xl bg-[#060606] border border-[#2a2a2a] text-white text-sm focus:outline-none focus:border-white">{{ categorie.description || '' }}</textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-white uppercase tracking-wider mb-2">
+              Photo de couverture actuelle
+            </label>
+            <div class="w-32 aspect-[500/912] overflow-hidden bg-[#060606] border border-[#2a2a2a] mb-4">
+              <img src="/uploads/categories/{{ categorie.id }}.webp" alt="{{ categorie.title }}" class="w-full h-full object-cover" />
+            </div>
+
+            <label for="thumbnail" class="block text-xs font-bold text-white uppercase tracking-wider mb-2">
+              Remplacer la photo de couverture (optionnel)
+            </label>
+            <input type="file" 
+                   id="thumbnail" 
+                   name="thumbnail" 
+                   accept="image/*"
+                   class="w-full text-sm text-[#aaaaaa] file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border file:border-[#2a2a2a] file:bg-[#141414] file:text-white hover:file:bg-[#222222] cursor-pointer" />
+          </div>
+
+          <div class="pt-6 border-t border-[#222222] flex items-center justify-end gap-4">
+            <a href="{{ route('admin.modifier.cat') }}" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-[#aaaaaa] hover:text-white transition-colors">
+              Annuler
+            </a>
+            <button type="submit" 
+                    class="px-6 py-2.5 rounded-xl bg-white hover:bg-[#e0e0e0] text-black font-bold text-sm transition-all shadow-md cursor-pointer">
+              Enregistrer
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+@end

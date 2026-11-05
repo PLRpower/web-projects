@@ -1,0 +1,210 @@
+@component('layouts/main', { title: 'Accueil' })
+  <!-- Hero Section -->
+  <section class="py-16 sm:py-24 text-center">
+    <div class="max-w-[1360px] mx-auto px-6">
+      <div class="mb-8 sm:mb-12">
+        <h1 class="display-1 mb-4">CESI Drop'</h1>
+        <div class="max-w-[596px] mx-auto">
+          <p class="text-base sm:text-lg text-[#c0c0c0] font-medium leading-relaxed">
+            Découvrez les photos et les vidéos instantanément après les évènements du BDE CESI.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  @if(categories && categories.length > 0)
+  <section id="my-services" class="pb-16 sm:pb-24">
+    <div class="max-w-[1360px] mx-auto px-6">
+      <div class="mb-10 sm:mb-12">
+        <div class="flex items-center gap-6">
+          <h2 class="display-3 m-0">Les catégories</h2>
+          <div class="title-line size-150px hidden sm:block"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        @each(categorie in categories)
+        <a href="{{ route('categorie', [categorie.id]) }}" class="category-card group">
+          <div class="card-picture aspect-[500/912]">
+            <img src="/uploads/categories/{{ categorie.id }}.webp" 
+                 alt="{{ categorie.title }}" 
+                 loading="lazy" 
+                 decoding="async" 
+                 class="service-link-image" />
+            <div class="rectangle-gradient-bg"></div>
+            <div class="arrow-inside-picture">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </div>
+          </div>
+          <div class="card-body">
+            <h3 class="text-lg sm:text-xl font-bold text-white mb-1.5 group-hover:text-white transition-colors">
+              {{ categorie.title }}
+            </h3>
+            @if(categorie.description)
+            <p class="text-xs sm:text-sm text-[#aaaaaa] leading-relaxed line-clamp-2 m-0">
+              {{ categorie.description }}
+            </p>
+            @endif
+          </div>
+        </a>
+        @endeach
+      </div>
+    </div>
+  </section>
+  @endif
+
+  <!-- Photos Gallery Section (Uncropped Dynamic Wall with Multi-Column Spans) -->
+  <section class="pb-16 sm:pb-24"
+           x-data="photoWall({
+             initialMedias: {{ JSON.stringify(medias) }},
+             page: 1,
+             lastPage: {{ pagination.lastPage }},
+             fetchUrl: '/'
+           })">
+    <div class="max-w-[1360px] mx-auto px-6">
+      <div class="mb-10 sm:mb-12 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-6">
+          <h2 class="display-3 m-0">Les photos</h2>
+          <div class="title-line size-150px hidden sm:block"></div>
+        </div>
+
+        <!-- Selection mode / Download toggle button -->
+        <div class="flex items-center gap-3">
+          <button type="button"
+                  @click="$store.selection.isSelecting = !$store.selection.isSelecting"
+                  class="px-3.5 py-1.5 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer"
+                  :class="$store.selection.isSelecting 
+                    ? 'bg-blue-600/20 border-blue-500 text-blue-400' 
+                    : 'bg-[#141414] hover:bg-[#1f1f1f] border-[#2a2a2a] text-[#aaaaaa] hover:text-white'">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span x-text="$store.selection.isSelecting ? 'Annuler la sélection' : 'Télécharger des photos'"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dynamic Photo Wall -->
+      <div x-ref="container" 
+           class="photo-wall relative w-full"
+           :style="{ height: totalHeight ? `${totalHeight}px` : 'auto', minHeight: '300px' }">
+        <template x-for="(media, index) in medias" :key="media.id">
+          <div class="brick absolute"
+               :style="positions[media.id] ? {
+                 top: positions[media.id].top,
+                 left: positions[media.id].left,
+                 width: positions[media.id].width,
+                 height: positions[media.id].height,
+                 opacity: 1
+               } : { opacity: 0 }">
+            <div class="portfolio-wrapper group w-full h-full"
+                 :class="$store.selection.isSelected(media.id) ? 'ring-2 ring-blue-500 border-blue-500' : ''"
+                 @click="$store.selection.isSelecting 
+                   ? $store.selection.toggle(media.id) 
+                   : $dispatch('open-lightbox', { id: media.id, ext: media.extname, index: index, items: medias })">
+              
+              <img :src="`/uploads/${media.id}.webp`" 
+                   :alt="`Photo #${media.id}`"
+                   :width="media.width"
+                   :height="media.height"
+                   decoding="async" 
+                   class="card-image w-full h-full block object-contain" />
+              
+              <!-- Selection Checkbox overlay -->
+              <div class="absolute top-3 left-3 z-20 transition-all duration-200"
+                   x-show="$store.selection.isSelecting || $store.selection.isSelected(media.id)"
+                   x-transition
+                   @click.stop="$store.selection.toggle(media.id)">
+                <div class="w-7 h-7 rounded-lg border flex items-center justify-center transition-all shadow-lg cursor-pointer"
+                     :class="$store.selection.isSelected(media.id) 
+                       ? 'bg-blue-600 border-blue-400 text-white shadow-blue-600/50' 
+                       : 'bg-black/70 hover:bg-black border-white/60 text-transparent'">
+                  <svg class="w-4 h-4 fill-current stroke-current" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+
+              <div class="portfolio-project-gradient"></div>
+              
+              <div class="portfolio-link-btn-wrapper" x-show="!$store.selection.isSelecting">
+                <div class="btn-primary no-hover">
+                  <span>Afficher</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                  </svg>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Infinite Scroll Sentinel & Discreet Loader -->
+      <div x-ref="sentinel" class="w-full py-12 flex justify-center items-center" x-show="page < lastPage">
+        <div x-show="loading" class="flex items-center gap-3 text-[#aaaaaa] text-sm">
+          <span class="w-5 h-5 border-2 border-neutral-700 border-t-white rounded-full animate-spin"></span>
+          <span>Chargement des photos...</span>
+        </div>
+      </div>
+
+      <!-- Sticky Floating Bottom Bar for Multi-photo Download -->
+      <div class="fixed bottom-6 inset-x-0 z-40 max-w-xl mx-auto px-4"
+           x-show="$store.selection.selected.length > 0"
+           x-transition:enter="transition ease-out duration-200"
+           x-transition:enter-start="opacity-0 translate-y-4"
+           x-transition:enter-end="opacity-100 translate-y-0"
+           x-transition:leave="transition ease-in duration-150"
+           x-transition:leave-start="opacity-100 translate-y-0"
+           x-transition:leave-end="opacity-0 translate-y-4"
+           style="display: none;">
+        <div class="bg-neutral-900/95 border border-neutral-700/80 rounded-2xl p-3.5 sm:p-4 shadow-2xl backdrop-blur-md flex items-center justify-between gap-3">
+          
+          <!-- Counter -->
+          <div class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded-lg bg-blue-600 text-white font-extrabold text-xs" x-text="$store.selection.selected.length"></span>
+            <span class="hidden sm:inline">photo(s) sélectionnée(s)</span>
+            <span class="sm:hidden">sél.</span>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="flex items-center gap-2">
+            <!-- Select all loaded -->
+            <button type="button"
+                    @click="$store.selection.selectAll(medias.map(m => m.id))"
+                    class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors hidden sm:block">
+              Tout cocher
+            </button>
+
+            <!-- Download Selection as ZIP -->
+            <button type="button"
+                    @click="$store.selection.download('accueil')"
+                    class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2 cursor-pointer hover:scale-105 active:scale-95">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span>Télécharger (<span x-text="$store.selection.selected.length"></span>)</span>
+            </button>
+
+            <!-- Cancel / Clear -->
+            <button type="button"
+                    @click="$store.selection.clear()"
+                    class="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+                    title="Annuler la sélection">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+@end

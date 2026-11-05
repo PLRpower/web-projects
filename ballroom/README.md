@@ -1,35 +1,34 @@
 # Ballroom Strasbourg — RED LIGHT SPECIAL 2026
 
-Landing page « pressbook » de l'événement **RED LIGHT SPECIAL** (Ballroom Strasbourg, 24 octobre 2026).
-Site vitrine d'une seule page, disponible en **français** (`/`), **allemand** (`/de/`) et **néerlandais** (`/nl/`).
+Pressbook landing page for the **RED LIGHT SPECIAL** event (Ballroom Strasbourg, October 24, 2026).
+Single-page showcase website available in **French** (`/`), **German** (`/de/`), and **Dutch** (`/nl/`).
 
-## Stack
+## Tech Stack
 
-- [Astro](https://astro.build) — site statique, aucun backend, hébergeable partout (Netlify, Vercel, GitHub Pages…)
-- Aucune dépendance JS côté client (CSS pur, polices Google Fonts) — la visionneuse
-  de la galerie fonctionne uniquement avec `:target`
-- Images optimisées à la build (WebP responsive via `astro:assets` / sharp)
+- [Astro](https://astro.build) — static site, backend-free, deployable anywhere (Netlify, Vercel, GitHub Pages…)
+- Zero client-side JS dependencies (pure CSS, Google Fonts) — gallery lightbox operates entirely via CSS `:target`
+- Build-time optimized images (responsive WebP via `astro:assets` / sharp)
 
-## Commandes
+## Commands
 
 ```bash
-npm install    # installer les dépendances
-npm run dev    # serveur de développement → http://localhost:4321
-npm run build  # build de production → dist/
-npm run preview # prévisualiser le build
+npm install     # install dependencies
+npm run dev     # development server -> http://localhost:4321
+npm run build   # production build -> dist/
+npm run preview # preview production build
 ```
 
 ## Structure
 
 ```
-public/         # favicon, og.jpg (image de partage)
+public/         # favicon, og.jpg (social share image)
 src/
-  assets/       # photos sources (optimisées à la build)
-    gallery/    #   photos de scène — ballroom-01…27.jpg
-    vinii/      #   portraits Vinii Revlon — vinii-01…04.jpg
-  i18n/         # dictionnaires FR (source), DE, NL + TICKET_URL
-  components/   # sections de la landing page
+  assets/       # source photos (optimized at build time)
+    gallery/    #   stage photos — ballroom-01…27.jpg
+    vinii/      #   Vinii Revlon portraits — vinii-01…04.jpg
+  i18n/         # translation dictionaries FR (source), DE, NL + TICKET_URL
+  components/   # landing page sections
   layouts/      # Layout.astro (head, SEO, hreflang)
   pages/        # index.astro (FR), de/index.astro, nl/index.astro
-  styles/       # global.css (design system « Red Light »)
+  styles/       # global.css ("Red Light" design system)
 ```

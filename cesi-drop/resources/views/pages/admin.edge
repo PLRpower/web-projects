@@ -1,0 +1,124 @@
+@component('layouts/main', { title: 'Panneau d\'administration' })
+  <div class="py-12 sm:py-16">
+    <div class="max-w-[1360px] mx-auto px-6">
+      
+      <!-- Admin Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-8 mb-8 border-b border-[#222222] gap-4">
+        <div>
+          <h1 class="text-3xl font-extrabold text-white tracking-tight">Panneau d'administration</h1>
+          <p class="text-sm text-[#aaaaaa] mt-1">Gérez la modération, les catégories et la mise en avant des photos.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <a href="{{ route('logout') }}" 
+             class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#141414] hover:bg-[#1f1f1f] border border-[#2a2a2a] text-[#aaaaaa] hover:text-red-400 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            Déconnexion
+          </a>
+        </div>
+      </div>
+
+      <!-- Metrics Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+        <div class="p-6 rounded-2xl bg-[#0f0f0f] border border-[#222222]">
+          <div class="text-xs font-bold text-[#aaaaaa] uppercase tracking-wider mb-2">En attente de modération</div>
+          <div class="text-4xl font-extrabold text-amber-400">{{ stats.pending }}</div>
+          <div class="text-xs text-[#777777] mt-1">Photos soumises par les étudiants</div>
+        </div>
+        <div class="p-6 rounded-2xl bg-[#0f0f0f] border border-[#222222]">
+          <div class="text-xs font-bold text-[#aaaaaa] uppercase tracking-wider mb-2">Total des photos</div>
+          <div class="text-4xl font-extrabold text-white">{{ stats.total }}</div>
+          <div class="text-xs text-[#777777] mt-1">Photos enregistrées en base</div>
+        </div>
+        <div class="p-6 rounded-2xl bg-[#0f0f0f] border border-[#222222]">
+          <div class="text-xs font-bold text-[#aaaaaa] uppercase tracking-wider mb-2">Catégories actives</div>
+          <div class="text-4xl font-extrabold text-emerald-400">{{ stats.categories }}</div>
+          <div class="text-xs text-[#777777] mt-1">Évènements créés</div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Grid -->
+      <h2 class="text-xl font-bold text-white mb-6">Actions rapides</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <a href="{{ route('admin.moderer') }}" 
+           class="group p-6 rounded-2xl bg-[#0f0f0f] border border-[#222222] hover:border-[#444444] hover:bg-[#141414] transition-all duration-200">
+          <div class="w-12 h-12 rounded-xl bg-amber-950/30 border border-amber-800/40 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-105 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white group-hover:text-white transition-colors mb-1">
+            Modérer les photos
+          </h3>
+          <p class="text-sm text-[#aaaaaa] m-0">
+            Validez, classez par catégorie ou supprimez les photos récemment soumises.
+          </p>
+        </a>
+
+        <a href="{{ route('admin.choisir') }}" 
+           class="group p-6 rounded-2xl bg-[#0f0f0f] border border-[#222222] hover:border-[#444444] hover:bg-[#141414] transition-all duration-200">
+          <div class="w-12 h-12 rounded-xl bg-blue-950/30 border border-blue-800/40 flex items-center justify-center text-blue-400 mb-4 group-hover:scale-105 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white group-hover:text-white transition-colors mb-1">
+            Photos à la une
+          </h3>
+          <p class="text-sm text-[#aaaaaa] m-0">
+            Sélectionnez les meilleures photos qui apparaîtront sur la page d'accueil.
+          </p>
+        </a>
+
+        <a href="{{ route('admin.publier') }}" 
+           class="group p-6 rounded-2xl bg-[#0f0f0f] border border-[#222222] hover:border-[#444444] hover:bg-[#141414] transition-all duration-200">
+          <div class="w-12 h-12 rounded-xl bg-emerald-950/30 border border-emerald-800/40 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-105 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white group-hover:text-white transition-colors mb-1">
+            Publier directement
+          </h3>
+          <p class="text-sm text-[#aaaaaa] m-0">
+            Téléversez un lot de photos déjà validées et assignez-les directement à un évènement.
+          </p>
+        </a>
+
+        <a href="{{ route('admin.categorie') }}" 
+           class="group p-6 rounded-2xl bg-[#0f0f0f] border border-[#222222] hover:border-[#444444] hover:bg-[#141414] transition-all duration-200">
+          <div class="w-12 h-12 rounded-xl bg-purple-950/30 border border-purple-800/40 flex items-center justify-center text-purple-400 mb-4 group-hover:scale-105 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white group-hover:text-white transition-colors mb-1">
+            Créer une catégorie
+          </h3>
+          <p class="text-sm text-[#aaaaaa] m-0">
+            Ajoutez un nouvel évènement avec son affiche de couverture.
+          </p>
+        </a>
+
+        <a href="{{ route('admin.modifier.cat') }}" 
+           class="group p-6 rounded-2xl bg-[#0f0f0f] border border-[#222222] hover:border-[#444444] hover:bg-[#141414] transition-all duration-200">
+          <div class="w-12 h-12 rounded-xl bg-neutral-900 border border-neutral-700/80 flex items-center justify-center text-neutral-300 mb-4 group-hover:scale-105 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white group-hover:text-white transition-colors mb-1">
+            Gérer les catégories
+          </h3>
+          <p class="text-sm text-[#aaaaaa] m-0">
+            Modifiez les titres, descriptions, images de couverture ou supprimez des catégories.
+          </p>
+        </a>
+
+      </div>
+
+    </div>
+  </div>
+@end

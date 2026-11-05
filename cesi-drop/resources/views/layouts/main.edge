@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark h-full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title ? title + ' - CESI Drop\'' : 'CESI Drop\' - Les photos des évènements du CESI' }}</title>
+  <meta name="description" content="{{ description || 'Découvrez et téléchargez les photos des évènements du BDE CESI en haute qualité.' }}" />
+  
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="{{ title ? title + ' - CESI Drop\'' : 'CESI Drop\'' }}" />
+  <meta property="og:description" content="{{ description || 'Les photos instantanées des évènements du CESI.' }}" />
+  <meta property="og:image" content="{{ ogImage || '/thumbnail.png' }}" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/webclip.svg" />
+
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+  @if($slots.head)
+    {{{ await $slots.head() }}}
+  @endif
+</head>
+<body class="bg-[#060606] text-[#c0c0c0] font-sans flex flex-col min-h-screen selection:bg-white selection:text-black"
+      x-data="galleryLightbox"
+      @open-lightbox.window="open($event.detail)">
+
+  @include('layouts/navbar')
+
+  <main class="flex-grow">
+    {{{ await $slots.main() }}}
+  </main>
+
+  @include('layouts/footer')
+
+  <!-- Modern Lightbox Modal (Alpine.js) -->
+  <div x-show="isOpen"
+       x-transition:enter="transition ease-out duration-200"
+       x-transition:enter-start="opacity-0 scale-95"
+       x-transition:enter-end="opacity-100 scale-100"
+       x-transition:leave="transition ease-in duration-150"
+       x-transition:leave-start="opacity-100 scale-100"
+       x-transition:leave-end="opacity-0 scale-95"
+       @keydown.escape.window="close()"
+       @keydown.right.window="next()"
+       @keydown.left.window="prev()"
+       @click="close()"
+       class="fixed inset-0 z-50 flex flex-col items-center justify-center p-3 sm:p-6 bg-black/95 backdrop-blur-md select-none cursor-pointer"
+       style="display: none;">
+    
+    <!-- Top Bar: Counter & Close button -->
+    <div class="relative z-20 w-full max-w-6xl flex items-center justify-between px-2 mb-2">
+      <!-- Photo index counter -->
+      <div class="text-xs sm:text-sm font-semibold text-neutral-400 bg-neutral-900/80 px-3 py-1.5 rounded-full border border-neutral-800 cursor-default"
+           x-show="items.length > 0 && currentIndex >= 0"
+           @click.stop>
+        <span x-text="currentIndex + 1"></span> / <span x-text="items.length"></span>
+      </div>
+      <div x-show="items.length === 0 || currentIndex < 0"></div>
+
+      <!-- Close button -->
+      <button @click="close()" 
+              class="text-neutral-400 hover:text-white transition-colors p-2 rounded-full hover:bg-neutral-800/80 cursor-pointer"
+              title="Fermer (Échap)"
+              aria-label="Fermer la photo">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Main Container: Prev Button + Image + Next Button -->
+    <div class="relative z-10 max-w-6xl w-full flex-grow flex items-center justify-center min-h-0"
+         @touchstart="handleTouchStart($event)"
+         @touchend="handleTouchEnd($event)">
+      
+      <!-- Prev Button -->
+      <button type="button"
+              x-show="items.length > 1"
+              @click.stop="prev()"
+              class="hidden sm:flex absolute left-0 z-20 w-11 h-11 items-center justify-center rounded-full bg-neutral-900/80 hover:bg-neutral-800 border border-neutral-700/80 text-white transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer -ml-2 lg:-ml-6"
+              title="Photo précédente (←)"
+              aria-label="Photo précédente">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+
+      <!-- Image display -->
+      <div class="relative overflow-hidden bg-[#060606] border border-[#222222] flex items-center justify-center max-h-[72vh] sm:max-h-[76vh] w-auto max-w-full shadow-2xl cursor-default"
+           @click.stop>
+        <img :src="currentSrc" 
+             :alt="'Photo #' + currentId"
+             decoding="async"
+             class="max-h-[70vh] sm:max-h-[74vh] w-auto max-w-full object-contain block select-none" />
+      </div>
+
+      <!-- Next Button -->
+      <button type="button"
+              x-show="items.length > 1"
+              @click.stop="next()"
+              class="hidden sm:flex absolute right-0 z-20 w-11 h-11 items-center justify-center rounded-full bg-neutral-900/80 hover:bg-neutral-800 border border-neutral-700/80 text-white transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer -mr-2 lg:-mr-6"
+              title="Photo suivante (→)"
+              aria-label="Photo suivante">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Actions toolbar -->
+    <div class="relative z-20 mt-4 flex flex-wrap items-center justify-center gap-4 sm:gap-6 bg-neutral-900/90 border border-neutral-800/80 px-4 sm:px-6 py-2.5 rounded-full shadow-2xl backdrop-blur-sm cursor-default"
+         @click.stop>
+      
+      <!-- Mobile Prev / Next controls -->
+      <div class="flex sm:hidden items-center gap-1 border-r border-neutral-800 pr-3 mr-1" x-show="items.length > 1">
+        <button type="button" @click.stop="prev()" class="p-1.5 text-neutral-300 hover:text-white" aria-label="Précédente">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button type="button" @click.stop="next()" class="p-1.5 text-neutral-300 hover:text-white" aria-label="Suivante">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <!-- Share button -->
+      <button type="button" 
+              @click="shareCurrent()"
+              class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-neutral-300 hover:text-white transition-colors cursor-pointer"
+              title="Partager le lien">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+        </svg>
+        <span x-text="copied ? 'Lien copié !' : 'Partager'"></span>
+      </button>
+
+      <!-- Download Original HD -->
+      <a :href="currentOriginal"
+         download
+         class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-white bg-white/10 hover:bg-white hover:text-black border border-white/20 px-3.5 py-1.5 rounded-full transition-all cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        <span>Télécharger HD</span>
+      </a>
+
+      <!-- Signaler -->
+      <button type="button" 
+              @click="reportOpen = true; reportSent = false; reportError = null"
+              class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-neutral-400 hover:text-white transition-colors cursor-pointer"
+              title="Signaler cette photo">
+        <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <span>Signaler</span>
+      </button>
+
+      @eval(await auth.check())
+      @if(auth.isAuthenticated)
+      <!-- Admin Delete -->
+      <form action="{{ route('admin.supprimer') }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer cette photo ?')">
+        {{ csrfField() }}
+        <input type="hidden" name="imageId" :value="currentId" />
+        <button type="submit" 
+                class="inline-flex items-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+          <span>Supprimer</span>
+        </button>
+      </form>
+      @endif
+
+    </div>
+    <!-- Modal Signalement direct -->
+    <div x-show="reportOpen"
+         x-transition:enter="transition ease-out duration-150"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-100"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm"
+         style="display: none;"
+         @click.self.stop="reportOpen = false"
+         @click.stop>
+      <div class="bg-[#111111] border border-[#2a2a2a] rounded-2xl max-w-md w-full p-6 text-left shadow-2xl relative"
+           @click.stop>
+        
+        <button type="button" 
+                @click="reportOpen = false"
+                class="absolute top-4 right-4 text-neutral-400 hover:text-white p-1 rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
+                aria-label="Fermer la boîte de dialogue">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+
+        <header class="mb-4">
+          <h3 class="text-base font-bold text-white m-0">Signaler cette photo</h3>
+          <p class="text-xs text-neutral-400 m-0 mt-0.5">Photo #<span x-text="currentId"></span> • Droit à l'image ou contenu inapproprié</p>
+        </header>
+
+        <!-- Formulaire actif -->
+        <form x-show="!reportSent" @submit.prevent="submitReport('{{ csrfToken }}')" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-neutral-300 mb-1">Motif du signalement</label>
+            <select x-model="reportMotif" 
+                    class="w-full bg-[#080808] border border-[#2a2a2a] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-500 cursor-pointer">
+              <option value="Droit à l'image (demande de retrait)">Droit à l'image (je souhaite le retrait de ma photo)</option>
+              <option value="Contenu inapproprié ou dégradant">Contenu inapproprié ou dégradant</option>
+              <option value="Autre motif">Autre motif</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-neutral-300 mb-1">Précisions (facultatif)</label>
+            <textarea x-model="reportDetails" 
+                      rows="2" 
+                      placeholder="Expliquez brièvement le motif..." 
+                      class="w-full bg-[#080808] border border-[#2a2a2a] rounded-lg p-2.5 text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-neutral-500 resize-none"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-neutral-300 mb-1">Votre e-mail ou Discord (facultatif)</label>
+            <input type="text" 
+                   x-model="reportContact" 
+                   placeholder="Pour vous informer du traitement de la demande" 
+                   class="w-full bg-[#080808] border border-[#2a2a2a] rounded-lg px-3 py-2 text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-neutral-500" />
+          </div>
+
+          <div x-show="reportError" class="p-2.5 rounded-lg bg-red-950/40 border border-red-800 text-red-300 text-xs" style="display: none;">
+            <span x-text="reportError"></span>
+          </div>
+
+          <button type="submit" 
+                  :disabled="reportSending"
+                  class="w-full py-2.5 px-4 rounded-xl bg-white text-black font-bold text-xs uppercase tracking-wider hover:bg-neutral-200 transition-colors disabled:opacity-50 cursor-pointer">
+            <span x-text="reportSending ? 'Transmission en cours...' : 'Envoyer le signalement'"></span>
+          </button>
+        </form>
+
+        <!-- Message de confirmation après envoi -->
+        <div x-show="reportSent" class="space-y-4 py-2" style="display: none;">
+          <div class="p-4 rounded-xl bg-neutral-900 border border-neutral-700 text-neutral-200 text-xs leading-relaxed">
+            <strong class="text-white block text-sm mb-1">Signalement transmis</strong>
+            Votre signalement a été envoyé directement à l'équipe de modération de Studio CESI via notre salon de surveillance Discord. Tout cliché faisant l'objet d'une demande de droit à l'image est dépublié sous 24h à 48h ouvrées.
+          </div>
+          <button type="button" 
+                  @click="reportOpen = false" 
+                  class="w-full py-2 px-4 rounded-xl bg-[#1f1f1f] text-white font-bold text-xs hover:bg-[#2a2a2a] transition-colors cursor-pointer">
+            Fermer
+          </button>
+        </div>
+
+        <footer class="text-[11px] text-[#666666] text-center border-t border-[#1c1c1c] pt-3 mt-4">
+          Contact direct : <a href="mailto:studio.cesi@outlook.com" class="underline hover:text-neutral-400">studio.cesi@outlook.com</a> • <a href="{{ route('confidentialite') }}" class="underline hover:text-neutral-400">Confidentialité</a>
+        </footer>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

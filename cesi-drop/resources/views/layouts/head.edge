@@ -1,0 +1,16 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{{ title ? title + ' - CESI Drop\'' : 'CESI Drop\' - Les photos & vidéos des évènements du CESI' }}</title>
+<meta name="description" content="Découvrez les photos et les vidéos instantanément après les évènements du BDE CESI." />
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="{{ title ? title + ' - CESI Drop\'' : 'CESI Drop\'' }}" />
+<meta property="og:description" content="Les photos & vidéos instantanées des évènements du CESI." />
+<meta property="og:image" content="/thumbnail.png" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/webclip.svg" />
+
+@vite(['resources/css/app.css', 'resources/js/app.js'])

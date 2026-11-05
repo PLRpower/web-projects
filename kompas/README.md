@@ -1,34 +1,34 @@
-# Kompas | CESI - Suivi du Projet
+# Kompas | CESI - Project Overview
 
-## Objectif Principal
-**Kompas | CESI** est la plateforme ultime pour les étudiants du CESI.
-Son **coeur de métier** est la gestion des **CCTL** (Contrôles Continus par Test en Ligne) - les examens QCM de l'école.
+## Core Objective
+**Kompas | CESI** is the primary academic platform for CESI engineering students.
+Its **core feature** is managing **CCTL** (Continuous Assessment Online Tests) — the school's MCQ exams.
 
-## Fonctionnalités Clés
-1.  **Gestion des CCTL (Priorité N°1)**
-    *   Récupération de n'importe quel examen de n'importe quelle année.
-    *   Mode entraînement (Training) sur les banques de questions.
-    *   Base de données collaborative des questions/réponses.
+## Key Features
+1. **CCTL Management (Priority #1)**
+   * Retrieve any past exam paper across academic years.
+   * Training / practice mode based on curated question banks.
+   * Collaborative question and answer database.
 
-2.  **Outils Bonus (Arguments de vente)**
-    *   Amélioration de la productivité.
-    *   Outils d'IA pour l'aide aux révisions.
-    *   Design premium et expérience utilisateur fluide.
+2. **Additional Features**
+   * Student productivity boosters.
+   * AI-powered study and revision assistance.
+   * Premium design system with smooth UX.
 
-## Stack Technique
-*   **Frontend**: Next.js 14 (App Router), React, TailwindCSS.
-*   **Design**: Custom CSS variables, Glassmorphism, Font "Syne".
-*   **Backend**: Supabase (Auth, Database, Edge Functions).
+## Tech Stack
+* **Frontend**: Next.js 14 (App Router), React, Tailwind CSS.
+* **Design**: Custom CSS variables, glassmorphism, "Syne" font.
+* **Backend**: Supabase (Auth, Database, Edge Functions).
 
-## To-Do List
-- [x] Initialisation du projet (Next.js, Tailwind).
-- [x] Design System de base (Couleurs, Font Syne).
-- [x] Pages d'authentification (Login/Register).
-- [ ] **Moteur de CCTL** (Datebase schema, Upload, Search).
-- [ ] **Mode Entraînement** (Simulation d'examen).
-- [ ] Dashboard utilisateur.
-- [ ] Intégration Supabase complète.
+## Roadmap
+- [x] Project scaffolding (Next.js, Tailwind).
+- [x] Base design system (colors, Syne typography).
+- [x] Authentication flows (Login/Register).
+- [ ] **CCTL Engine** (Database schema, upload, search).
+- [ ] **Practice Mode** (Exam simulation).
+- [ ] User dashboard.
+- [ ] Full Supabase integration.
 
 ## Notes
-- L'esthétique est primordiale : doit être "Premium", sombre, vibrant (Jaune/Orange).
-- L'expérience utilisateur sur la recherche de CCTL doit être instantanée.
+- Visual polish is essential: premium, dark aesthetic, vibrant highlights (Yellow/Orange).
+- CCTL search and retrieval experience must be instantaneous.

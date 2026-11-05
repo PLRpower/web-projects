@@ -1,0 +1,71 @@
+@component('layouts/main', { title: 'Gérer les catégories' })
+  <div class="py-12 sm:py-16">
+    <div class="max-w-[1360px] mx-auto px-6">
+      
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-8 mb-8 border-b border-[#222222] gap-4">
+        <div>
+          <a href="{{ route('admin') }}" class="btn-primary no-hover text-xs mb-3 inline-flex items-center gap-2">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            <span>Retour au panneau admin</span>
+          </a>
+          <h1 class="text-3xl font-extrabold text-white tracking-tight">Gérer les catégories</h1>
+          <p class="text-sm text-[#aaaaaa] mt-1">Modifiez les informations ou supprimez des évènements existants.</p>
+        </div>
+
+        <a href="{{ route('admin.categorie') }}" 
+           class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-[#e0e0e0] text-black font-bold text-xs uppercase tracking-wider transition-all shadow-md">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Nouvelle catégorie
+        </a>
+      </div>
+
+      <!-- Categories Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        @each(categorie in categories)
+        <div class="overflow-hidden bg-[#0f0f0f] border border-[#222222] flex flex-col justify-between hover:border-[#444444] transition-colors">
+          
+          <div class="aspect-[500/912] w-full overflow-hidden bg-[#060606] relative">
+            <img src="/uploads/categories/{{ categorie.id }}.webp" 
+                 alt="{{ categorie.title }}" 
+                 loading="lazy" 
+                 decoding="async"
+                 class="w-full h-full object-cover" />
+          </div>
+
+          <div class="p-5 flex-grow flex flex-col justify-between bg-[#121212] border-t border-[#222222]">
+            <div class="mb-4">
+              <h3 class="text-base font-bold text-white mb-1">{{ categorie.title }}</h3>
+              @if(categorie.description)
+              <p class="text-xs text-[#aaaaaa] line-clamp-2 m-0">{{ categorie.description }}</p>
+              @endif
+            </div>
+
+            <div class="flex items-center gap-2 pt-3 border-t border-[#222222]">
+              <a href="{{ route('admin.modifier', [categorie.id]) }}" 
+                 class="flex-1 text-center py-2 px-3 rounded-lg bg-[#1a1a1a] hover:bg-[#282828] border border-[#333333] text-white text-xs font-bold uppercase tracking-wider transition-colors">
+                Modifier
+              </a>
+              <form action="{{ route('admin.supprimer.cat', [categorie.id]) }}" method="POST"
+                    onsubmit="return confirm('Attention ! Supprimer cette catégorie supprimera également TOUTES les photos qui y sont rattachées. Confirmer ?')"
+                    class="flex-1">
+                {{ csrfField() }}
+                <button type="submit" 
+                        class="w-full py-2 px-3 rounded-lg bg-red-950/30 hover:bg-red-900/50 border border-red-800/50 text-red-400 hover:text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer">
+                  Supprimer
+                </button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+        @endeach
+      </div>
+
+    </div>
+  </div>
+@end
