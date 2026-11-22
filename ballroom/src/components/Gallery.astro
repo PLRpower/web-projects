@@ -1,7 +1,18 @@
 ---
 import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
 import type { Dict } from '../i18n';
+import p01 from '../assets/redball/IMG-20261114-WA0107.jpg';
+import p02 from '../assets/redball/IMG-20261114-WA0028.jpg';
+import p03 from '../assets/redball/IMG-20261114-WA0067.jpg';
+import p04 from '../assets/redball/IMG-20261114-WA0033.jpg';
+import p05 from '../assets/redball/IMG-20261114-WA0162.jpg';
+import p06 from '../assets/redball/IMG-20261114-WA0152.jpg';
+import p07 from '../assets/redball/IMG-20261114-WA0069.jpg';
+import p08 from '../assets/redball/IMG-20261114-WA0127.jpg';
+import p09 from '../assets/redball/IMG-20261114-WA0042.jpg';
+import p10 from '../assets/redball/IMG-20261114-WA0126.jpg';
+import p11 from '../assets/redball/IMG-20261114-WA0050.jpg';
+import p12 from '../assets/redball/IMG-20261114-WA0019.jpg';
 
 interface Props {
   t: Dict;
@@ -9,61 +20,99 @@ interface Props {
 
 const { t } = Astro.props;
 
-/** Photos de scène, chargées depuis src/assets/gallery et triées par nom. */
-const photos = Object.entries(
-  import.meta.glob<{ default: ImageMetadata }>('../assets/gallery/*.jpg', { eager: true }),
-)
-  .sort(([a], [b]) => a.localeCompare(b))
-  .map(([, mod]) => mod.default);
+const frames = [
+  { src: p01, span: 'span-8', pos: 'center 22%' },
+  { src: p02, span: 'span-4', pos: 'center 20%' },
+  { src: p03, span: 'span-4', pos: 'center 20%' },
+  { src: p04, span: 'span-4', pos: 'center 18%' },
+  { src: p05, span: 'span-4', pos: 'center 18%' },
+  { src: p06, span: 'span-6', pos: 'center 22%' },
+  { src: p07, span: 'span-6', pos: 'center 20%' },
+  { src: p08, span: 'span-4', pos: 'center 20%' },
+  { src: p09, span: 'span-4', pos: 'center 18%' },
+  { src: p10, span: 'span-4', pos: 'center 22%' },
+  { src: p11, span: 'span-6', pos: 'center 20%' },
+  { src: p12, span: 'span-6', pos: 'center 20%' },
+] as const;
 
-const last = photos.length;
+const total = frames.length;
+const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
-<section class="section gallery-section" id="gallery">
+<section class="section" id="gallery">
   <div class="container">
-    <div class="section-head">
-      <p class="eyebrow">{t.gallery.eyebrow}</p>
-      <h2 class="section-title">{t.gallery.title}</h2>
-      <p class="section-subtitle">{t.gallery.subtitle}</p>
+    <div class="section-header-row" data-reveal>
+      <div>
+        <div class="section-marker">
+          <span class="section-num">{t.gallery.index}</span>
+          <span class="eyebrow">{t.gallery.eyebrow}</span>
+        </div>
+        <h2 class="section-title">{t.gallery.title}</h2>
+      </div>
+      <div class="gallery-header-meta">
+        <span class="gallery-archive-badge">
+          <span class="crimson-dot" aria-hidden="true"></span>
+          {t.gallery.badge}
+        </span>
+        <p class="section-subtitle">{t.gallery.subtitle}</p>
+      </div>
     </div>
 
-    <div class="gallery-masonry">
+    <div class="archive-grid">
       {
-        photos.map((photo, i) => (
-          <a class="gallery-item" href={`#photo-${i + 1}`} aria-label={`${t.gallery.altPrefix} ${i + 1}`}>
+        frames.map((frame, i) => (
+          <a
+            class={`archive-item ${frame.span}`}
+            href={`#photo-${i + 1}`}
+            aria-label={`${t.gallery.altPrefix} ${pad(i + 1)}`}
+          >
             <Image
-              src={photo}
-              alt={`${t.gallery.altPrefix} ${i + 1}`}
-              widths={[360, 560, 760]}
-              sizes="(min-width: 1120px) 346px, (min-width: 700px) 45vw, 46vw"
+              src={frame.src}
+              alt={`${t.gallery.altPrefix} ${pad(i + 1)}`}
+              widths={[480, 760, 1080]}
+              sizes="(min-width: 1120px) 600px, (min-width: 720px) 48vw, 94vw"
               format="webp"
+              style={`object-position: ${frame.pos};`}
             />
+            <span class="archive-index" aria-hidden="true">
+              {pad(i + 1)}
+            </span>
           </a>
         ))
       }
     </div>
+
+    <div style="margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+      <a href="/archives/" class="btn btn-outline">Toutes les photos (170) &amp; vidéos (16) →</a>
+    </div>
   </div>
 
   {
-    photos.map((photo, i) => {
-      const prev = i === 0 ? last : i;
-      const next = i === last - 1 ? 1 : i + 2;
+    frames.map((frame, i) => {
+      const prev = i === 0 ? total : i;
+      const next = i === total - 1 ? 1 : i + 2;
       return (
-        <div class="lightbox" id={`photo-${i + 1}`} role="dialog" aria-label={`${t.gallery.altPrefix} ${i + 1}`}>
+        <div class="lightbox" id={`photo-${i + 1}`} role="dialog" aria-label={`${t.gallery.altPrefix} ${pad(i + 1)}`}>
+          <a class="lightbox-backdrop" href="#gallery" aria-label={t.gallery.close} />
           <a class="lightbox-close" href="#gallery" aria-label={t.gallery.close}>
             ×
           </a>
           <a class="lightbox-nav lightbox-prev" href={`#photo-${prev}`} aria-label={t.gallery.previous}>
             ‹
           </a>
-          <Image
-            class="lightbox-img"
-            src={photo}
-            alt={`${t.gallery.altPrefix} ${i + 1}`}
-            widths={[960, 1280]}
-            sizes="(min-width: 1300px) 1200px, 92vw"
-            format="webp"
-          />
+          <figure class="lightbox-figure">
+            <Image
+              class="lightbox-img"
+              src={frame.src}
+              alt={`${t.gallery.altPrefix} ${pad(i + 1)}`}
+              widths={[960, 1400]}
+              sizes="(min-width: 1300px) 1200px, 92vw"
+              format="webp"
+            />
+            <figcaption class="lightbox-counter">
+              {pad(i + 1)} / {pad(total)}
+            </figcaption>
+          </figure>
           <a class="lightbox-nav lightbox-next" href={`#photo-${next}`} aria-label={t.gallery.next}>
             ›
           </a>
@@ -72,3 +121,19 @@ const last = photos.length;
     })
   }
 </section>
+
+<script>
+  document.addEventListener('keydown', (event) => {
+    const match = window.location.hash.match(/^#photo-(\d+)$/);
+    if (!match) return;
+    const current = Number(match[1]);
+    const total = document.querySelectorAll('.lightbox').length;
+    if (event.key === 'Escape') {
+      window.location.hash = '#gallery';
+    } else if (event.key === 'ArrowLeft') {
+      window.location.hash = `#photo-${current === 1 ? total : current - 1}`;
+    } else if (event.key === 'ArrowRight') {
+      window.location.hash = `#photo-${current === total ? 1 : current + 1}`;
+    }
+  });
+</script>

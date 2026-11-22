@@ -1,11 +1,4 @@
 ---
-import { Image } from 'astro:assets';
-import viniiPoster from '../assets/artists/vinii-revlon.png';
-import boPoster from '../assets/artists/bo-the-qu-ing.png';
-import viviPoster from '../assets/artists/vivi-gorgeous-gucci.png';
-import toshiroPoster from '../assets/artists/toshiro-kamara.png';
-import bodyPoster from '../assets/artists/body-kennedy.png';
-import tonyPoster from '../assets/artists/tony-revlon.png';
 import type { Dict } from '../i18n';
 
 interface Props {
@@ -13,59 +6,34 @@ interface Props {
 }
 
 const { t } = Astro.props;
-
-const initials = (name: string) => {
-  const clean = name.replace(/["«»]/g, '').trim();
-  const words = clean.split(/\s+/);
-  if (words.length >= 2) {
-    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
-  }
-  return clean.slice(0, 2).toUpperCase();
-};
-
-const artists = [
-  { ...t.artists.vini, photo: viniiPoster },
-  { ...t.artists.bo, photo: boPoster },
-  { ...t.artists.vivi, photo: viviPoster },
-  { ...t.artists.toshiro, photo: toshiroPoster },
-  { ...t.artists.body, photo: bodyPoster },
-  { ...t.artists.tony, photo: tonyPoster },
-];
 ---
 
-<section class="section" id="artists">
+<section class="section band-tinted" id="lineup">
   <div class="container">
-    <div class="section-head">
-      <p class="eyebrow">{t.artists.eyebrow}</p>
-      <h2 class="section-title">{t.artists.title}</h2>
+    <div class="section-header-row" data-reveal>
+      <div>
+        <div class="section-marker">
+          <span class="section-num">{t.lineup.index}</span>
+          <span class="eyebrow">{t.lineup.eyebrow}</span>
+        </div>
+        <h2 class="section-title">{t.lineup.title}</h2>
+      </div>
+      <p class="section-subtitle">{t.lineup.lead}</p>
     </div>
 
-    <div class="artists-grid">
+    <div class="lineup-grid" data-reveal>
       {
-        artists.map((artist) => (
-          <article class="artist-card artist-card--featured">
-            <figure class="artist-photo artist-photo--landscape">
-              <Image src={artist.photo} alt={artist.photoAlt} width={840} format="webp" />
-            </figure>
-            <div class="artist-top">
-              <div class="monogram" aria-hidden="true">
-                {initials(artist.name)}
-              </div>
-              <div>
-                <h3>{artist.name}</h3>
-                <span class="artist-role">{artist.role}</span>
-              </div>
+        t.lineup.slots.map((slot) => (
+          <article class="lineup-cell">
+            <div class="lineup-top">
+              <span class="lineup-code">{slot.code}</span>
+              <span class="status-tag">{slot.status}</span>
             </div>
-            <ul class="credits">
-              {artist.credits.map((c) => (
-                <li>{c}</li>
-              ))}
-            </ul>
+            <h3>{slot.role}</h3>
+            <p>{slot.note}</p>
           </article>
         ))
       }
-
-      <p class="judges-note">{t.artists.judges}</p>
     </div>
   </div>
 </section>

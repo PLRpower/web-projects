@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import stageWide from '../assets/gallery/ballroom-06.jpg';
+import stageWide from '../assets/gallery/ballroom-03.jpg';
 import type { Dict } from '../i18n';
 
 interface Props {
@@ -10,49 +10,56 @@ interface Props {
 const { t } = Astro.props;
 ---
 
-<section class="section" id="about">
+<section class="section" id="manifesto">
   <div class="container">
-    <div class="section-head">
-      <p class="eyebrow">{t.about.eyebrow}</p>
-      <h2 class="section-title">{t.about.title}</h2>
+    <div class="editorial-split">
+      <aside class="editorial-aside" data-reveal>
+        <div class="section-marker">
+          <span class="section-num">{t.manifesto.index}</span>
+          <span class="eyebrow">{t.manifesto.eyebrow}</span>
+        </div>
+        <h2 class="section-title">{t.manifesto.title}</h2>
+
+        <div class="manifesto-note">
+          <h3>{t.manifesto.identityTitle}</h3>
+          <p>{t.manifesto.identity}</p>
+        </div>
+      </aside>
+
+      <div class="editorial-main">
+        <p class="manifesto-lead" data-reveal>{t.manifesto.lead}</p>
+        <p class="manifesto-body" data-reveal>{t.manifesto.body}</p>
+
+        <div class="pillars-block" data-reveal>
+          <p class="sub-label">{t.manifesto.pillarsTitle}</p>
+          <ol class="pillars-list">
+            {
+              t.manifesto.pillars.map((p) => (
+                <li>
+                  <span class="pillar-num">{p.num}</span>
+                  <div class="pillar-copy">
+                    <h3>{p.name}</h3>
+                    <p>{p.desc}</p>
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </div>
     </div>
 
-    <div class="about-grid">
-      <div>
-        <p class="about-lead">{t.about.lead}</p>
-        <p class="about-body">{t.about.body}</p>
+    <figure class="editorial-plate" data-reveal>
+      <div class="editorial-plate-frame">
+        <Image
+          src={stageWide}
+          alt={t.manifesto.photoAlt}
+          widths={[640, 1000, 1400]}
+          sizes="(min-width: 1240px) 1200px, 94vw"
+          format="webp"
+        />
       </div>
-      <div>
-        <h3 class="section-title" style="font-size: 1.3rem; margin-bottom: 0.5rem;">{t.about.pillarsTitle}</h3>
-        <ol class="pillars">
-          {t.about.pillars.map((p, i) => (
-            <li>
-              <span class="num">0{i + 1}</span>
-              <span class="name">{p.name}</span>
-              <span class="desc">— {p.desc}</span>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </div>
-
-    <figure class="section-photo">
-      <Image
-        src={stageWide}
-        alt={t.about.photoAlt}
-        widths={[640, 900, 1200]}
-        sizes="(min-width: 1150px) 1120px, 96vw"
-        format="webp"
-      />
-      <figcaption>{t.about.photoCaption}</figcaption>
+      <figcaption>{t.manifesto.photoCaption}</figcaption>
     </figure>
-
-    <div class="identity">
-      <h3>{t.about.identityTitle}</h3>
-      <p>{t.about.identity}</p>
-      <div class="tag-row">
-        {t.about.tags.map((tag) => <span class="tag">{tag}</span>)}
-      </div>
-    </div>
   </div>
 </section>

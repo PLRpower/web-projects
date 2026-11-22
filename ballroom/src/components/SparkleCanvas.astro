@@ -1,0 +1,331 @@
+<canvas class="sparkle-stage" id="sparkle-stage" aria-hidden="true"></canvas>
+
+<script>
+  interface Caustic {
+    x: number;
+    y: number;
+    rx: number;
+    ry: number;
+    angle: number;
+    vx: number;
+    vy: number;
+    phase: number;
+    speed: number;
+  }
+
+  interface Sequin {
+    x: number;
+    y: number;
+    r: number;
+    vy: number;
+    swayAmp: number;
+    swaySpeed: number;
+    spin: number;
+    spinSpeed: number;
+    phase: number;
+    star: boolean;
+  }
+
+  interface Spark {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    r: number;
+    spin: number;
+    spinSpeed: number;
+    life: number;
+    maxLife: number;
+    star: boolean;
+  }
+
+  const initSparkleStage = () => {
+    const canvas = document.getElementById('sparkle-stage') as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const spotTargets = document.querySelectorAll<HTMLElement>('.lineup-cell, .tickets-frame');
+    spotTargets.forEach((el) => {
+      el.addEventListener('pointermove', (e) => {
+        const rect = el.getBoundingClientRect();
+        el.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+        el.style.setProperty('--my', `${e.clientY - rect.top}px`);
+      });
+    });
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    const resize = () => {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    const rand = (min: number, max: number) => min + Math.random() * (max - min);
+
+    const caustics: Caustic[] = Array.from({ length: 14 }, (_, i) => ({
+      x: rand(0, w),
+      y: rand(0, h),
+      rx: rand(10, 26),
+      ry: rand(4, 10),
+      angle: rand(-0.6, -0.2),
+      vx: rand(0.14, 0.34),
+      vy: rand(0.03, 0.09),
+      phase: i * 0.9,
+      speed: rand(0.015, 0.032),
+    }));
+
+    const sequinCount = w < 640 ? 20 : 32;
+    const sequins: Sequin[] = Array.from({ length: sequinCount }, (_, i) => ({
+      x: rand(0, w),
+      y: rand(0, h),
+      r: rand(2.6, 5.2),
+      vy: rand(-0.28, -0.1),
+      swayAmp: rand(0.14, 0.38),
+      swaySpeed: rand(0.01, 0.026),
+      spin: rand(0, Math.PI * 2),
+      spinSpeed: rand(0.04, 0.09),
+      phase: i * 0.7,
+      star: i % 3 === 0,
+    }));
+
+    const sparks: Spark[] = [];
+
+    const drawFourStar = (x: number, y: number, r: number, alpha: number) => {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.globalAlpha = alpha;
+
+      const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 1.55);
+      glow.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      glow.addColorStop(0.45, 'rgba(255, 253, 247, 0.62)');
+      glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 1.55, 0, Math.PI * 2);
+      ctx.fill();
+
+      const inner = r * 0.14;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.moveTo(0, -r);
+      ctx.lineTo(inner, -inner);
+      ctx.lineTo(r, 0);
+      ctx.lineTo(inner, inner);
+      ctx.lineTo(0, r);
+      ctx.lineTo(-inner, inner);
+      ctx.lineTo(-r, 0);
+      ctx.lineTo(-inner, -inner);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = 'rgba(165, 152, 130, 0.38)';
+      ctx.lineWidth = 0.55;
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    const drawSequin = (x: number, y: number, r: number, spin: number, alpha: number) => {
+      const tilt = Math.cos(spin);
+      const sx = Math.max(0.14, Math.abs(tilt));
+      const glint = Math.pow(Math.abs(tilt), 4);
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(spin * 0.25);
+      ctx.globalAlpha = alpha;
+
+      if (glint > 0.35) {
+        const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 2.1);
+        g.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+        g.addColorStop(0.5, 'rgba(240, 232, 214, 0.4)');
+        g.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(0, 0, r * 2.1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.scale(sx, 1);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.strokeStyle = 'rgba(168, 156, 135, 0.44)';
+      ctx.lineWidth = 0.6;
+
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = (i * Math.PI) / 3;
+        const px = Math.cos(a) * r;
+        const py = Math.sin(a) * r;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      if (glint > 0.72) {
+        drawFourStar(x, y, r * 2.4, alpha * 0.95);
+      }
+    };
+
+    const spawnBurst = (x: number, y: number, count = 18, spread = 60) => {
+      for (let i = 0; i < count; i++) {
+        if (sparks.length >= 110) sparks.shift();
+        const a = (Math.PI * 2 * i) / count + rand(-0.25, 0.25);
+        const speed = rand(0.9, 2.8) * (spread / 65);
+        sparks.push({
+          x: x + rand(-4, 4),
+          y: y + rand(-4, 4),
+          vx: Math.cos(a) * speed,
+          vy: Math.sin(a) * speed - 0.55,
+          r: rand(2.2, 4.8),
+          spin: rand(0, Math.PI * 2),
+          spinSpeed: rand(0.12, 0.25),
+          life: 0,
+          maxLife: rand(34, 58),
+          star: i % 2 === 0,
+        });
+      }
+    };
+
+    window.addEventListener('ballroom:sparkburst', ((event: CustomEvent) => {
+      const { x, y, count, spread } = event.detail ?? {};
+      if (typeof x === 'number' && typeof y === 'number') {
+        spawnBurst(x, y, count ?? 20, spread ?? 70);
+      }
+    }) as EventListener);
+
+    let lastX = -999;
+    let lastY = -999;
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        if (e.pointerType === 'touch') return;
+        const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+        if (dist < 38) return;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        if (sparks.length >= 110) sparks.shift();
+        sparks.push({
+          x: e.clientX + rand(-4, 4),
+          y: e.clientY + rand(-4, 4),
+          vx: rand(-0.35, 0.35),
+          vy: rand(0.25, 0.75),
+          r: rand(2, 4.2),
+          spin: rand(0, Math.PI * 2),
+          spinSpeed: rand(0.1, 0.22),
+          life: 0,
+          maxLife: rand(28, 44),
+          star: Math.random() > 0.45,
+        });
+      },
+      { passive: true },
+    );
+
+    window.addEventListener(
+      'click',
+      (e) => {
+        const target = e.target as HTMLElement | null;
+        if (!target) return;
+        if (target.closest('[data-mirrorball]')) return;
+        if (target.closest('.btn, .archive-item, .lineup-cell')) {
+          spawnBurst(e.clientX, e.clientY, 16, 62);
+        } else {
+          spawnBurst(e.clientX, e.clientY, 8, 45);
+        }
+      },
+      { passive: true },
+    );
+
+    const frame = () => {
+      if (!document.hidden) {
+        ctx.clearRect(0, 0, w, h);
+
+        // 1. Soft white mirrorball light reflections gliding cleanly over silk-ivory paper
+        for (let i = 0; i < caustics.length; i++) {
+          const c = caustics[i];
+          c.x += c.vx;
+          c.y += c.vy;
+          c.phase += c.speed;
+          if (c.x - c.rx > w) c.x = -c.rx;
+          if (c.y - c.rx > h) c.y = -c.rx;
+
+          const pulse = 0.35 + 0.65 * Math.pow(0.5 + 0.5 * Math.sin(c.phase), 1.4);
+          ctx.save();
+          ctx.translate(c.x, c.y);
+          ctx.rotate(c.angle);
+          ctx.globalAlpha = pulse * 0.65;
+
+          const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, c.rx * 1.35);
+          grad.addColorStop(0, 'rgba(255, 255, 255, 0.98)');
+          grad.addColorStop(0.55, 'rgba(255, 255, 255, 0.5)');
+          grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          ctx.fillStyle = grad;
+          ctx.scale(1, c.ry / c.rx);
+          ctx.beginPath();
+          ctx.arc(0, 0, c.rx * 1.35, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // 2. Ambient white-pearl sequins & subtle stars
+        for (let i = 0; i < sequins.length; i++) {
+          const s = sequins[i];
+          s.y += s.vy;
+          s.phase += s.swaySpeed;
+          s.x += Math.sin(s.phase) * s.swayAmp;
+          s.spin += s.spinSpeed;
+          if (s.y < -12) {
+            s.y = h + 12;
+            s.x = rand(0, w);
+          }
+
+          const twinkle = 0.28 + 0.72 * Math.pow(0.5 + 0.5 * Math.sin(s.phase * 1.8), 2);
+          if (s.star) {
+            drawFourStar(s.x, s.y, s.r * 1.45, twinkle * 0.85);
+          } else {
+            drawSequin(s.x, s.y, s.r, s.spin, twinkle * 0.82);
+          }
+        }
+
+        // 3. Interactive runway dust & bursts
+        for (let i = sparks.length - 1; i >= 0; i--) {
+          const sp = sparks[i];
+          sp.life += 1;
+          if (sp.life >= sp.maxLife) {
+            sparks.splice(i, 1);
+            continue;
+          }
+          sp.vx *= 0.965;
+          sp.vy = sp.vy * 0.965 + 0.032;
+          sp.x += sp.vx;
+          sp.y += sp.vy;
+          sp.spin += sp.spinSpeed;
+
+          const p = sp.life / sp.maxLife;
+          const alpha = p < 0.2 ? p / 0.2 : Math.pow(1 - (p - 0.2) / 0.8, 1.4);
+          if (sp.star) {
+            drawFourStar(sp.x, sp.y, sp.r * (1.25 - p * 0.35), alpha * 0.95);
+          } else {
+            drawSequin(sp.x, sp.y, sp.r * (1 - p * 0.2), sp.spin, alpha * 0.92);
+          }
+        }
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  };
+
+  initSparkleStage();
+</script>

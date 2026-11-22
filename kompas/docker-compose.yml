@@ -1,0 +1,13 @@
+services:
+  kompas:
+    image: ghcr.io/plrpower/kompas:latest
+    container_name: kompas
+    restart: unless-stopped
+    ports:
+      - "3334:3334"
+    env_file:
+      - .env
+    volumes:
+      - ./.data:/app/.data
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Affiche A3 — CESI Drop'</title>
+  <style>
+    @font-face {
+      font-family: 'Mona Sans';
+      src: url('../public/fonts/Mona-Sans-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Mona Sans';
+      src: url('../public/fonts/Mona-Sans-Medium.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Mona Sans';
+      src: url('../public/fonts/Mona-Sans-BoldWide.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Mona Sans';
+      src: url('../public/fonts/Mona-Sans-ExtraBoldWide.ttf') format('truetype');
+      font-weight: 800;
+      font-style: normal;
+    }
+
+    @page {
+      size: 297mm 420mm;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    html, body {
+      width: 297mm;
+      height: 420mm;
+      background: #060606;
+      color: #ffffff;
+      font-family: 'Mona Sans', system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+    }
+
+    .poster {
+      position: relative;
+      width: 297mm;
+      height: 420mm;
+      background: #060606;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 15mm 16mm 12mm 16mm;
+    }
+
+    /* Pure flat true black — zero gradients */
+
+    /* Subtle giant watermark text in background for print depth */
+    .bg-watermark {
+      position: absolute;
+      top: 115mm;
+      left: -15mm;
+      font-size: 165pt;
+      font-weight: 800;
+      line-height: 0.82;
+      letter-spacing: -0.04em;
+      color: rgba(255, 255, 255, 0.028);
+      text-transform: uppercase;
+      white-space: nowrap;
+      transform: rotate(-8deg);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Decorative vertical film sprocket rails on far left & right edges */
+    .film-rail {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 5.5mm;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0mm,
+        transparent 5mm,
+        rgba(250, 204, 21, 0.10) 5mm,
+        rgba(250, 204, 21, 0.10) 9mm
+      );
+      z-index: 2;
+    }
+    .film-rail.left { left: 3.5mm; }
+    .film-rail.right { right: 3.5mm; }
+
+    /* Foreground content */
+    .content {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Minimal Top Stamp (no website navbar) */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-img {
+      height: 14mm;
+      width: auto;
+      display: block;
+    }
+
+    .domain-stamp {
+      padding: 2.2mm 5.5mm;
+      border: 1.5px solid #facc15;
+      color: #facc15;
+      font-size: 11.5pt;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    /* Hero with Giant Official Logo + Flat Bold Ribbon, tilted down on the left */
+    .hero {
+      margin-top: 6mm;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      transform: rotate(-2.4deg);
+      transform-origin: center center;
+    }
+
+    .hero-logo {
+      height: 36mm;
+      width: auto;
+      display: block;
+      margin-left: -3mm;
+    }
+
+    .headline-ribbon-wrap {
+      margin-top: 4mm;
+      display: inline-block;
+    }
+
+    .headline-ribbon {
+      display: inline-block;
+      background: #facc15;
+      color: #060606;
+      padding: 3.5mm 10mm 3mm 8mm;
+      font-size: 56pt;
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.025em;
+      text-transform: uppercase;
+      box-shadow: 6px 6px 0 #ffffff;
+    }
+
+    /* Overlapping Polaroid / Print Photo Collage */
+    .collage-stage {
+      position: relative;
+      height: 152mm;
+      margin-top: 4mm;
+      width: 100%;
+    }
+
+    .polaroid {
+      position: absolute;
+      background: #f5f5f4;
+      padding: 3.2mm 3.2mm 10.5mm 3.2mm;
+      box-shadow: 0 22px 45px rgba(0, 0, 0, 0.78), 0 4px 12px rgba(0, 0, 0, 0.45);
+      border-radius: 1.5mm;
+    }
+
+    .polaroid img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #141414;
+    }
+
+    .polaroid-label {
+      position: absolute;
+      bottom: 2.5mm;
+      left: 3.5mm;
+      right: 3.5mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 8.5pt;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #1c1917;
+    }
+
+    .polaroid-label span:last-child {
+      color: #eab308;
+    }
+
+    /* 5 dynamic overlapping prints */
+    .p1 {
+      width: 112mm;
+      height: 68mm;
+      top: 6mm;
+      left: 0mm;
+      transform: rotate(-5.5deg);
+      z-index: 2;
+    }
+
+    .p2 {
+      width: 72mm;
+      height: 96mm;
+      top: -4mm;
+      left: 102mm;
+      transform: rotate(3.2deg);
+      z-index: 4;
+    }
+
+    .p3 {
+      width: 92mm;
+      height: 74mm;
+      top: 10mm;
+      right: 0mm;
+      transform: rotate(-4.2deg);
+      z-index: 3;
+    }
+
+    .p4 {
+      width: 98mm;
+      height: 76mm;
+      bottom: 2mm;
+      left: 22mm;
+      transform: rotate(4.5deg);
+      z-index: 5;
+    }
+
+    .p5 {
+      width: 104mm;
+      height: 78mm;
+      bottom: 0mm;
+      right: 16mm;
+      transform: rotate(-3.2deg);
+      z-index: 6;
+    }
+
+    /* Floating yellow sticker over collage */
+    .sticker {
+      position: absolute;
+      top: 62mm;
+      right: 6mm;
+      z-index: 10;
+      background: #facc15;
+      color: #080808;
+      padding: 4mm 6.5mm;
+      font-size: 13pt;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transform: rotate(7deg);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.7);
+      border: 2px solid #080808;
+    }
+
+    /* Bottom Asymmetric Editorial Promo + QR Zone */
+    .bottom-cta {
+      margin-top: 6mm;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12mm;
+      padding-top: 8mm;
+      border-top: 2px solid #facc15;
+    }
+
+    .cta-left {
+      flex: 1;
+    }
+
+    .cta-headline {
+      font-size: 32pt;
+      font-weight: 800;
+      line-height: 1.02;
+      text-transform: uppercase;
+      color: #ffffff;
+      margin-bottom: 4.5mm;
+    }
+
+    .cta-headline span {
+      color: #facc15;
+    }
+
+    .cta-desc {
+      font-size: 15pt;
+      font-weight: 500;
+      line-height: 1.42;
+      color: #d6d3d1;
+      margin-bottom: 7mm;
+    }
+
+    .cta-desc strong {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .url-callout {
+      display: inline-flex;
+      align-items: center;
+      gap: 4mm;
+      background: linear-gradient(90deg, #facc15 0%, #f59e0b 100%);
+      color: #060606;
+      padding: 3.8mm 8mm;
+      font-size: 22pt;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      box-shadow: 5px 5px 0 #ffffff;
+    }
+
+    .url-arrow {
+      width: 7mm;
+      height: 7mm;
+    }
+
+    /* QR Code with Yellow/Orange Viewfinder Corners */
+    .qr-wrapper {
+      position: relative;
+      padding: 4.5mm;
+      flex-shrink: 0;
+    }
+
+    .corner {
+      position: absolute;
+      width: 8mm;
+      height: 8mm;
+      border-color: #facc15;
+      border-style: solid;
+    }
+    .corner.tl { top: 0; left: 0; border-width: 1.4mm 0 0 1.4mm; }
+    .corner.tr { top: 0; right: 0; border-width: 1.4mm 1.4mm 0 0; }
+    .corner.bl { bottom: 0; left: 0; border-width: 0 0 1.4mm 1.4mm; }
+    .corner.br { bottom: 0; right: 0; border-width: 0 1.4mm 1.4mm 0; }
+
+    .qr-card {
+      background: #ffffff;
+      padding: 4.5mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75);
+    }
+
+    .qr-card img {
+      width: 56mm;
+      height: 56mm;
+      display: block;
+    }
+
+    .qr-caption {
+      margin-top: 2.5mm;
+      font-size: 9.5pt;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #080808;
+    }
+
+    /* Clean Minimal Footer + Partner Logos */
+    .footer {
+      margin-top: 6mm;
+      padding-top: 5mm;
+      border-top: 1px solid #262626;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-left {
+      font-size: 11.5pt;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #a8a29e;
+    }
+
+    .partners {
+      display: flex;
+      align-items: center;
+      gap: 7mm;
+    }
+
+    .partner-studio {
+      height: 14mm;
+      width: auto;
+      display: block;
+      object-fit: contain;
+      mix-blend-mode: lighten;
+    }
+
+    .partner-bde-img {
+      height: 15mm;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .partner-cesi {
+      height: 15mm;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+  <div class="poster">
+    <div class="bg-watermark">DROP' 2026</div>
+    <div class="film-rail left"></div>
+    <div class="film-rail right"></div>
+
+    <div class="content">
+      <!-- Hero with Giant Official Logo -->
+      <section class="hero">
+        <img src="../public/logo_full.svg" alt="CESI Drop'" class="hero-logo" />
+        <div class="headline-ribbon-wrap">
+          <div class="headline-ribbon">EST DE RETOUR !</div>
+        </div>
+      </section>
+
+      <!-- Overlapping Polaroid Collage (Real Curated Event Photos) -->
+      <section class="collage-stage">
+        <div class="polaroid p1">
+          <img src="gala-custom.jpg" alt="Gala 2026" />
+          <div class="polaroid-label"><span>GALA 2026</span><span>#01</span></div>
+        </div>
+        <div class="polaroid p2">
+          <img src="soiree-custom.jpg" alt="Soirée BDE" />
+          <div class="polaroid-label"><span>SOIRÉE BDE</span><span>#02</span></div>
+        </div>
+        <div class="polaroid p3">
+          <img src="sport-custom.jpg" alt="Sport CESI" />
+          <div class="polaroid-label"><span>SPORT CESI</span><span>#03</span></div>
+        </div>
+        <div class="polaroid p4">
+          <img src="wes-custom.jpg" alt="WES 2026" />
+          <div class="polaroid-label"><span>WES 2026</span><span>#04</span></div>
+        </div>
+        <div class="polaroid p5">
+          <img src="../uploads/1799.webp" alt="Soirée d'Intégration" />
+          <div class="polaroid-label"><span>INTÉGRATION</span><span>#05</span></div>
+        </div>
+
+        <div class="sticker">+2 000 PHOTOS</div>
+      </section>
+
+      <!-- Bottom Promo + QR -->
+      <section class="bottom-cta">
+        <div class="cta-left">
+          <h2 class="cta-headline">
+            SCANNE &amp; REVIS<br />
+            <span>TES SOIRÉES.</span>
+          </h2>
+          <p class="cta-desc">
+            Récupère gratuitement tes photos après chaque évènement.
+            Soirées, intégration, galas, tournois : tous vos souvenirs au même endroit.
+          </p>
+          <div class="url-callout">
+            <span>cesi-drop.fr</span>
+            <svg class="url-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="qr-wrapper">
+          <div class="corner tl"></div>
+          <div class="corner tr"></div>
+          <div class="corner bl"></div>
+          <div class="corner br"></div>
+          <div class="qr-card">
+            <img src="qr.svg" alt="QR Code vers https://cesi-drop.fr" />
+            <span class="qr-caption">SCANNEZ-MOI</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer with Partner Logos -->
+      <footer class="footer">
+        <span class="footer-left">CESI-DROP.FR</span>
+        <div class="partners">
+          <img src="../../portfolio-studio-cesi/public/img/logo.png" alt="Studio CESI" class="partner-studio" />
+          <img src="file:///C:/Users/pault/Qsync/Pictures/StudioCESI/Logo%20et%20visuels/BDE/logo-bde.png" alt="BDE CESI" class="partner-bde-img" />
+          <img src="../public/cesi-projet-etudiant.webp" alt="CESI Projet Étudiant" class="partner-cesi" />
+        </div>
+      </footer>
+    </div>
+  </div>
+</body>
+</html>

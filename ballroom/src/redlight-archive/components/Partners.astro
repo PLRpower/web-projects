@@ -1,0 +1,30 @@
+---
+import type { Dict } from '../i18n';
+
+interface Props {
+  t: Dict;
+}
+
+const { t } = Astro.props;
+---
+
+<section class="section" id="partners">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">{t.partners.eyebrow}</p>
+      <h2 class="section-title">{t.partners.title}</h2>
+      <p class="section-subtitle">{t.partners.subtitle}</p>
+    </div>
+
+    <div class="partners-grid">
+      {t.partners.groups.map((g) => (
+        <div class="partner-group">
+          <h3>{g.audience}</h3>
+          <ul>
+            {g.benefits.map((b) => <li>{b}</li>)}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

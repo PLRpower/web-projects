@@ -8,23 +8,35 @@ interface Props {
 const { t } = Astro.props;
 ---
 
-<section class="section" id="partners">
+<section class="section band-tinted" id="partners">
   <div class="container">
-    <div class="section-head">
-      <p class="eyebrow">{t.partners.eyebrow}</p>
-      <h2 class="section-title">{t.partners.title}</h2>
+    <div class="section-header-row" data-reveal>
+      <div>
+        <div class="section-marker">
+          <span class="section-num">{t.partners.index}</span>
+          <span class="eyebrow">{t.partners.eyebrow}</span>
+        </div>
+        <h2 class="section-title">{t.partners.title}</h2>
+      </div>
       <p class="section-subtitle">{t.partners.subtitle}</p>
     </div>
 
-    <div class="partners-grid">
-      {t.partners.groups.map((g) => (
-        <div class="partner-group">
-          <h3>{g.audience}</h3>
-          <ul>
-            {g.benefits.map((b) => <li>{b}</li>)}
-          </ul>
-        </div>
-      ))}
+    <div class="partners-ledger" data-reveal>
+      {
+        t.partners.groups.map((g, i) => (
+          <div class="partner-cell">
+            <div class="partner-head">
+              <span class="partner-num">0{i + 1}</span>
+              <h3>{g.audience}</h3>
+            </div>
+            <ul>
+              {g.benefits.map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
     </div>
   </div>
 </section>

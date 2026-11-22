@@ -1,43 +1,54 @@
 ---
-import { TICKET_URL } from '../i18n';
-import type { Dict } from '../i18n';
+import { SOCIAL_LINKS, TICKET_URL, type Dict } from '../i18n';
 
 interface Props {
   t: Dict;
 }
 
 const { t } = Astro.props;
-const placeholder = TICKET_URL === '#tickets';
 ---
 
 <section class="section" id="tickets">
   <div class="container">
-    <div class="tickets-panel">
-      <p class="eyebrow" style="justify-content: center; display: inline-flex;">{t.tickets.eyebrow}</p>
-      <h2 class="section-title">{t.tickets.title}</h2>
-      <div class="tickets-venue-badge">
-        <span class="pin" aria-hidden="true">📍</span>
-        <span><strong>{t.tickets.venue}</strong> — {t.tickets.address}</span>
-      </div>
-      <p class="tickets-note">{t.tickets.note}</p>
-
-      <div class="tickets-cards">
-        <div class="ticket-card">
-          <p class="name">{t.tickets.standard.name}</p>
-          <p class="price">{t.tickets.standard.price}</p>
-          <p class="note">{t.tickets.standard.note}</p>
+    <div class="tickets-frame" data-reveal>
+      <div class="tickets-primary">
+        <div class="section-marker">
+          <span class="section-num">{t.tickets.index}</span>
+          <span class="eyebrow">{t.tickets.eyebrow}</span>
         </div>
-        <div class="ticket-card">
-          <p class="name">{t.tickets.student.name}</p>
-          <p class="price">{t.tickets.student.price}</p>
-          <p class="note">{t.tickets.student.note}</p>
-        </div>
+        <h2 class="section-title">{t.tickets.title}</h2>
+        <p class="status-tag status-tag--large status-tag--crimson">{t.tickets.status}</p>
+        <p class="tickets-lead">{t.tickets.lead}</p>
+
+        <dl class="tickets-specs">
+          {
+            t.tickets.specs.map((s) => (
+              <div class="tickets-spec-row">
+                <dt>{s.label}</dt>
+                <dd>{s.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
       </div>
 
-      <a href={TICKET_URL} class="btn btn-primary" target="_blank" rel="noopener noreferrer" aria-disabled={placeholder ? 'true' : undefined}>
-        {t.tickets.cta}
-      </a>
-      {placeholder && <p class="tickets-legal">{t.tickets.legal}</p>}
+      <div class="tickets-channels">
+        <p class="sub-label">{t.tickets.channelsLabel}</p>
+        <p class="tickets-channels-note">{t.tickets.channelsNote}</p>
+        <div class="tickets-actions">
+          <a href={TICKET_URL} class="btn btn-ink btn-ticket" target="_blank" rel="noopener noreferrer">
+            {t.tickets.ctaTicket} ↗
+          </a>
+          <div class="tickets-socials">
+            <a href={SOCIAL_LINKS.instagram} class="btn btn-line btn-sm" target="_blank" rel="noopener noreferrer">
+              {t.tickets.ctaInstagram} ↗
+            </a>
+            <a href={SOCIAL_LINKS.facebook} class="btn btn-line btn-sm" target="_blank" rel="noopener noreferrer">
+              {t.tickets.ctaFacebook} ↗
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

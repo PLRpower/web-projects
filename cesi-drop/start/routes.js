@@ -13,6 +13,7 @@ router.get('/', [MediaController, 'afficher']).as('accueil');
 router.on('/publier').render('pages/publier').as('publier');
 router.get('/categorie/:id', [MediaController, 'categorie']).as('categorie');
 router.post('/publier/post', [MediaController, 'publier']).as('publier.post');
+router.get('/telecharger/:id', [MediaController, 'telecharger']);
 router.get('/telecharger-selection', [MediaController, 'telechargerSelection']).as('media.telechargerSelection');
 router.post('/telecharger-selection', [MediaController, 'telechargerSelection']);
 router.post('/signaler', [MediaController, 'signaler']).as('media.signaler');

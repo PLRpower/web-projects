@@ -1,0 +1,9 @@
+---
+import Layout from '../../redlight-archive/layouts/Layout.astro';
+import Home from '../../redlight-archive/components/Home.astro';
+import { en } from '../../redlight-archive/i18n/en';
+---
+
+<Layout title={en.meta.title} description={en.meta.description} htmlLang={en.htmlLang} currentPath="/en/red-ball/">
+  <Home t={en} />
+</Layout>

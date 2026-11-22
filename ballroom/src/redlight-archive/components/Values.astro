@@ -1,0 +1,42 @@
+---
+import { Image } from 'astro:assets';
+import community from '../assets/gallery/ballroom-19.jpg';
+import type { Dict } from '../i18n';
+
+interface Props {
+  t: Dict;
+}
+
+const { t } = Astro.props;
+---
+
+<section class="section values-section" id="values">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">{t.values.eyebrow}</p>
+      <h2 class="section-title">{t.values.title}</h2>
+    </div>
+
+    <div class="values-grid">
+      {t.values.items.map((v) => (
+        <article class="value-card">
+          <h3>{v.title}</h3>
+          <p>{v.desc}</p>
+        </article>
+      ))}
+    </div>
+
+    <figure class="section-photo">
+      <Image
+        src={community}
+        alt={t.values.photoAlt}
+        widths={[640, 900, 1200]}
+        sizes="(min-width: 1150px) 1120px, 96vw"
+        format="webp"
+      />
+      <figcaption>{t.values.photoCaption}</figcaption>
+    </figure>
+
+    <blockquote class="big-quote">{t.values.quote}</blockquote>
+  </div>
+</section>

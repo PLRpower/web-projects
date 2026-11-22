@@ -1,5 +1,5 @@
 ---
-import type { Dict } from '../i18n';
+import { SOCIAL_LINKS, TICKET_URL, type Dict } from '../i18n';
 
 interface Props {
   t: Dict;
@@ -12,22 +12,26 @@ const { t } = Astro.props;
   <div class="container">
     <div class="footer-inner">
       <div class="footer-brand">
-        <!-- noinspection HtmlUnknownAnchorTarget -->
         <a href="#top" class="brand">
           <span class="brand-mark" aria-hidden="true"></span>
-          <span>Ballroom <em>Strasbourg</em></span>
+          <span class="brand-text">Ballroom <em>Strasbourg</em></span>
         </a>
         <p class="footer-tagline">{t.footer.tagline}</p>
         <p class="footer-venue">{t.footer.venue}</p>
       </div>
 
       <nav class="footer-links" aria-label="Footer">
-        <span class="footer-label">{t.footer.follow} —</span>
-        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">Instagram</a>
-        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a>
+        <span class="footer-label">{t.footer.follow}</span>
+        <a href="/red-ball/">{t.nav.redball} ↗</a>
+        <a href={TICKET_URL} target="_blank" rel="noopener noreferrer">Billetweb ↗</a>
+        <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer">Instagram ↗</a>
+        <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer">Facebook ↗</a>
       </nav>
     </div>
 
-    <p class="footer-bottom">© 2026 — {t.footer.rights}</p>
+    <div class="footer-bottom">
+      <span>© 2026–2027</span>
+      <span>{t.footer.rights}</span>
+    </div>
   </div>
 </footer>

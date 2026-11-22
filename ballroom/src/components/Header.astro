@@ -1,5 +1,4 @@
 ---
-import { TICKET_URL } from '../i18n';
 import type { Dict } from '../i18n';
 import LanguageSwitch from './LanguageSwitch.astro';
 
@@ -14,19 +13,21 @@ const { t } = Astro.props;
   <div class="container header-inner">
     <a href="#top" class="brand" aria-label="Ballroom Strasbourg">
       <span class="brand-mark" aria-hidden="true"></span>
-      <span>Ballroom <em>Strasbourg</em></span>
+      <span class="brand-text">Ballroom <em>Strasbourg</em></span>
     </a>
 
     <nav class="main-nav" aria-label="Navigation">
-      <a href="#about">{t.nav.about}</a>
-      <a href="#artists">{t.nav.artists}</a>
-      <a href="#programme">{t.nav.programme}</a>
+      <a href="#manifesto">{t.nav.manifesto}</a>
+      <a href="#lineup">{t.nav.lineup}</a>
       <a href="#gallery">{t.nav.gallery}</a>
+      <a href="#values">{t.nav.values}</a>
+      <a href="#partners">{t.nav.partners}</a>
+      <a href={t.code === 'fr' ? '/red-ball/' : `/${t.code}/red-ball/`} class="nav-archive">{t.nav.redball}</a>
     </nav>
 
     <div class="header-actions">
       <LanguageSwitch current={t.code} />
-      <a href={TICKET_URL} class="btn btn-primary btn-sm header-cta" target="_blank" rel="noopener noreferrer">{t.nav.tickets}</a>
+      <a href="#tickets" class="btn btn-ink btn-sm header-cta">{t.nav.tickets}</a>
       <button
         class="nav-toggle"
         type="button"
@@ -36,20 +37,18 @@ const { t } = Astro.props;
       >
         <span class="nav-toggle-bar" aria-hidden="true"></span>
         <span class="nav-toggle-bar" aria-hidden="true"></span>
-        <span class="nav-toggle-bar" aria-hidden="true"></span>
       </button>
     </div>
   </div>
 
   <nav class="mobile-nav" id="mobile-nav" aria-label="Navigation">
-    <a href="#about">{t.nav.about}</a>
-    <a href="#artists">{t.nav.artists}</a>
-    <a href="#devices">{t.nav.devices}</a>
-    <a href="#programme">{t.nav.programme}</a>
+    <a href="#manifesto">{t.nav.manifesto}</a>
+    <a href="#lineup">{t.nav.lineup}</a>
     <a href="#gallery">{t.nav.gallery}</a>
-    <a href="#partners">{t.nav.partners}</a>
     <a href="#values">{t.nav.values}</a>
-    <a href={TICKET_URL} class="btn btn-primary mobile-nav-cta" target="_blank" rel="noopener noreferrer">{t.nav.tickets}</a>
+    <a href="#partners">{t.nav.partners}</a>
+    <a href={t.code === 'fr' ? '/red-ball/' : `/${t.code}/red-ball/`}>{t.nav.redball}</a>
+    <a href="#tickets" class="btn btn-ink mobile-nav-cta">{t.nav.tickets}</a>
   </nav>
 </header>
 

@@ -1,6 +1,8 @@
 ---
-import { TICKET_URL } from '../i18n';
-import type { Dict } from '../i18n';
+import { Image } from 'astro:assets';
+import heroPlate from '../assets/gallery/ballroom-04.jpg';
+import MirrorBall from './MirrorBall.astro';
+import { TICKET_URL, type Dict } from '../i18n';
 
 interface Props {
   t: Dict;
@@ -10,52 +12,66 @@ const { t } = Astro.props;
 ---
 
 <section class="hero" id="top">
-  <div class="hero-glow" aria-hidden="true"></div>
-  <div class="container hero-inner">
-    <p class="hero-eyebrow" set:html={t.hero.eyebrow}></p>
-    <h1 class="hero-title">
-      <span class="hero-title-main">{t.hero.title}</span>
-      <span class="hero-subtitle">
-        <span class="hero-title-code">{t.hero.code}</span>
-        <span class="hero-title-sub">{t.hero.subtitle}</span>
-      </span>
-    </h1>
-    <p class="hero-tagline">{t.hero.tagline}</p>
-
-    <div class="hero-meta">
-      <span><strong>{t.hero.date}</strong></span>
-      <span class="dot" aria-hidden="true">✦</span>
-      <span class="hero-venue"><strong>{t.hero.venue}</strong> · {t.hero.address}</span>
-      <span class="dot" aria-hidden="true">✦</span>
-      <span>{t.hero.audience}</span>
+  <div class="hero-caustics" aria-hidden="true"></div>
+  <div class="container">
+    <div class="hero-kicker-bar">
+      <p class="hero-kicker"><span class="kicker-star" aria-hidden="true">✦</span> {t.hero.kicker}</p>
+      <span class="hero-location">{t.hero.location}</span>
     </div>
 
-    <div class="hero-cta">
-      <a href={TICKET_URL} class="btn btn-primary" target="_blank" rel="noopener noreferrer">{t.hero.ctaPrimary}</a>
-      <!-- noinspection HtmlUnknownAnchorTarget -->
-      <a href="#about" class="btn btn-ghost">{t.hero.ctaSecondary}</a>
-    </div>
+    <div class="hero-canvas-wrap">
+      <MirrorBall label={t.hero.mirrorballLabel} />
 
-    <p class="hero-deadline">{t.hero.deadline}</p>
+      <div class="hero-grid">
+        <div class="hero-content">
+          <h1 class="hero-title">
+            <span class="hero-title-pre">
+              {t.hero.titlePre}<span class="title-spark" aria-hidden="true">✦</span>
+            </span>
+            <span class="hero-title-main">{t.hero.titleMain}</span>
+          </h1>
+
+          <p class="hero-byline">
+            <span class="byline-dot" aria-hidden="true"></span>
+            <span>{t.hero.byline}</span>
+          </p>
+
+          <p class="hero-tagline">{t.hero.tagline}</p>
+
+          <dl class="hero-meta">
+            {
+              t.hero.meta.map((item) => (
+                <div class="hero-meta-cell">
+                  <dt>{item.label}</dt>
+                  <dd>{item.value}</dd>
+                </div>
+              ))
+            }
+          </dl>
+
+          <div class="hero-cta">
+            <a href={TICKET_URL} class="btn btn-ink" target="_blank" rel="noopener noreferrer">
+              {t.hero.ctaPrimary} ↗
+            </a>
+            <a href="#manifesto" class="btn btn-line">{t.hero.ctaSecondary}</a>
+          </div>
+        </div>
+
+        <figure class="hero-plate">
+          <div class="hero-plate-frame">
+            <Image
+              src={heroPlate}
+              alt={t.hero.plateAlt}
+              widths={[540, 840, 1200]}
+              sizes="(min-width: 960px) 40vw, 94vw"
+              format="webp"
+              loading="eager"
+              fetchpriority="high"
+            />
+          </div>
+          <figcaption>{t.hero.plateCaption}</figcaption>
+        </figure>
+      </div>
+    </div>
   </div>
-  <!-- noinspection HtmlUnknownAnchorTarget -->
-  <a href="#about" class="hero-scroll" aria-hidden="true">↓</a>
 </section>
-
-<div class="marquee" aria-hidden="true">
-  <div class="marquee-track">
-    {
-      Array.from({ length: 2 }).map(() => (
-        <>
-          <span>Red Light Special</span>
-          <span>24.10.2026</span>
-          <span>Studio du Rhin</span>
-          <span>Strasbourg</span>
-          <span>Vinii Revlon</span>
-          <span>10 catégories</span>
-          <span>Ballroom</span>
-        </>
-      ))
-    }
-  </div>
-</div>

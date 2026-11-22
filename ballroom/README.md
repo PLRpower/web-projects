@@ -1,13 +1,14 @@
-# Ballroom Strasbourg — RED LIGHT SPECIAL 2026
+# Ballroom Strasbourg — White Ballroom
 
-Pressbook landing page for the **RED LIGHT SPECIAL** event (Ballroom Strasbourg, October 24, 2026).
-Single-page showcase website available in **French** (`/`), **German** (`/de/`), and **Dutch** (`/nl/`).
+Editorial showcase website for the upcoming **White Ballroom** edition in Strasbourg, presented by Harmonie Nouvelle × Club Convives.
+Static multi-language site available in **French** (`/`), **German** (`/de/`), **Dutch** (`/nl/`), and **English** (`/en/`).
 
 ## Tech Stack
 
-- [Astro](https://astro.build) — static site, backend-free, deployable anywhere (Netlify, Vercel, GitHub Pages…)
-- Zero client-side JS dependencies (pure CSS, Google Fonts) — gallery lightbox operates entirely via CSS `:target`
-- Build-time optimized images (responsive WebP via `astro:assets` / sharp)
+- [Astro](https://astro.build) — static site, backend-free
+- Pure CSS editorial design system (warm alabaster, obsidian ink, hairline grids, Cormorant Garamond & DM Sans)
+- Build-time optimized images (responsive WebP via `astro:assets`)
+- CSS `:target` archive lightbox enhanced with lightweight keyboard navigation
 
 ## Commands
 
@@ -21,14 +22,12 @@ npm run preview # preview production build
 ## Structure
 
 ```
-public/         # favicon, og.jpg (social share image)
+public/         # favicon.svg, og.jpg
 src/
   assets/       # source photos (optimized at build time)
-    gallery/    #   stage photos — ballroom-01…27.jpg
-    vinii/      #   Vinii Revlon portraits — vinii-01…04.jpg
-  i18n/         # translation dictionaries FR (source), DE, NL + TICKET_URL
-  components/   # landing page sections
-  layouts/      # Layout.astro (head, SEO, hreflang)
-  pages/        # index.astro (FR), de/index.astro, nl/index.astro
-  styles/       # global.css ("Red Light" design system)
+  i18n/         # dictionaries FR (source), DE, NL, EN
+  components/   # editorial landing page sections
+  layouts/      # Layout.astro (head, SEO, hreflang, typography)
+  pages/        # index.astro (FR), de/index.astro, nl/index.astro, en/index.astro
+  styles/       # global.css (White Ballroom editorial design system)
 ```

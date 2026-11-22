@@ -2,6 +2,7 @@ import Media from '#models/media';
 import Category from '#models/category';
 import uploadService from '#services/upload_service';
 import fs from 'node:fs';
+import sharp from 'sharp';
 import { DateTime } from 'luxon';
 import { ZipArchive } from 'archiver';
 
@@ -132,6 +133,26 @@ export default class MediaController {
       count: createdMedias.length,
       ids: createdMedias,
     });
+  }
+
+  async telecharger({ params, response, auth }) {
+    const media = await Media.findOrFail(params.id);
+    if (!media.published && !(await auth.check())) {
+      return response.notFound('Photo introuvable');
+    }
+
+    const originalPath = uploadService.getFilePath(`${media.id}_original.${media.extname}`);
+    const filePath = fs.existsSync(originalPath)
+      ? originalPath
+      : uploadService.getFilePath(`${media.id}.webp`);
+    if (!fs.existsSync(filePath)) {
+      return response.notFound('Fichier introuvable');
+    }
+
+    const jpg = await sharp(filePath).rotate().flatten({ background: '#ffffff' }).jpeg({ quality: 90 }).toBuffer();
+    response.header('Content-Type', 'image/jpeg');
+    response.header('Content-Disposition', `attachment; filename="cesi-drop-${media.id}.jpg"`);
+    return response.send(jpg);
   }
 
   async telechargerSelection({ request, response }) {

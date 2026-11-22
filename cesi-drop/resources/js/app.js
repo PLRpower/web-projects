@@ -313,8 +313,8 @@ Alpine.data('photoWall', (config = {}) => ({
 Alpine.data('galleryLightbox', () => ({
   isOpen: false,
   currentSrc: '',
-  currentOriginal: '',
-  currentExt: '',
+  zoomed: false,
+  zoomOrigin: 'center',
   currentId: null,
   currentIndex: -1,
   items: [],
@@ -374,20 +374,17 @@ Alpine.data('galleryLightbox', () => ({
     })
   },
 
-  open(payload, fallbackExt) {
+  open(payload) {
     let id = null
-    let ext = 'jpg'
     let items = []
     let index = -1
 
     if (payload && typeof payload === 'object') {
       id = payload.id
-      ext = payload.ext || 'jpg'
       items = payload.items || []
       index = payload.index !== undefined ? payload.index : -1
     } else {
       id = payload
-      ext = fallbackExt || 'jpg'
     }
 
     if (!id) return
@@ -397,7 +394,6 @@ Alpine.data('galleryLightbox', () => ({
     }
 
     this.currentId = id
-    this.currentExt = ext
     this.reportOpen = false
     this.reportSent = false
     this.reportError = null
@@ -429,14 +425,23 @@ Alpine.data('galleryLightbox', () => ({
 
   updateCurrent() {
     if (this.currentIndex >= 0 && this.currentIndex < this.items.length) {
-      const item = this.items[this.currentIndex]
-      this.currentId = item.id
-      this.currentExt = item.extname || 'jpg'
+      this.currentId = this.items[this.currentIndex].id
     }
 
+    this.zoomed = false
     this.currentSrc = `/uploads/${this.currentId}.webp`
-    this.currentOriginal = this.currentExt ? `/uploads/${this.currentId}_original.${this.currentExt}` : this.currentSrc
     this.updateUrlParam(this.currentId)
+  },
+
+  toggleZoom(event) {
+    if (this.swiped) return
+    if (!this.zoomed) {
+      const bounds = event.currentTarget.getBoundingClientRect()
+      this.zoomOrigin = event.detail
+        ? `${event.clientX - bounds.left}px ${event.clientY - bounds.top}px`
+        : 'center'
+    }
+    this.zoomed = !this.zoomed
   },
 
   next() {

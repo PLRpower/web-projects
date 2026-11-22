@@ -1,0 +1,35 @@
+---
+import type { Dict } from '../i18n';
+
+interface Props {
+  t: Dict;
+}
+
+const { t } = Astro.props;
+const sequence = [...t.ribbon, ...t.ribbon];
+---
+
+<div class="runway-ribbon" aria-hidden="true">
+  <div class="ribbon-track">
+    <div class="ribbon-group">
+      {
+        sequence.map((item, idx) => (
+          <span class={idx % 2 === 0 ? 'ribbon-item ribbon-item--serif' : 'ribbon-item'}>
+            <span>{item}</span>
+            <span class={idx % 2 === 1 ? 'ribbon-star ribbon-star--crimson' : 'ribbon-star'}>✦</span>
+          </span>
+        ))
+      }
+    </div>
+    <div class="ribbon-group">
+      {
+        sequence.map((item, idx) => (
+          <span class={idx % 2 === 0 ? 'ribbon-item ribbon-item--serif' : 'ribbon-item'}>
+            <span>{item}</span>
+            <span class={idx % 2 === 1 ? 'ribbon-star ribbon-star--crimson' : 'ribbon-star'}>✦</span>
+          </span>
+        ))
+      }
+    </div>
+  </div>
+</div>
