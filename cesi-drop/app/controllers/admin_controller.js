@@ -29,6 +29,10 @@ export default class AdminController {
     }
 
     const categoryId = request.input('category') || null;
+    const rawPhotographer = request.input('photographer');
+    const photographer = typeof rawPhotographer === 'string' && rawPhotographer.trim()
+      ? rawPhotographer.trim().slice(0, 100)
+      : null;
     const createdIds = [];
 
     for (const rawFile of files) {
@@ -39,6 +43,7 @@ export default class AdminController {
         published: true,
         categoryId: categoryId ? Number(categoryId) : null,
         extname: file.extname || 'jpg',
+        photographer,
       });
       const processed = await uploadService.processPhoto(file.tmpPath, media.id, file.extname || 'jpg');
       media.width = processed.width;

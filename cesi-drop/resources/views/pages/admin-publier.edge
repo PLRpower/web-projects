@@ -2,6 +2,7 @@
   <div class="py-12 sm:py-16"
         x-data="{
           categoryId: '',
+          photographer: '',
           dragging: false,
           uploading: false,
           progress: 0,
@@ -18,6 +19,9 @@
 
             const formData = new FormData();
             formData.append('category', this.categoryId);
+            if (this.photographer.trim()) {
+              formData.append('photographer', this.photographer.trim());
+            }
             for (let i = 0; i < files.length; i++) {
               formData.append('files[]', files[i]);
             }
@@ -73,6 +77,18 @@
             <option value="{{ cat.id }}">{{ cat.title }}</option>
             @endeach
           </select>
+        </div>
+
+        <div>
+          <label for="photographer" class="block text-xs font-bold text-white uppercase tracking-wider mb-2">
+            Crédit photographe <span class="text-[#777777] font-normal normal-case">(facultatif)</span>
+          </label>
+          <input id="photographer"
+                 type="text"
+                 maxlength="100"
+                 x-model="photographer"
+                 placeholder="Ex : Paul T. ou @studio.cesi"
+                 class="w-full px-4 py-3 rounded-xl bg-[#060606] border border-[#2a2a2a] text-white placeholder-[#666666] text-sm focus:outline-none focus:border-amber-500" />
         </div>
 
         <div class="border-2 border-dashed rounded-2xl p-8 sm:p-12 text-center transition-all duration-200 cursor-pointer"

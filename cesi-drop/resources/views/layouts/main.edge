@@ -36,12 +36,12 @@
 
   <!-- Modern Lightbox Modal (Alpine.js) -->
   <div x-show="isOpen"
-       x-transition:enter="transition ease-out duration-200"
-       x-transition:enter-start="opacity-0 scale-95"
-       x-transition:enter-end="opacity-100 scale-100"
-       x-transition:leave="transition ease-in duration-150"
-       x-transition:leave-start="opacity-100 scale-100"
-       x-transition:leave-end="opacity-0 scale-95"
+       x-transition:enter="transition-opacity ease-out duration-200"
+       x-transition:enter-start="opacity-0"
+       x-transition:enter-end="opacity-100"
+       x-transition:leave="transition-opacity ease-in duration-150"
+       x-transition:leave-start="opacity-100"
+       x-transition:leave-end="opacity-0"
        @keydown.escape.window="close()"
        @keydown.right.window="next()"
        @keydown.left.window="prev()"
@@ -55,7 +55,7 @@
       <div class="text-xs sm:text-sm font-semibold text-neutral-400 bg-neutral-900/80 px-3 py-1.5 rounded-full border border-neutral-800 cursor-default"
            x-show="items.length > 0 && currentIndex >= 0"
            @click.stop>
-        <span x-text="currentIndex + 1"></span> / <span x-text="items.length"></span>
+        <span x-text="currentIndex + 1"></span> / <span x-text="Math.max(totalItems, items.length)"></span>
       </div>
       <div x-show="items.length === 0 || currentIndex < 0"></div>
 
@@ -115,6 +115,18 @@
       </button>
     </div>
 
+    <!-- Optional Photographer Credit -->
+    <div x-show="currentPhotographer"
+         @click.stop
+         class="relative z-20 mt-2.5 text-xs text-neutral-400 flex items-center gap-1.5 cursor-default"
+         style="display: none;">
+      <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+      <span>Photo par <strong class="text-white font-semibold" x-text="currentPhotographer"></strong></span>
+    </div>
+
     <!-- Actions toolbar -->
     <div class="relative z-20 mt-4 flex flex-wrap items-center justify-center gap-4 sm:gap-6 bg-neutral-900/90 border border-neutral-800/80 px-4 sm:px-6 py-2.5 rounded-full shadow-2xl backdrop-blur-sm cursor-default"
          @click.stop>
@@ -129,6 +141,22 @@
         </button>
       </div>
 
+      <!-- Like / Coup de cœur button -->
+      <button type="button"
+              @click="toggleLike('{{ csrfToken }}')"
+              :disabled="liking"
+              class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50"
+              :class="isCurrentLiked() ? 'text-amber-400' : 'text-neutral-300 hover:text-amber-400'"
+              title="Coup de cœur">
+        <svg class="w-4 h-4 transition-transform active:scale-125"
+             :fill="isCurrentLiked() ? 'currentColor' : 'none'"
+             stroke="currentColor"
+             viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+        </svg>
+        <span x-text="currentLikes"></span>
+      </button>
+
       <!-- Share button -->
       <button type="button" 
               @click="shareCurrent()"
@@ -138,6 +166,18 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
         </svg>
         <span x-text="copied ? 'Lien copié !' : 'Partager'"></span>
+      </button>
+
+      <!-- Copy watermarked image button -->
+      <button type="button"
+              @click="copyCurrentImage()"
+              :disabled="imageCopying"
+              class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-neutral-300 hover:text-white transition-colors cursor-pointer disabled:opacity-50"
+              title="Copier l'image avec le logo Studio CESI">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+        </svg>
+        <span x-text="imageCopying ? 'Copie...' : (imageCopied ? 'Image copiée !' : 'Copier')"></span>
       </button>
 
       <a :href="'/telecharger/' + currentId"
@@ -178,12 +218,12 @@
     </div>
     <!-- Modal Signalement direct -->
     <div x-show="reportOpen"
-         x-transition:enter="transition ease-out duration-150"
-         x-transition:enter-start="opacity-0 scale-95"
-         x-transition:enter-end="opacity-100 scale-100"
-         x-transition:leave="transition ease-in duration-100"
-         x-transition:leave-start="opacity-100 scale-100"
-         x-transition:leave-end="opacity-0 scale-95"
+         x-transition:enter="transition-opacity ease-out duration-150"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-in duration-100"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm"
          style="display: none;"
          @click.self.stop="reportOpen = false"
@@ -261,6 +301,52 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- QR Code Share Modal (Admins) -->
+  <div x-data="qrModal"
+       @open-qr-modal.window="open($event.detail)"
+       x-show="isOpen"
+       x-transition:enter="transition-opacity ease-out duration-150"
+       x-transition:enter-start="opacity-0"
+       x-transition:enter-end="opacity-100"
+       x-transition:leave="transition-opacity ease-in duration-100"
+       x-transition:leave-start="opacity-100"
+       x-transition:leave-end="opacity-0"
+       @keydown.escape.window="close()"
+       @click.self="close()"
+       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm"
+       style="display: none;">
+    <div class="bg-[#111111] border border-[#2a2a2a] rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl relative" @click.stop>
+      <button type="button"
+              @click="close()"
+              class="absolute top-4 right-4 text-neutral-400 hover:text-white p-1 rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
+              aria-label="Fermer">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <h3 class="text-base font-bold text-white mb-1" x-text="title"></h3>
+      <p class="text-xs text-neutral-400 mb-5">Scannez pour accéder directement aux photos</p>
+
+      <div class="bg-white rounded-xl p-3 inline-block mb-4 shadow-lg">
+        <img :src="qrSrc" :alt="'QR Code ' + title" class="w-56 h-56 block" />
+      </div>
+
+      <p class="text-[11px] text-neutral-500 break-all mb-5 px-2" x-text="url"></p>
+
+      <div class="flex items-center gap-2">
+        <button type="button"
+                @click="downloadQr()"
+                class="flex-1 py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer">
+          Télécharger PNG
+        </button>
+        <button type="button"
+                @click="copyLink()"
+                class="py-2.5 px-4 rounded-xl bg-[#1f1f1f] hover:bg-[#2a2a2a] border border-[#333333] text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                x-text="copied ? 'Copié !' : 'Copier lien'">
+        </button>
+      </div>
+    </div>
   </div>
 
 </body>

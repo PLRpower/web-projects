@@ -116,6 +116,57 @@ class UploadService {
     return outputPath;
   }
 
+  /**
+   * Apply Studio CESI watermark in the bottom-right corner and return a JPEG buffer
+   */
+  async applyWatermark(filePath) {
+    const baseImage = sharp(filePath).rotate().flatten({ background: '#ffffff' });
+    const { data: baseBuffer, info } = await baseImage.toBuffer({ resolveWithObject: true });
+
+    const watermarkPath = app.makePath('public/studio-cesi-logo.png');
+    if (!fs.existsSync(watermarkPath)) {
+      return sharp(baseBuffer).jpeg({ quality: 90 }).toBuffer();
+    }
+
+    const imgWidth = info.width || 1600;
+    const imgHeight = info.height || 1080;
+
+    // Proportional watermark width (~14% of photo width, clamped between 90px and 340px)
+    const targetWmWidth = Math.round(Math.min(Math.max(imgWidth * 0.14, 90), 340));
+    const padX = Math.round(targetWmWidth * 0.12);
+    const padY = Math.round(targetWmWidth * 0.08);
+
+    const { data: logoBuffer, info: logoInfo } = await sharp(watermarkPath)
+      .trim()
+      .resize({ width: targetWmWidth, withoutEnlargement: true })
+      .png()
+      .toBuffer({ resolveWithObject: true });
+
+    const badgeWidth = logoInfo.width + padX * 2;
+    const badgeHeight = logoInfo.height + padY * 2;
+    const radius = Math.round(Math.min(badgeWidth, badgeHeight) * 0.16);
+
+    const badgeSvg = Buffer.from(
+      `<svg width="${badgeWidth}" height="${badgeHeight}" xmlns="http://www.w3.org/2000/svg">` +
+        `<rect x="0" y="0" width="${badgeWidth}" height="${badgeHeight}" rx="${radius}" ry="${radius}" fill="rgba(255,255,255,0.85)"/>` +
+      `</svg>`
+    );
+
+    const watermarkBadge = await sharp(badgeSvg)
+      .composite([{ input: logoBuffer, left: padX, top: padY }])
+      .png()
+      .toBuffer();
+
+    const margin = Math.round(Math.min(imgWidth, imgHeight) * 0.025);
+    const left = Math.max(0, imgWidth - badgeWidth - margin);
+    const top = Math.max(0, imgHeight - badgeHeight - margin);
+
+    return sharp(baseBuffer)
+      .composite([{ input: watermarkBadge, left, top }])
+      .jpeg({ quality: 90 })
+      .toBuffer();
+  }
+
   deleteMediaFiles(mediaId, extname) {
     const webpPath = this.getFilePath(`${mediaId}.webp`);
     const origPath = this.getFilePath(`${mediaId}_original.${extname}`);

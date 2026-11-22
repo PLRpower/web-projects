@@ -6,6 +6,25 @@ import sharp from 'sharp';
 import { DateTime } from 'luxon';
 import { ZipArchive } from 'archiver';
 
+// Lightweight burst rate-limiter per session/visitor (prevents automated spam without blocking shared school Wi-Fi)
+const likeRateMap = new Map();
+const RATE_WINDOW_MS = 60_000;
+const MAX_LIKES_PER_WINDOW = 40;
+
+function isRateLimited(key) {
+  const now = Date.now();
+  const entry = likeRateMap.get(key);
+  if (!entry || now > entry.resetAt) {
+    if (likeRateMap.size > 5000) {
+      likeRateMap.clear();
+    }
+    likeRateMap.set(key, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return false;
+  }
+  entry.count += 1;
+  return entry.count > MAX_LIKES_PER_WINDOW;
+}
+
 export default class MediaController {
   async afficher({ view, request, response, auth }) {
     // Cloudflare Edge Cache headers (public vs authenticated)
@@ -38,6 +57,8 @@ export default class MediaController {
         height: h,
         ratio: Number((w / h).toFixed(3)),
         isPortrait: w < h,
+        likes: m.likes || 0,
+        photographer: m.photographer || null,
       };
     };
 
@@ -86,6 +107,8 @@ export default class MediaController {
         height: h,
         ratio: Number((w / h).toFixed(3)),
         isPortrait: w < h,
+        likes: m.likes || 0,
+        photographer: m.photographer || null,
       };
     };
 
@@ -109,6 +132,11 @@ export default class MediaController {
       return response.badRequest({ message: 'Aucun fichier reçu' });
     }
 
+    const rawPhotographer = request.input('photographer');
+    const photographer = typeof rawPhotographer === 'string' && rawPhotographer.trim()
+      ? rawPhotographer.trim().slice(0, 100)
+      : null;
+
     const createdMedias = [];
     for (const rawFile of files) {
       const file = Array.isArray(rawFile) ? rawFile[0] : rawFile;
@@ -118,6 +146,7 @@ export default class MediaController {
         extname: file.extname || 'jpg',
         published: false,
         accueil: false,
+        photographer,
       });
 
       const processed = await uploadService.processPhoto(file.tmpPath, media.id, file.extname || 'jpg');
@@ -149,7 +178,7 @@ export default class MediaController {
       return response.notFound('Fichier introuvable');
     }
 
-    const jpg = await sharp(filePath).rotate().flatten({ background: '#ffffff' }).jpeg({ quality: 90 }).toBuffer();
+    const jpg = await uploadService.applyWatermark(filePath);
     response.header('Content-Type', 'image/jpeg');
     response.header('Content-Disposition', `attachment; filename="cesi-drop-${media.id}.jpg"`);
     return response.send(jpg);
@@ -213,15 +242,14 @@ export default class MediaController {
 
     for (const media of medias) {
       let filePath = uploadService.getFilePath(`${media.id}_original.${media.extname}`);
-      let fileName = `cesi-drop-${media.id}.${media.extname}`;
 
       if (!fs.existsSync(filePath)) {
         filePath = uploadService.getFilePath(`${media.id}.webp`);
-        fileName = `cesi-drop-${media.id}.webp`;
       }
 
       if (fs.existsSync(filePath)) {
-        archive.file(filePath, { name: fileName });
+        const watermarkedBuffer = await uploadService.applyWatermark(filePath);
+        archive.append(watermarkedBuffer, { name: `cesi-drop-${media.id}.jpg` });
       }
     }
 
@@ -285,6 +313,65 @@ export default class MediaController {
     return response.json({
       success: true,
       message: 'Votre signalement a été transmis avec succès à l\'équipe de modération.',
+    });
+  }
+
+  async like({ params, request, response, session }) {
+    const mediaId = Number(params.id);
+    if (!Number.isInteger(mediaId) || mediaId <= 0) {
+      return response.badRequest({ message: 'Identifiant invalide' });
+    }
+
+    const media = await Media.find(mediaId);
+    if (!media || !media.published) {
+      return response.notFound({ message: 'Photo introuvable' });
+    }
+
+    // 1. Burst rate-limit per session (allows many students on the same school Wi-Fi)
+    const rateKey = session.sessionId || request.ip() || 'anon';
+    if (isRateLimited(rateKey)) {
+      return response.tooManyRequests({ message: 'Trop de requêtes, réessayez dans une minute.' });
+    }
+
+    // 2. Check AdonisJS signed session
+    const sessionLikes = new Set(Array.isArray(session.get('liked_medias')) ? session.get('liked_medias').map(Number) : []);
+
+    // 3. Check HttpOnly signed cookie (persists across session restarts, unique per browser)
+    const rawCookie = request.cookie('cesi_liked', '');
+    const cookieLikes = new Set(
+      typeof rawCookie === 'string' && rawCookie
+        ? rawCookie.split(',').map(Number).filter((n) => Number.isInteger(n) && n > 0)
+        : []
+    );
+
+    const alreadyLiked = sessionLikes.has(mediaId) || cookieLikes.has(mediaId);
+
+    let liked;
+    if (alreadyLiked) {
+      media.likes = Math.max(0, (media.likes || 0) - 1);
+      sessionLikes.delete(mediaId);
+      cookieLikes.delete(mediaId);
+      liked = false;
+    } else {
+      media.likes = (media.likes || 0) + 1;
+      sessionLikes.add(mediaId);
+      cookieLikes.add(mediaId);
+      liked = true;
+    }
+
+    await media.save();
+
+    session.put('liked_medias', Array.from(sessionLikes).slice(-500));
+    response.cookie('cesi_liked', Array.from(cookieLikes).slice(-500).join(','), {
+      maxAge: '365d',
+      httpOnly: true,
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    return response.json({
+      liked,
+      likes: media.likes,
     });
   }
 }

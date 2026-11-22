@@ -42,5 +42,5 @@ RUN mkdir -p uploads tmp
 
 EXPOSE 3333
 
-# Limite mémoire 512M adaptée à la RAM RPi 4
-CMD ["node", "--max-old-space-size=512", "bin/server.js"]
+# Exécute les migrations en attente au démarrage puis lance le serveur (limite 512M adaptée à la RAM RPi 4)
+CMD ["sh", "-c", "node ace migration:run --force && exec node --max-old-space-size=512 bin/server.js"]

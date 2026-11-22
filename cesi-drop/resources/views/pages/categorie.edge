@@ -31,6 +31,7 @@
              initialMedias: {{ JSON.stringify(medias) }},
              page: 1,
              lastPage: {{ pagination.lastPage }},
+             total: {{ pagination.total }},
              fetchUrl: '/categorie/{{ categorie.id }}'
            })">
     <div class="max-w-[1360px] mx-auto px-6">
@@ -56,13 +57,26 @@
           </span>
         </div>
 
-        <!-- Multi-selection / Download Toggle -->
+        <!-- Multi-selection / Download Toggle & Admin QR Code -->
         <div class="flex items-center gap-3">
+          @eval(await auth.check())
+          @if(auth.isAuthenticated)
+          <button type="button"
+                  @click="$dispatch('open-qr-modal', { title: {{ JSON.stringify(categorie.title) }}, url: '/categorie/{{ categorie.id }}' })"
+                  class="px-3.5 py-1.5 rounded-xl border bg-[#141414] hover:bg-[#1f1f1f] border-[#2a2a2a] hover:border-amber-500/60 text-[#aaaaaa] hover:text-amber-400 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer"
+                  title="Générer le QR Code de cet évènement">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+            </svg>
+            <span>QR Code</span>
+          </button>
+          @endif
+
           <button type="button"
                   @click="$store.selection.isSelecting = !$store.selection.isSelecting"
                   class="px-3.5 py-1.5 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer"
                   :class="$store.selection.isSelecting 
-                    ? 'bg-blue-600/20 border-blue-500 text-blue-400' 
+                    ? 'bg-amber-500/20 border-amber-500 text-amber-400' 
                     : 'bg-[#141414] hover:bg-[#1f1f1f] border-[#2a2a2a] text-[#aaaaaa] hover:text-white'">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -86,10 +100,10 @@
                  opacity: 1
                } : { opacity: 0 }">
             <div class="portfolio-wrapper group w-full h-full"
-                 :class="$store.selection.isSelected(media.id) ? 'ring-2 ring-blue-500 border-blue-500' : ''"
+                 :class="$store.selection.isSelected(media.id) ? 'ring-2 ring-amber-500 border-amber-500' : ''"
                  @click="$store.selection.isSelecting 
                    ? $store.selection.toggle(media.id) 
-                   : $dispatch('open-lightbox', { id: media.id, ext: media.extname, index: index, items: medias })">
+                   : $dispatch('open-lightbox', { id: media.id, ext: media.extname, index: index, items: medias, total: total })">
               
               <img :src="`/uploads/${media.id}.webp`" 
                    :alt="`Photo #${media.id}`"
@@ -105,7 +119,7 @@
                    @click.stop="$store.selection.toggle(media.id)">
                 <div class="w-7 h-7 rounded-lg border flex items-center justify-center transition-all shadow-lg cursor-pointer"
                      :class="$store.selection.isSelected(media.id) 
-                       ? 'bg-blue-600 border-blue-400 text-white shadow-blue-600/50' 
+                       ? 'bg-amber-500 border-amber-400 text-black shadow-amber-500/40' 
                        : 'bg-black/70 hover:bg-black border-white/60 text-transparent'">
                   <svg class="w-4 h-4 fill-current stroke-current" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -151,7 +165,7 @@
           
           <!-- Counter -->
           <div class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
-            <span class="px-2.5 py-1 rounded-lg bg-blue-600 text-white font-extrabold text-xs" x-text="$store.selection.selected.length"></span>
+            <span class="px-2.5 py-1 rounded-lg bg-amber-500 text-black font-extrabold text-xs" x-text="$store.selection.selected.length"></span>
             <span class="hidden sm:inline">photo(s) sélectionnée(s)</span>
             <span class="sm:hidden">sél.</span>
           </div>
@@ -168,7 +182,7 @@
             <!-- Download Selection as ZIP -->
             <button type="button"
                     @click="$store.selection.download('{{ categorie.title }}')"
-                    class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2 cursor-pointer hover:scale-105 active:scale-95">
+                    class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/30 flex items-center gap-2 cursor-pointer hover:scale-105 active:scale-95">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>

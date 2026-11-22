@@ -17,6 +17,7 @@ router.get('/telecharger/:id', [MediaController, 'telecharger']);
 router.get('/telecharger-selection', [MediaController, 'telechargerSelection']).as('media.telechargerSelection');
 router.post('/telecharger-selection', [MediaController, 'telechargerSelection']);
 router.post('/signaler', [MediaController, 'signaler']).as('media.signaler');
+router.post('/media/:id/like', [MediaController, 'like']).as('media.like');
 
 // Legal & Compliance routes (RGPD, CGU, Mentions Légales) - Edge cached 7 days
 const legalCache = ({ response }, next) => {

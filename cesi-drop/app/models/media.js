@@ -39,6 +39,14 @@ __decorate([
 ], Media.prototype, "height", void 0);
 __decorate([
     column(),
+    __metadata("design:type", Number)
+], Media.prototype, "likes", void 0);
+__decorate([
+    column(),
+    __metadata("design:type", String)
+], Media.prototype, "photographer", void 0);
+__decorate([
+    column(),
     __metadata("design:type", Object)
 ], Media.prototype, "categoryId", void 0);
 __decorate([
