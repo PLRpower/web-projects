@@ -27,6 +27,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { CodeBlock } from '@/components/cctl/CodeBlock';
+import { CCTLSourceImage } from '@/components/cctl/CCTLSourceImage';
 import { ALL_SEED_CCTLS } from '@/lib/cctl-seed-data';
 import { PublishedCCTLEntry } from '@/lib/cctl-store';
 import { formatAcademicYear, CCTLChoice, CCTLMatchingPair, CCTLQuestion } from '@/types/cctl';
@@ -314,7 +315,7 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                                             </span>
                                         )}
                                         <span className="text-xs font-semibold text-text-secondary">
-                                            {isMultiple ? 'Choix multiples' : 'Réponse unique'}
+                                            {question.typeLabel || (isMultiple ? 'Choix multiples' : 'Réponse unique')}
                                         </span>
                                     </div>
 
@@ -330,11 +331,12 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
 
                                 {/* Prompt & Code */}
                                 <div className="space-y-3">
-                                    <h3 className="text-base sm:text-lg font-normal font-serif text-text-primary leading-relaxed whitespace-pre-line">
-                                        {question.prompt}
-                                    </h3>
+                                    {question.promptImageUrl && !question.formulaImageUrl
+                                        ? <CCTLSourceImage src={question.promptImageUrl} alt={question.prompt || 'Énoncé de la question'} />
+                                        : <h3 className="text-base sm:text-lg font-normal font-serif text-text-primary leading-relaxed whitespace-pre-line">{question.prompt}</h3>}
+                                    {question.formulaImageUrl && <CCTLSourceImage src={question.formulaImageUrl} alt="Formule de l’énoncé" />}
 
-                                    {question.codeSnippet && (
+                                    {question.codeSnippet && !question.promptImageUrl && (
                                         <CodeBlock
                                             code={question.codeSnippet}
                                             language={question.codeLanguage || 'typescript'}
@@ -356,7 +358,9 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                                                             {pair.id}
                                                         </span>
                                                         <span className="font-semibold text-text-primary break-words text-sm leading-relaxed">
-                                                            {pair.leftItem}
+                                                            {pair.leftImageUrl
+                                                                ? <CCTLSourceImage src={pair.leftImageUrl} alt={pair.leftItem || `Élément ${pair.id}`} />
+                                                                : pair.leftItem}
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30 text-xs font-semibold font-mono shadow-xs shrink-0 sm:justify-end">
@@ -406,7 +410,9 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                                                     </div>
 
                                                     <div className={`flex-1 text-sm leading-relaxed ${isExpected ? 'text-emerald-800 dark:text-emerald-300 font-bold sm:text-base' : 'text-text-primary font-medium'}`}>
-                                                        {choice.text}
+                                                        {choice.imageUrl
+                                                            ? <CCTLSourceImage src={choice.imageUrl} alt={choice.text || `Proposition ${choice.id}`} />
+                                                            : choice.text}
                                                     </div>
 
                                                     {isExpected && (
@@ -421,14 +427,16 @@ export default function PublicCCTLViewerPage({ params }: { params: Promise<{ id:
                                 ) : null}
 
                                 {/* Pedagogical Explanation */}
-                                {question.explanation && (
+                                {(question.explanation || question.explanationImageUrl) && (
                                     <div className="p-4 rounded-2xl bg-gradient-to-r from-surface-highlight/70 to-surface border border-accent-yellow/20 space-y-1.5 text-xs">
                                         <div className="flex items-center gap-1.5 text-accent-yellow font-bold uppercase tracking-wider text-[11px]">
                                             <Sparkles className="w-3.5 h-3.5" />
                                             Explication Pédagogique
                                         </div>
                                         <p className="text-text-secondary leading-relaxed">
-                                            {question.explanation}
+                                            {question.explanationImageUrl
+                                                ? <CCTLSourceImage src={question.explanationImageUrl} alt={question.explanation || 'Correction de la question'} />
+                                                : question.explanation}
                                         </p>
                                     </div>
                                 )}

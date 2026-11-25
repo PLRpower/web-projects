@@ -1,91 +1,34 @@
-import { CCTLChoice } from '@/types/cctl';
-import { VisualLine } from '../types';
+import type { CCTLChoice } from '@/types/cctl';
+import { captureCell, readCell, readRow } from '../answer-table';
+import type { PageImages } from '../page-images';
+import type { PageLayout } from '../page-layout';
+import type { VisualLine } from '../types';
 
-const ROW_START_REGEX = /^([A-Z])\s+([☑■☐])\s+([☑■☐])\s+(Oui(?:\s*\(\+\d+\))?|Non)(?:\s+(.*))?$/;
-const ROW_START_REGEX_ALT = /^([A-Z])\s+([☑■☐])\s+([☑■☐])(?:\s+(.*))?$/;
+export const CHOICE_ROW = /^([A-Z])\s+([☑■☐])\s+([☑■☐])(?:\s+(Oui(?:\s*\(\+\d+\))?|Non)(?=\s|$))?\s*(.*)$/;
 
-/**
- * Parses single choice or multiple choice QCM tables
- */
-export function parseChoiceQuestion(filteredQLines: VisualLine[], firstChoiceIdx: number): CCTLChoice[] {
+export async function parseChoiceQuestion(lines: VisualLine[], layouts: PageLayout[], images: PageImages): Promise<CCTLChoice[]> {
+    const markers = lines.flatMap(line => {
+        const match = line.fullText.match(CHOICE_ROW);
+        return match ? [{ line, match }] : [];
+    });
     const choices: CCTLChoice[] = [];
-    const tableLines = firstChoiceIdx !== -1 ? filteredQLines.slice(firstChoiceIdx) : [];
-    let currentChoice: CCTLChoice | null = null;
-
-    for (const tline of tableLines) {
-        const raw = tline.fullText.trim();
-        if (!raw) continue;
-        if (/Réponse\s+attendue|Réponse\s+saisie|Réponse\s+discordante/i.test(raw)) continue;
-        if (/^attendue\s+saisie\s+discordante$/i.test(raw)) continue;
-        if (/^Réponse\s+Réponse\s+Réponse$/i.test(raw)) continue;
-
-        const match = raw.match(ROW_START_REGEX);
-        if (match) {
-            if (currentChoice) choices.push(currentChoice);
-            const optId = match[1];
-            const expectedBox = match[2];
-            const studentBox = match[3];
-            const discordance = match[4];
-            let text = match[5] ? match[5].trim() : '';
-
-            // Clean up any remaining discordance noise
-            if (/^(?:Non|Oui(?:\s*\(\+\d+\))?)$/i.test(text)) {
-                text = '';
-            }
-
-            currentChoice = {
-                id: optId,
-                text: text,
-                isExpected: expectedBox === '☑',
-                isStudentAnswer: studentBox === '☑',
-                isDiscordant: discordance.toLowerCase().startsWith('oui'),
-                discordanceDetail: discordance.includes('+') ? discordance : undefined
-            };
-        } else {
-            const altMatch = raw.match(ROW_START_REGEX_ALT);
-            if (altMatch && ['☑', '■', '☐'].includes(altMatch[2])) {
-                if (currentChoice) choices.push(currentChoice);
-                const optId = altMatch[1];
-                const expectedBox = altMatch[2];
-                const studentBox = altMatch[3];
-                let rest = (altMatch[4] || '').trim();
-                let isDisc = false;
-                let discDetail: string | undefined;
-
-                if (/^Non(?:\s+|$)/i.test(rest)) {
-                    rest = rest.replace(/^Non(?:\s+|$)/i, '').trim();
-                    isDisc = false;
-                } else if (/^Oui(?:\s*(\(\+\d+\)))?(?:\s+|$)/i.test(rest)) {
-                    const m = rest.match(/^Oui(?:\s*(\(\+\d+\)))?(?:\s+|$)/i);
-                    isDisc = true;
-                    if (m && m[1]) discDetail = m[1];
-                    rest = rest.replace(/^Oui(?:\s*(\(\+\d+\)))?(?:\s+|$)/i, '').trim();
-                }
-
-                if (/^(?:Non|Oui(?:\s*\(\+\d+\))?)$/i.test(rest)) {
-                    rest = '';
-                }
-
-                currentChoice = {
-                    id: optId,
-                    text: rest,
-                    isExpected: expectedBox === '☑',
-                    isStudentAnswer: studentBox === '☑',
-                    isDiscordant: isDisc,
-                    discordanceDetail: discDetail
-                };
-            } else if (currentChoice) {
-                // Continuation line for multi-line choice description
-                if (!/^(?:Non|Oui(?:\s*\(\+\d+\))?)$/i.test(raw)) {
-                    currentChoice.text += (currentChoice.text ? ' ' : '') + raw;
-                }
-            }
-        }
+    for (const [index, { line, match }] of markers.entries()) {
+        const [, id, expected, student, discordance, fallbackText] = match;
+        const row = await readRow(lines, line, line.items[0], markers[index + 1]?.line, layouts[line.page - 1], images);
+        const right = row.columns.at(-1) ?? row.bounds[2];
+        const left = row.columns[4];
+        const expression = discordance?.replace(/\s+/g, ' ');
+        choices.push({
+            id,
+            text: left === undefined ? fallbackText : readCell(row, left, right),
+            imageUrl: left === undefined ? undefined : await captureCell(row, images, left, right),
+            isExpected: expected === '☑',
+            isStudentAnswer: student === '☑',
+            isDiscordant: expression?.startsWith('Oui') ?? false,
+            discordanceDetail: expression?.includes('+') ? expression : undefined,
+            explanation: row.explanation,
+            explanationImageUrl: row.explanationImageUrl,
+        });
     }
-
-    if (currentChoice) {
-        choices.push(currentChoice);
-    }
-
     return choices;
 }

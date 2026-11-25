@@ -25,15 +25,20 @@ export interface CCTLChoice {
     isStudentAnswer?: boolean;  // Réponse saisie par l'étudiant (optionnel)
     isDiscordant?: boolean;     // Présence d'une discordance (optionnel)
     discordanceDetail?: string; // e.g. "(+1)"
+    explanation?: string;
+    explanationImageUrl?: string;
 }
 
 export interface CCTLMatchingPair {
     id: string;
     leftItem: string;           // Élément de gauche (texte ou réf image)
+    leftImageUrl?: string;
     rightExpected: string;      // Association attendue
     rightStudent?: string;      // Association saisie par l'étudiant
     isCorrect?: boolean;
     discordanceDetail?: string; // e.g. "Oui (+1)"
+    explanation?: string;
+    explanationImageUrl?: string;
 }
 
 export interface CCTLFillBlankItem {
@@ -68,7 +73,10 @@ export interface CCTLQuestion {
     fillBlanks?: CCTLFillBlankItem[];
     correctAnswersCount: number;
     points?: number;
+    maxPoints?: number;
+    isCancelled?: boolean;
     explanation?: string;       // Explication / correction détaillée
+    explanationImageUrl?: string;
     category?: string;          // Thème / Chapitre
     rawText?: string;
 }
@@ -77,6 +85,7 @@ export interface CCTLSection {
     id: string;
     title: string;
     introText?: string;
+    introImageUrl?: string;
     codeSnippet?: string;
     codeLanguage?: string;
     questionCount: number;

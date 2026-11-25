@@ -1,8 +1,11 @@
-import { CCTLQuestionType, CCTLStudentStatus, CCTLChoice, CCTLMatchingPair, CCTLFillBlankItem } from '@/types/cctl';
+import type { CCTLQuestionType, CCTLStudentStatus, CCTLChoice, CCTLMatchingPair, CCTLFillBlankItem } from '@/types/cctl';
 
 export interface VisualItem {
     text: string;
     x: number;
+    y: number;
+    width: number;
+    height: number;
 }
 
 export interface VisualLine {
@@ -16,6 +19,7 @@ export interface SectionData {
     id: string;
     title: string;
     startLineIndex: number;
+    titleEndLineIndex?: number;
     endLineIndex?: number;
     codeSnippet?: string;
     codeLanguage?: string;

@@ -1,5 +1,8 @@
-import { VisualLine, SectionData, QuestionBoundary } from './types';
+import type { VisualLine, SectionData, QuestionBoundary } from './types';
 import { isScaleLine } from './metadata';
+import { isSectionTitleLine } from './spatial';
+
+export const QUESTION_HEADER = /^(?:Annulée\s*[-–—]\s*)?(?:\uf059\s*)?Question\s+(\d+)(?=\s+(?:Question|Vrai|QCM|Option|Réponse|Analyse|d'association|numérique)|\s*[:—-]|\s*$)/i;
 
 /**
  * Detects exam sections/sub-parts (e.g. DL1 POO) and question boundaries.
@@ -26,13 +29,21 @@ export function detectSectionsAndBoundaries(visualLines: VisualLine[]): {
         const trimmed = line.fullText.trim();
 
         // Check if line is an explicit section header (e.g. DL1 POO, Partie 2, etc.)
-        const isSectionHeader = /^(?:DL\d+|Partie\s+\d+|Section\s+\d+|Devoir\s+Libre\s*\d*)\b/i.test(trimmed);
+        const isPrintedTitle = isSectionTitleLine(line, visualLines[i + 1]);
+        const isSectionHeader = isPrintedTitle || /^(?:DL\d+|Partie\s+\d+|Section\s+\d+|Devoir\s+Libre\s*\d*)\b/i.test(trimmed);
         if (isSectionHeader) {
-            currentSec.endLineIndex = i;
+            const startLineIndex = i;
+            const titleLines = [trimmed];
+            while (isPrintedTitle && visualLines[i + 1]?.page === line.page &&
+                isSectionTitleLine(visualLines[i + 1], visualLines[i + 2])) {
+                titleLines.push(visualLines[++i].fullText);
+            }
+            currentSec.endLineIndex = startLineIndex;
             currentSec = {
                 id: `sec-${detectedSections.length + 1}`,
-                title: trimmed,
-                startLineIndex: i,
+                title: titleLines.join(' '),
+                startLineIndex,
+                titleEndLineIndex: i,
                 questionCount: 0
             };
             detectedSections.push(currentSec);
@@ -41,11 +52,11 @@ export function detectSectionsAndBoundaries(visualLines: VisualLine[]): {
         }
 
         // Only match genuine Moodle question headers at the start of a line
-        const qMatch = line.fullText.match(/^\s*(?:\s*)?Question\s+(\d+)(?:\s+(?:Question|Vrai|QCM|Option|Réponse|Analyse|d'association|numérique)|[:—-]|\s*$)/i);
+        const qMatch = trimmed.match(QUESTION_HEADER);
         if (qMatch) {
             const rawNum = parseInt(qMatch[1], 10);
             // If question numbers reset without an explicit title, create an implicit section
-            if (rawNum <= lastQNum && currentSec.title === 'Partie Principale') {
+            if (rawNum <= lastQNum) {
                 currentSec.endLineIndex = i;
                 currentSec = {
                     id: `sec-${detectedSections.length + 1}`,
@@ -72,9 +83,10 @@ export function detectSectionsAndBoundaries(visualLines: VisualLine[]): {
     // Determine section intro text and shared code blocks (between section start and first question)
     for (const sec of detectedSections) {
         const firstQ = questionStarts.find(q => q.sectionData === sec);
-        if (firstQ && firstQ.lineIndex > sec.startLineIndex) {
-            const introLines = visualLines.slice(sec.startLineIndex + 1, firstQ.lineIndex)
-                .filter(l => !/^\d+\s*\/\s*\d+$/.test(l.fullText.trim()) && !isScaleLine(l.fullText));
+        if (firstQ && sec.titleEndLineIndex !== undefined) {
+            const introLines = visualLines.slice(sec.titleEndLineIndex + 1, firstQ.lineIndex)
+                .filter(l => !/^\d+\s*\/\s*\d+$/.test(l.fullText.trim()) &&
+                    !isScaleLine(l.fullText) && !/^Note du dossier\s*:/i.test(l.fullText));
 
             const codeParts: string[] = [];
             const textParts: string[] = [];

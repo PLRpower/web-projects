@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, DragEvent } from 'react';
+import { CCTLSourceImage } from './CCTLSourceImage';
 import Link from 'next/link';
 import {
     ArrowLeft,
@@ -873,12 +874,26 @@ export function BatchCCTLImporter({
                         </div>
 
                         <div className="flex-1 overflow-y-auto space-y-3 pr-1">
-                            {previewItem.exam.questions.map((q, qIdx) => (
-                                <div key={qIdx} className="p-4 rounded-2xl bg-surface border border-border text-xs space-y-2.5">
+                            {previewItem.exam.questions.map((q, qIdx, questions) => {
+                                const section = q.sectionTitle !== questions[qIdx - 1]?.sectionTitle
+                                    ? previewItem.exam?.sections?.find(item => item.title === q.sectionTitle)
+                                    : undefined;
+                                return (
+                                <React.Fragment key={qIdx}>
+                                {section && (
+                                    <div className="p-4 rounded-2xl border border-border text-sm space-y-2">
+                                        <h3 className="font-semibold">{section.title}</h3>
+                                        {section.introImageUrl
+                                            ? <CCTLSourceImage src={section.introImageUrl} alt={section.introText || 'Consignes du dossier'} />
+                                            : <p className="whitespace-pre-line">{section.introText}</p>}
+                                        {section.codeSnippet && !section.introImageUrl && <pre className="overflow-x-auto">{section.codeSnippet}</pre>}
+                                    </div>
+                                )}
+                                <div className="p-4 rounded-2xl bg-surface border border-border text-xs space-y-2.5">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <span className="font-mono font-bold text-accent-yellow">
-                                                Question {q.number || qIdx + 1}
+                                                {q.isCancelled && 'Annulée · '}Question {q.sectionQuestionNumber || q.number || qIdx + 1}
                                             </span>
                                             {q.sectionTitle && (
                                                 <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-accent-yellow/15 text-accent-yellow border border-accent-yellow/30">
@@ -890,32 +905,19 @@ export function BatchCCTLImporter({
                                             {q.typeLabel || q.type}
                                         </span>
                                     </div>
-                                    {/* Prompt / Enoncé (100% Texte sélectionnable et copiable) */}
                                     <div className="space-y-2">
-                                        <p className="font-medium text-text-primary leading-relaxed whitespace-pre-line select-text">
-                                            {q.prompt}
-                                        </p>
-
-                                        {/* Formule mathématique isolée si présente */}
-                                        {(q.formulaImageUrl || (q.promptImageUrl && q.hasPromptFormula)) && (
-                                            <div className="inline-flex items-center gap-2 p-2 sm:px-3 sm:py-1.5 rounded-xl bg-white dark:bg-zinc-950 border border-border/80 shadow-xs max-w-full overflow-x-auto">
-                                                <span className="text-[10px] font-mono font-bold text-text-muted shrink-0">Formule :</span>
-                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img
-                                                    src={q.formulaImageUrl || q.promptImageUrl}
-                                                    alt="Formule de l'énoncé"
-                                                    className="max-h-12 w-auto object-contain dark:invert rounded"
-                                                />
-                                            </div>
-                                        )}
+                                        {q.promptImageUrl && !q.formulaImageUrl
+                                            ? <CCTLSourceImage src={q.promptImageUrl} alt={q.prompt || 'Énoncé de la question'} />
+                                            : <p className="font-medium text-text-primary leading-relaxed whitespace-pre-line select-text">{q.prompt}</p>}
+                                        {q.formulaImageUrl && <CCTLSourceImage src={q.formulaImageUrl} alt="Formule de l’énoncé" />}
                                     </div>
 
-                                    {/* Code Snippet si présent */}
-                                    {q.codeSnippet && (
+                                    {q.codeSnippet && !q.promptImageUrl && (
                                         <div className="p-3 rounded-xl bg-surface-highlight border border-border font-mono text-[11px] overflow-x-auto whitespace-pre leading-relaxed text-text-primary">
                                             {q.codeSnippet}
                                         </div>
                                     )}
+                                    {q.statusRaw && <p className="text-text-muted">{q.statusRaw}</p>}
 
                                     {/* Question avec paires d'associations / multi-parties (Matching ou Valeurs numériques multiples) */}
                                     {q.matchingPairs && q.matchingPairs.length > 0 ? (
@@ -929,9 +931,9 @@ export function BatchCCTLImporter({
                                                         <span className="w-5 h-5 rounded bg-surface-highlight border border-border flex items-center justify-center text-[10px] font-bold text-text-muted shrink-0">
                                                             {pair.id}
                                                         </span>
-                                                        <span className="font-semibold text-text-primary break-words">
-                                                            {pair.leftItem}
-                                                        </span>
+                                                        {pair.leftImageUrl
+                                                            ? <CCTLSourceImage src={pair.leftImageUrl} alt={pair.leftItem || `Élément ${pair.id}`} />
+                                                            : <span className="font-semibold text-text-primary break-words">{pair.leftItem}</span>}
                                                     </div>
 
                                                     <div className="flex items-center gap-1.5 shrink-0 sm:justify-end">
@@ -939,17 +941,23 @@ export function BatchCCTLImporter({
                                                             <Check size={11} />
                                                             <span>{pair.rightExpected}</span>
                                                         </div>
+                                                        {pair.rightStudent !== undefined && <span>Saisie · {pair.rightStudent}</span>}
+                                                        {pair.discordanceDetail && <span>{pair.discordanceDetail}</span>}
                                                     </div>
+                                                    {pair.explanationImageUrl
+                                                        ? <CCTLSourceImage src={pair.explanationImageUrl} alt={pair.explanation || 'Commentaire de la proposition'} />
+                                                        : pair.explanation && <p className="whitespace-pre-line">{pair.explanation}</p>}
                                                 </div>
                                             ))}
                                         </div>
                                     ) : q.type === 'short_answer' || q.type === 'fill_blank' || q.type === 'numerical' ? (
                                         /* Question à réponse courte / saisie libre / valeur numérique unique */
-                                        <div className="p-3 rounded-xl bg-emerald-500/10 border-2 border-emerald-500 dark:bg-emerald-500/15 dark:border-emerald-400 flex items-center justify-between gap-2 text-xs shadow-xs">
-                                            <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 uppercase font-bold">Valeur / Réponse attendue :</span>
-                                            <span className="font-mono font-bold text-emerald-800 dark:text-emerald-300">
-                                                {q.choices?.[0]?.text || q.fillBlanks?.[0]?.expectedText}
-                                            </span>
+                                        <div className="space-y-1">
+                                            {q.choices[0]?.text && <p className="whitespace-pre-line">Attendue · {q.choices[0].text}</p>}
+                                            {q.fillBlanks?.[0]?.studentText && <p className="whitespace-pre-line">Saisie · {q.fillBlanks[0].studentText}</p>}
+                                            {q.choices[0]?.explanationImageUrl
+                                                ? <CCTLSourceImage src={q.choices[0].explanationImageUrl} alt={q.choices[0].explanation || 'Commentaire de la proposition'} />
+                                                : q.choices[0]?.explanation && <p className="whitespace-pre-line">{q.choices[0].explanation}</p>}
                                         </div>
                                     ) : (
                                         /* QCM classique (Choix unique / multiple) */
@@ -971,24 +979,16 @@ export function BatchCCTLImporter({
                                                         }`}>
                                                             {c.id}
                                                         </span>
-                                                        <span className={`flex-1 break-words leading-relaxed ${c.isExpected ? 'text-emerald-800 dark:text-emerald-300 font-bold' : 'text-text-primary font-medium'}`}>
-                                                            {c.imageUrl && !c.text ? (
-                                                                <div className="py-0.5 flex items-center">
-                                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                                    <img
-                                                                        src={c.imageUrl}
-                                                                        alt={`Formule proposition ${c.id}`}
-                                                                        className="max-h-10 w-auto object-contain dark:invert rounded"
-                                                                    />
-                                                                </div>
-                                                            ) : c.text ? (
-                                                                c.text
-                                                            ) : (
-                                                                <span className="italic text-text-muted text-[11px]">
-                                                                    Proposition {c.id}
-                                                                </span>
-                                                            )}
-                                                        </span>
+                                                        <div className="flex-1 break-words leading-relaxed">
+                                                            {c.imageUrl
+                                                                ? <CCTLSourceImage src={c.imageUrl} alt={c.text || `Proposition ${c.id}`} />
+                                                                : c.text}
+                                                            {c.explanationImageUrl
+                                                                ? <CCTLSourceImage src={c.explanationImageUrl} alt={c.explanation || 'Commentaire de la proposition'} />
+                                                                : c.explanation && <p className="mt-1 whitespace-pre-line font-normal">{c.explanation}</p>}
+                                                        </div>
+                                                        {c.isStudentAnswer && <span className="shrink-0">Saisie</span>}
+                                                        {c.discordanceDetail && <span className="shrink-0">{c.discordanceDetail}</span>}
                                                         {c.isExpected && (
                                                             <span className="shrink-0 flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30 shadow-xs">
                                                                 <Check size={10} /> Attendue
@@ -999,8 +999,13 @@ export function BatchCCTLImporter({
                                             </div>
                                         )
                                     )}
+                                    {q.explanationImageUrl
+                                        ? <CCTLSourceImage src={q.explanationImageUrl} alt={q.explanation || 'Correction de la question'} />
+                                        : q.explanation && <p className="whitespace-pre-line">{q.explanation}</p>}
                                 </div>
-                            ))}
+                                </React.Fragment>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

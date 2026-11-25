@@ -1,4 +1,5 @@
-import { VisualLine } from './types';
+import type { VisualLine } from './types';
+import { isSectionTitleLine, joinVisualItems } from './spatial';
 
 /**
  * Checks if a line is an evaluation scale description from Moodle
@@ -99,11 +100,27 @@ export function detectPromoAndDomain(
 /**
  * Extracts student name, evaluation scale and raw title from header lines
  */
-export function extractExamHeaderMeta(visualLines: VisualLine[], fileName: string) {
+export function extractExamHeaderMeta(visualLines: VisualLine[]) {
     let studentName: string | undefined;
     let evaluationStandard: string | undefined;
     let evaluationWeighted: string | undefined;
     let rawTitle = '';
+
+    const titleIndex = visualLines.findIndex((line, i) => isSectionTitleLine(line, visualLines[i + 1]));
+    if (titleIndex > 0) {
+        studentName = visualLines[0].fullText;
+        const titleLines = visualLines.slice(titleIndex);
+        const titleEnd = titleLines.findIndex((line, i) => !isSectionTitleLine(line, titleLines[i + 1]));
+        rawTitle = titleLines.slice(0, titleEnd === -1 ? undefined : titleEnd).map(line => line.fullText).join(' ');
+        const scaleLines = visualLines.slice(1, titleIndex);
+        const weightedLabel = scaleLines.flatMap(line => line.items).find(item => /(?:Échelle d'évaluation|Moyenne) pondérée/i.test(item.text));
+        const columnSplit = weightedLabel ? weightedLabel.x - 2 : Infinity;
+        const standard = scaleLines.map(line => joinVisualItems(line.items.filter(item => item.x < columnSplit))).join(' ').trim();
+        const weighted = scaleLines.map(line => joinVisualItems(line.items.filter(item => item.x >= columnSplit))).join(' ').trim();
+        evaluationStandard = standard.match(/(?:Échelle d'évaluation standard|Moyenne standard\s*\([^)]+\))\s*:\s*(.+)/i)?.[1];
+        evaluationWeighted = weighted.match(/(?:Échelle d'évaluation pondérée|Moyenne pondérée\s*\([^)]+\))\s*:\s*(.+)/i)?.[1];
+        return { studentName, evaluationStandard, evaluationWeighted, rawTitle };
+    }
 
     const firstPageLines = visualLines.slice(0, 40);
 

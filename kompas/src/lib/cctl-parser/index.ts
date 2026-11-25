@@ -1,21 +1,14 @@
-import {
-    CCTLExam,
-    CCTLQuestion,
-    CCTLQuestionType,
-    CCTLStudentStatus,
-    CCTLChoice,
-    CCTLMatchingPair,
-    CCTLFillBlankItem
-} from '@/types/cctl';
-
+import type { CCTLExam, CCTLQuestion, CCTLQuestionType, CCTLStudentStatus } from '@/types/cctl';
 import { extractVisualLines } from './spatial';
-import { extractExamHeaderMeta, detectPromoAndDomain } from './metadata';
-import { detectSectionsAndBoundaries } from './sections';
+import { extractExamHeaderMeta, detectPromoAndDomain, isScaleLine } from './metadata';
+import { detectSectionsAndBoundaries, QUESTION_HEADER } from './sections';
 import { separatePromptAndCode } from './code-detector';
-import { parseChoiceQuestion } from './parsers/choice-parser';
+import { CHOICE_ROW, parseChoiceQuestion } from './parsers/choice-parser';
 import { parseMatchingQuestion } from './parsers/matching-parser';
 import { parseNumericalQuestion } from './parsers/numerical-parser';
 import { parseOpenQuestion } from './parsers/open-parser';
+import { PageImages } from './page-images';
+import type { VisualLine } from './types';
 
 export * from './types';
 export * from './metadata';
@@ -23,349 +16,205 @@ export * from './spatial';
 export * from './sections';
 export * from './code-detector';
 
-const ROW_START_REGEX = /^([A-Z])\s+([☑■☐])\s+([☑■☐])\s+(Oui\s*\(\+\d+\)|Oui|Non)\s+(.*)$/;
-const ROW_START_REGEX_ALT = /^([A-Z])\s+([☑■☐])\s+([☑■☐])\s+(.*)$/;
+const PAGE_NUMBER = /^\d+\s*\/\s*\d+$/;
+const STATUS = /^(?:Réponses?\s+(?:correctes?|partiellement correctes?|incorrectes?)\b|Aucune réponse saisie\b|Pas encore corrigée\b)/i;
+const QUESTION_COMMENT = /^(?:\uf075\s*)?Commentaire de correction de la question$/i;
 
-/**
- * Main parser entry point. Takes a raw PDF Uint8Array and returns a fully parsed,
- * structured, and verified CCTLExam object.
- */
+function getQuestionType(label: string): CCTLQuestionType {
+    if (/valeurs?\s+numériques?/i.test(label)) return 'numerical';
+    if (/ouverte|courte/i.test(label)) return 'short_answer';
+    if (/réponses?\s+multiples?/i.test(label)) return 'multiple_choice';
+    if (/association|apparier|relier|paires?/i.test(label)) return 'matching';
+    if (/zone|image|schéma/i.test(label)) return 'image_matching';
+    if (/texte à trous/i.test(label)) return 'fill_blank';
+    if (/ordonnancement/i.test(label)) return 'ordering';
+    if (/vrai\s*\/\s*faux/i.test(label)) return 'true_false';
+    return 'single_choice';
+}
+
+function getStatus(text: string): CCTLStudentStatus {
+    if (/^Réponses?\s+correctes?\b/i.test(text)) return 'correct';
+    if (/^Réponses?\s+partiellement/i.test(text)) return 'partially_correct';
+    if (/^Réponses?\s+incorrectes?\b/i.test(text)) return 'incorrect';
+    if (/^Aucune réponse saisie/i.test(text)) return 'unanswered';
+    return 'unknown';
+}
+
+function endOfPage(line: VisualLine): VisualLine {
+    return { page: line.page, y: 9, fullText: '', items: [] };
+}
+
 export async function parseCCTLPdf(
     pdfBuffer: Uint8Array,
     fileName: string,
     fileSizeInput?: number
 ): Promise<CCTLExam> {
-    const { lines: allVisualLines, numPages } = await extractVisualLines(pdfBuffer);
-    const fileSize = fileSizeInput || pdfBuffer.byteLength;
+    const { lines, numPages, layouts, pdf } = await extractVisualLines(pdfBuffer, true);
+    try {
+        const images = new PageImages(pdf, layouts);
+        const { studentName, evaluationStandard, evaluationWeighted, rawTitle } = extractExamHeaderMeta(lines);
+        const { detectedSections, questionStarts } = detectSectionsAndBoundaries(lines);
+        const questions: CCTLQuestion[] = [];
+        const typeCounts: Record<CCTLQuestionType, number> = {
+            single_choice: 0,
+            multiple_choice: 0,
+            fill_blank: 0,
+            matching: 0,
+            image_matching: 0,
+            ordering: 0,
+            true_false: 0,
+            short_answer: 0,
+            numerical: 0,
+            code_analysis: 0
+        };
 
-    // Extract Exam Header Metadata (Student name, Evaluation Scales, candidate title)
-    const { studentName, evaluationStandard, evaluationWeighted, rawTitle } = extractExamHeaderMeta(
-        allVisualLines,
-        fileName
-    );
+        for (const [index, start] of questionStarts.entries()) {
+            const nextQuestion = questionStarts[index + 1]?.lineIndex ?? lines.length;
+            const nextSection = detectedSections.find(sec => sec.startLineIndex > start.lineIndex)?.startLineIndex ?? lines.length;
+            const end = Math.min(nextQuestion, nextSection);
+            const questionLines = lines.slice(start.lineIndex, end).filter(l => !PAGE_NUMBER.test(l.fullText));
+            const header = questionLines[0];
+            const hasWrappedType = /^multiples?$/i.test(questionLines[1]?.fullText ?? '');
+            const body = questionLines.slice(hasWrappedType ? 2 : 1);
+            const typeLabel = (header.fullText.replace(QUESTION_HEADER, '').replace(/^\s*[:—-]\s*/, '').trim() +
+                (hasWrappedType ? ' ' + questionLines[1].fullText : '')).trim() || 'Question à réponse unique';
+            let type = getQuestionType(typeLabel);
 
-    // Detect Exam Sections / Sub-parts and Question Boundaries
-    const { detectedSections, questionStarts } = detectSectionsAndBoundaries(allVisualLines);
+            const statusIndex = body.findIndex(l => STATUS.test(l.fullText));
+            const statusLine = body[statusIndex];
+            const statusRaw = statusLine?.fullText;
+            const status = getStatus(statusRaw ?? '');
+            const discordanceCount = Number(statusRaw?.match(/(\d+)\s*discordances?/i)?.[1] ?? 0);
+            const score = statusRaw?.match(/(-?\d+(?:[.,]\d+)?)\s+points?\s+obtenus?\s+sur\s+(\d+(?:[.,]\d+)?)/i);
+            const points = score ? Number(score[1].replace(',', '.')) || 0 : undefined;
+            const maxPoints = score ? Number(score[2].replace(',', '.')) : undefined;
 
-    const questions: CCTLQuestion[] = [];
-    const typeCounts: Record<CCTLQuestionType, number> = {
-        single_choice: 0,
-        multiple_choice: 0,
-        fill_blank: 0,
-        matching: 0,
-        image_matching: 0,
-        ordering: 0,
-        true_false: 0,
-        short_answer: 0,
-        numerical: 0,
-        code_analysis: 0
-    };
+            const isAnswerTable = (l: VisualLine) => /^(?:Réponse\s+attendue|Élément à associer)\b|^Réponse\s*$|^attendue\s+(?:Réponse\s+)?saisie/i.test(l.fullText) || CHOICE_ROW.test(l.fullText);
+            const tableStart = body.findIndex((l, i) => i > statusIndex && isAnswerTable(l));
+            const questionComment = body.findIndex(l => QUESTION_COMMENT.test(l.fullText));
+            const promptEnd = Math.min(...[statusIndex, tableStart, questionComment, body.length].filter(i => i >= 0));
+            const promptLines = body.slice(0, promptEnd);
+            const lastLine = body.at(-1) ?? header;
+            const limit = lines[end]?.page === lastLine.page ? lines[end] : endOfPage(lastLine);
+            const promptImageUrl = await images.between(questionLines[hasWrappedType ? 1 : 0], body[promptEnd] ?? limit, promptLines);
+            const fullPrompt = promptLines.map(l => l.fullText).join('\n');
+            const { cleanPrompt, codeSnippet, codeLanguage } = separatePromptAndCode(fullPrompt.split('\n'));
 
-    let correctCount = 0;
-    let partialCount = 0;
-    let incorrectCount = 0;
-    let totalDiscordances = 0;
+            const answerStart = statusIndex === -1 ? promptEnd : statusIndex + 1;
+            const answerLines = body.slice(answerStart, questionComment === -1 ? undefined : questionComment);
+            const tableHeader = answerLines.findIndex(l => l.items.some(item => /discordante/i.test(item.text)) &&
+                l.items.some(item => /attendue/i.test(item.text)) && l.items.some(item => /saisie/i.test(item.text)));
+            const expectedAnswers = answerLines.findIndex(l => /^Réponses? attendues?$/i.test(l.fullText));
+            if (type === 'single_choice' && !answerLines.some(l => CHOICE_ROW.test(l.fullText)) && expectedAnswers !== -1) {
+                type = 'short_answer';
+            }
 
-    for (let qIdx = 0; qIdx < questionStarts.length; qIdx++) {
-        const start = questionStarts[qIdx];
-        const nextStart = questionStarts[qIdx + 1];
-        const startLineIdx = start.lineIndex;
+            let answers: Pick<CCTLQuestion, 'choices' | 'matchingPairs' | 'fillBlanks'> = { choices: [] };
+            if (type === 'numerical') {
+                answers = await parseNumericalQuestion(answerLines, tableHeader, layouts, images);
+            } else if (type === 'matching') {
+                answers = await parseMatchingQuestion(answerLines, tableHeader, layouts, images);
+            } else if (type === 'short_answer' || type === 'fill_blank') {
+                answers = parseOpenQuestion(answerLines, expectedAnswers, status);
+            } else if (type !== 'image_matching') {
+                answers.choices = await parseChoiceQuestion(answerLines, layouts, images);
+            }
 
-        // Boundary calculation: end at next question OR next section start, whichever comes first
-        const nextSec = detectedSections.find(s => s.startLineIndex > startLineIdx);
-        let endLineIdx = nextStart ? nextStart.lineIndex : allVisualLines.length;
-        if (nextSec && nextSec.startLineIndex < endLineIdx) {
-            endLineIdx = nextSec.startLineIndex;
+            const explanationLines = questionComment === -1 ? [] : body.slice(questionComment + 1);
+            const explanation = explanationLines.map(l => l.fullText).join('\n') || undefined;
+            const explanationImageUrl = questionComment !== -1
+                ? await images.between(body[questionComment], limit, explanationLines)
+                : type === 'image_matching' && statusLine
+                    ? await images.between(statusLine, limit, answerLines, 45, undefined, true)
+                    : undefined;
+
+            if (!fullPrompt && !promptImageUrl && !answers.choices.length && !answers.matchingPairs?.length) continue;
+
+            typeCounts[type]++;
+            const sectionTitle = start.sectionData.titleEndLineIndex !== undefined ? start.sectionTitle : undefined;
+            questions.push({
+                id: `q-${start.globalNumber}-${Date.now().toString(36)}`,
+                number: start.globalNumber,
+                sectionTitle,
+                sectionQuestionNumber: start.sectionQuestionNumber,
+                category: sectionTitle,
+                type,
+                typeLabel,
+                status,
+                statusRaw,
+                discordanceCount,
+                points,
+                maxPoints,
+                isCancelled: /^Annulée\b/i.test(header.fullText) || undefined,
+                prompt: cleanPrompt || (codeSnippet ? '' : fullPrompt),
+                codeSnippet,
+                codeLanguage: codeSnippet ? codeLanguage : undefined,
+                promptImageUrl,
+                hasPromptFormula: Boolean(promptImageUrl) || undefined,
+                ...answers,
+                matchingPairs: answers.matchingPairs?.length ? answers.matchingPairs : undefined,
+                fillBlanks: answers.fillBlanks?.length ? answers.fillBlanks : undefined,
+                correctAnswersCount: answers.choices.filter(c => c.isExpected).length,
+                explanation,
+                explanationImageUrl,
+                rawText: questionLines.map(l => l.fullText).join('\n')
+            });
         }
 
-        const qLines = allVisualLines.slice(startLineIdx, endLineIdx);
-        const filteredQLines = qLines.filter(l => !/^\d+\s*\/\s*\d+$/.test(l.fullText.trim()));
+        const header = lines.slice(0, 35).map(l => l.fullText).join(' ');
+        const { promo, domain, cleanSubject, academicYear } = detectPromoAndDomain(rawTitle, fileName, header, studentName);
+        const subject = cleanSubject || rawTitle || fileName.replace(/\.pdf$/i, '').replace(/[-_]/g, ' ');
 
-        // Determine question type from top lines
-        const topLinesText = filteredQLines.slice(0, 3).map(l => l.fullText).join(' ');
-        let rawType = 'Question à réponse unique';
-        let qType: CCTLQuestionType = 'single_choice';
-
-        if (/numériques?|numérique|valeurs?\s+numériques?/i.test(topLinesText)) {
-            rawType = 'Question à valeurs numériques';
-            qType = 'numerical';
-        } else if (/ouverte|courte|saisie\s+manuelle|texte\s+court|saisie\s+libre/i.test(topLinesText)) {
-            rawType = 'Question à réponse ouverte et courte';
-            qType = 'short_answer';
-        } else if (/réponses?\s+multiples?/i.test(topLinesText)) {
-            rawType = 'Question à réponses multiples';
-            qType = 'multiple_choice';
-        } else if (/réponse\s+unique/i.test(topLinesText)) {
-            rawType = 'Question à réponse unique';
-            qType = 'single_choice';
-        } else if (/trou|remplir|compléter|saisie/i.test(topLinesText)) {
-            rawType = 'Question à texte à trous / saisie';
-            qType = 'fill_blank';
-        } else if (/image|schéma|figure|visuel/i.test(topLinesText)) {
-            rawType = 'Question visuelle / image';
-            qType = 'image_matching';
-        } else if (/association|apparier|relier|paires?/i.test(topLinesText)) {
-            rawType = "Question d'association";
-            qType = 'matching';
-        } else if (/ordonnancement|ordre|chronologique/i.test(topLinesText)) {
-            rawType = "Question d'ordonnancement";
-            qType = 'ordering';
-        } else if (/vrai\s*\/\s*faux/i.test(topLinesText)) {
-            rawType = 'Vrai / Faux';
-            qType = 'true_false';
+        const sections = [];
+        for (const section of detectedSections.filter(sec => sec.questionCount > 0)) {
+            const firstQuestion = questionStarts.find(start => start.sectionData === section);
+            const firstLine = firstQuestion ? lines[firstQuestion.lineIndex] : undefined;
+            const intro = section.titleEndLineIndex === undefined || !firstQuestion ? [] :
+                lines.slice(section.titleEndLineIndex + 1, firstQuestion.lineIndex);
+            const lastAssessment = intro.findLastIndex(l => isScaleLine(l.fullText) || /^Note du dossier\s*:/i.test(l.fullText));
+            const introStart = intro[lastAssessment] ?? (section.titleEndLineIndex === undefined ? undefined : lines[section.titleEndLineIndex]);
+            const introImageUrl = introStart && firstLine ? await images.between(introStart, firstLine,
+                intro.slice(lastAssessment + 1).filter(l => !PAGE_NUMBER.test(l.fullText)), 37) : undefined;
+            sections.push({
+                id: section.id,
+                title: section.title,
+                introText: section.introText || undefined,
+                introImageUrl,
+                codeSnippet: section.codeSnippet || undefined,
+                codeLanguage: section.codeLanguage,
+                questionCount: questions.filter(q => section.title === q.sectionTitle).length || section.questionCount
+            });
         }
 
-        // Determine Student Correction Status
-        let status: CCTLStudentStatus = 'unknown';
-        let statusRaw = '';
-        let discordanceCount = 0;
-
-        for (const l of filteredQLines) {
-            if (/^\s*Réponses?\s+correctes?\b/i.test(l.fullText)) {
-                status = 'correct';
-                statusRaw = l.fullText;
-                const discMatch = l.fullText.match(/(\d+)\s*discordances?/i);
-                if (discMatch) discordanceCount = parseInt(discMatch[1], 10);
-                break;
-            } else if (/^\s*Réponses?\s+partiellement\s+correctes?\b/i.test(l.fullText)) {
-                status = 'partially_correct';
-                statusRaw = l.fullText;
-                const discMatch = l.fullText.match(/(\d+)\s*discordances?/i);
-                if (discMatch) discordanceCount = parseInt(discMatch[1], 10);
-                break;
-            } else if (/^\s*Réponses?\s+incorrectes?\b/i.test(l.fullText)) {
-                status = 'incorrect';
-                statusRaw = l.fullText;
-                const discMatch = l.fullText.match(/(\d+)\s*discordances?/i);
-                if (discMatch) discordanceCount = parseInt(discMatch[1], 10);
-                break;
+        return {
+            id: `exam-${Date.now().toString(36)}`,
+            title: `${subject} (${promo} - ${academicYear})`,
+            studentName,
+            evaluationStandard,
+            evaluationWeighted,
+            promo,
+            domain,
+            subject,
+            year: academicYear,
+            sections: sections.length > 1 || sections.some(s => s.introText || s.introImageUrl) ? sections : undefined,
+            totalQuestions: questions.length,
+            questions,
+            stats: {
+                correctCount: questions.filter(q => q.status === 'correct').length,
+                partialCount: questions.filter(q => q.status === 'partially_correct').length,
+                incorrectCount: questions.filter(q => q.status === 'incorrect').length,
+                totalDiscordances: questions.reduce((sum, q) => sum + q.discordanceCount, 0),
+                typeCounts
+            },
+            metadata: {
+                fileName,
+                fileSize: fileSizeInput ?? pdfBuffer.byteLength,
+                totalPages: numPages,
+                parsedAt: new Date().toISOString(),
+                source: 'pdf_export'
             }
-        }
-
-        if (status === 'correct') correctCount++;
-        else if (status === 'partially_correct') partialCount++;
-        else if (status === 'incorrect') incorrectCount++;
-        totalDiscordances += discordanceCount;
-
-        // Identify table indices
-        let firstChoiceIdx = -1;
-        let tableHeaderIdx = -1;
-
-        for (let li = 0; li < filteredQLines.length; li++) {
-            const txt = filteredQLines[li].fullText.trim();
-            if (
-                /Réponse(?:\s+attendue|\s+saisie|\s+discordante)/i.test(txt) ||
-                /^attendue\s+saisie\s+discordante$/i.test(txt) ||
-                /^Réponse\s+Réponse\s+Réponse$/i.test(txt)
-            ) {
-                if (tableHeaderIdx === -1) tableHeaderIdx = li;
-            }
-            if (
-                ROW_START_REGEX.test(txt) ||
-                (ROW_START_REGEX_ALT.test(txt) && ['☑', '■', '☐'].includes(txt.match(ROW_START_REGEX_ALT)?.[2] || ''))
-            ) {
-                if (firstChoiceIdx === -1) firstChoiceIdx = li;
-                break;
-            }
-        }
-
-        const promptCutoff = firstChoiceIdx !== -1
-            ? (tableHeaderIdx !== -1 && tableHeaderIdx < firstChoiceIdx ? tableHeaderIdx : firstChoiceIdx)
-            : (tableHeaderIdx !== -1 ? tableHeaderIdx : filteredQLines.length);
-
-        const promptLines: string[] = [];
-        for (let li = 1; li < promptCutoff; li++) {
-            const txt = filteredQLines[li].fullText.trim();
-            if (/^\s*Réponses?\s+(?:partiellement\s+)?(?:correctes?|incorrectes?)/i.test(txt)) continue;
-            if (/Réponse|attendue|saisie|discordante/i.test(txt) && txt.length < 40) continue;
-            if (/^multiples?$/i.test(txt)) continue;
-            promptLines.push(filteredQLines[li].fullText);
-        }
-
-        const fullPrompt = promptLines.join('\n').trim();
-
-        // Check if question is Numerical / Interval question
-        const isNumericalQuestion = qType === 'numerical' || /numériques?/i.test(topLinesText) || filteredQLines.some(l => /valeurs?\s+numériques?/i.test(l.fullText));
-        // Check if question is Association / Matching format
-        const isMatchingTable = !isNumericalQuestion && (qType === 'matching' || filteredQLines.some(l => /Élément\s+à\s+associer/i.test(l.fullText)));
-        // Check if question is Open / Short Answer
-        const isOpenQuestion = !isNumericalQuestion && !isMatchingTable && (qType === 'short_answer' || (firstChoiceIdx === -1 && filteredQLines.some(l => /Réponses?\s+attendues?/i.test(l.fullText))));
-
-        let cleanPrompt = fullPrompt;
-        let codeSnippet: string | undefined;
-        let codeLanguage = 'javascript';
-        let choices: CCTLChoice[] = [];
-        let matchingPairs: CCTLMatchingPair[] | undefined;
-        let fillBlanks: CCTLFillBlankItem[] | undefined;
-
-        if (isNumericalQuestion) {
-            qType = 'numerical';
-            rawType = 'Question à valeurs numériques';
-
-            let statusLi = -1;
-            let numTableHeaderLi = -1;
-            for (let li = 0; li < filteredQLines.length; li++) {
-                const txt = filteredQLines[li].fullText.trim();
-                if (statusLi === -1 && /Réponses?\s+(?:correctes?|partiellement|incorrectes?)/i.test(txt)) {
-                    statusLi = li;
-                }
-                if (numTableHeaderLi === -1 && (/Réponse\s+attendue/i.test(txt) || /^attendue\s+saisie/i.test(txt))) {
-                    numTableHeaderLi = li;
-                }
-            }
-
-            const numResult = parseNumericalQuestion(filteredQLines, numTableHeaderLi, statusLi !== -1 ? statusLi : (numTableHeaderLi !== -1 ? numTableHeaderLi : filteredQLines.length));
-            cleanPrompt = numResult.cleanPrompt;
-            codeSnippet = numResult.codeSnippet;
-            codeLanguage = numResult.codeLanguage || 'cpp';
-            choices = numResult.choices;
-            if (numResult.matchingPairs.length > 0) {
-                matchingPairs = numResult.matchingPairs;
-            }
-        } else if (isMatchingTable) {
-            qType = 'matching';
-            rawType = "Question d'association";
-
-            let tableHeaderLi = -1;
-            let statusLi = -1;
-            for (let li = 0; li < filteredQLines.length; li++) {
-                const txt = filteredQLines[li].fullText.trim();
-                if (statusLi === -1 && /Réponses?\s+(?:correctes?|partiellement|incorrectes?)/i.test(txt)) {
-                    statusLi = li;
-                }
-                if (tableHeaderLi === -1 && /Élément\s+à\s+associer/i.test(txt)) {
-                    tableHeaderLi = li;
-                }
-            }
-
-            const promptEndIdx = statusLi !== -1 ? statusLi : (tableHeaderLi !== -1 ? tableHeaderLi : filteredQLines.length);
-            const matchingPromptLines = filteredQLines.slice(1, promptEndIdx).map(l => l.fullText.trim()).filter(Boolean);
-            if (matchingPromptLines.length > 0) {
-                cleanPrompt = matchingPromptLines.join('\n');
-            }
-
-            const matchResult = parseMatchingQuestion(filteredQLines, tableHeaderLi);
-            matchingPairs = matchResult.matchingPairs;
-            choices = matchResult.choices;
-        } else if (isOpenQuestion) {
-            qType = 'short_answer';
-            rawType = 'Question à réponse ouverte et courte';
-
-            let statusIdx = -1;
-            let expectedIdx = -1;
-            for (let li = 0; li < filteredQLines.length; li++) {
-                const txt = filteredQLines[li].fullText.trim();
-                if (statusIdx === -1 && /Réponses?\s+(?:correctes?|partiellement|incorrectes?)/i.test(txt)) {
-                    statusIdx = li;
-                }
-                if (expectedIdx === -1 && /Réponses?\s+attendues?/i.test(txt)) {
-                    expectedIdx = li;
-                }
-            }
-
-            const openResult = parseOpenQuestion(filteredQLines, statusIdx, expectedIdx, status);
-            if (openResult.cleanPrompt) cleanPrompt = openResult.cleanPrompt;
-            choices = openResult.choices;
-            fillBlanks = openResult.fillBlanks;
-        } else {
-            // Default QCM parsing
-            choices = parseChoiceQuestion(filteredQLines, firstChoiceIdx);
-
-            const promptCodeResult = separatePromptAndCode(fullPrompt.split('\n'));
-            cleanPrompt = promptCodeResult.cleanPrompt || fullPrompt;
-            codeSnippet = promptCodeResult.codeSnippet;
-            if (promptCodeResult.codeLanguage) {
-                codeLanguage = promptCodeResult.codeLanguage;
-            }
-        }
-
-        // If question has no codeSnippet but section has a shared codeSnippet, inherit it
-        if (!codeSnippet && start.sectionData.codeSnippet) {
-            codeSnippet = start.sectionData.codeSnippet;
-            codeLanguage = start.sectionData.codeLanguage || 'cpp';
-        }
-
-        const validPrompt = (cleanPrompt || fullPrompt).trim();
-        const hasOptions = (choices && choices.length > 0) || (matchingPairs && matchingPairs.length > 0) || (fillBlanks && fillBlanks.length > 0);
-
-        // Skip invalid empty questions without choices/answers or with trivial prompt like "cesi.fr"
-        if (!hasOptions && (!validPrompt || /^cesi\.fr$/i.test(validPrompt) || validPrompt.length < 5)) {
-            continue;
-        }
-
-        const isMainSection = start.sectionTitle === 'Partie Principale';
-        const correctExpectedCount = choices.filter(c => c.isExpected).length;
-        typeCounts[qType] = (typeCounts[qType] || 0) + 1;
-
-        questions.push({
-            id: `q-${start.globalNumber}-${Date.now().toString(36)}`,
-            number: start.globalNumber,
-            sectionTitle: !isMainSection ? start.sectionTitle : undefined,
-            sectionQuestionNumber: start.sectionQuestionNumber,
-            category: !isMainSection ? start.sectionTitle : undefined,
-            type: qType,
-            typeLabel: rawType,
-            status,
-            statusRaw,
-            discordanceCount,
-            prompt: validPrompt,
-            codeSnippet,
-            codeLanguage,
-            choices,
-            matchingPairs: matchingPairs && matchingPairs.length > 0 ? matchingPairs : undefined,
-            fillBlanks: fillBlanks && fillBlanks.length > 0 ? fillBlanks : undefined,
-            correctAnswersCount: correctExpectedCount,
-            rawText: filteredQLines.map(l => l.fullText).join('\n')
-        });
+        };
+    } finally {
+        await pdf.loadingTask.destroy();
     }
-
-    // Determine Subject, Promo, Domain and Academic Year
-    const sampleHeaderLines = allVisualLines.slice(0, 35).map(l => l.fullText).join(' ');
-    const { promo, domain, cleanSubject, academicYear } = detectPromoAndDomain(
-        rawTitle,
-        fileName,
-        sampleHeaderLines,
-        studentName
-    );
-    const subject = cleanSubject || rawTitle || fileName.replace(/\.pdf$/i, '').replace(/[-_]/g, ' ');
-
-    const examSections = detectedSections
-        .filter(s => s.questionCount > 0)
-        .map(s => ({
-            id: s.id,
-            title: s.title,
-            introText: s.introText || undefined,
-            codeSnippet: s.codeSnippet || undefined,
-            codeLanguage: s.codeLanguage || undefined,
-            questionCount: s.questionCount
-        }));
-
-    return {
-        id: `exam-${Date.now().toString(36)}`,
-        title: `${subject} (${promo} - ${academicYear})`,
-        studentName,
-        evaluationStandard,
-        evaluationWeighted,
-        promo,
-        domain,
-        subject,
-        year: academicYear,
-        sections: examSections.length > 1 ? examSections : undefined,
-        totalQuestions: questions.length,
-        questions,
-        stats: {
-            correctCount,
-            partialCount,
-            incorrectCount,
-            totalDiscordances,
-            typeCounts
-        },
-        metadata: {
-            fileName,
-            fileSize,
-            totalPages: numPages,
-            parsedAt: new Date().toISOString(),
-            source: 'pdf_export'
-        }
-    };
 }

@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  serverExternalPackages: ['unpdf'],
+  serverExternalPackages: ['unpdf', '@napi-rs/canvas'],
   async rewrites() {
     return [
       { source: '/logo.svg', destination: '/img/logo.svg' },

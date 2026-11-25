@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { CCTLQuestion } from '@/types/cctl';
 import { CodeBlock } from './CodeBlock';
+import { CCTLSourceImage } from './CCTLSourceImage';
 import { Button } from '@/components/ui/button';
 
 const AICoachModal = dynamic(() => import('./AICoachModal').then(mod => mod.AICoachModal), {
@@ -48,6 +49,7 @@ export function CCTLQuestionCard({
     const hasMatchingPairs = Boolean(question.matchingPairs && question.matchingPairs.length > 0);
     const isMatching = (question.type === 'matching' || (isNumerical && hasMatchingPairs)) && hasMatchingPairs;
     const isShortAnswer = question.type === 'short_answer' || question.type === 'fill_blank' || (isNumerical && !hasMatchingPairs);
+    const reviewOnly = question.type === 'image_matching' && !question.choices.length;
 
     const expectedAnswerText = question.choices.find(c => c.isExpected)?.text || question.fillBlanks?.[0]?.expectedText || '';
 
@@ -95,7 +97,8 @@ export function CCTLQuestionCard({
     // Calculate practice result
     const expectedIds = question.choices.filter(c => c.isExpected).map(c => c.id);
     const isPracticeFullyCorrect = isShortAnswer
-        ? (isNumerical ? checkNumericalMatch(typedAnswer, expectedAnswerText) : typedAnswer.trim().toLowerCase() === expectedAnswerText.trim().toLowerCase())
+        ? (isNumerical ? checkNumericalMatch(typedAnswer, expectedAnswerText)
+            : expectedAnswerText.split('\n').some(answer => answer.trim().toLowerCase() === typedAnswer.trim().toLowerCase()))
         : isMatching
         ? (question.matchingPairs?.every(p => (matchingAnswers[p.id] || '').trim().toLowerCase() === p.rightExpected.trim().toLowerCase()) ?? false)
         : (selectedChoiceIds.length === expectedIds.length && selectedChoiceIds.every(id => expectedIds.includes(id)));
@@ -223,25 +226,13 @@ export function CCTLQuestionCard({
 
             {/* Prompt & Statement (100% Copyable / Selectable Text) */}
             <div className="space-y-3">
-                <p className="text-base sm:text-lg font-medium text-text-primary leading-relaxed whitespace-pre-line select-text">
-                    {question.prompt}
-                </p>
-
-                {/* Inline isolated formula crop when prompt has missing vector formulas */}
-                {(question.formulaImageUrl || (question.promptImageUrl && question.hasPromptFormula)) && (
-                    <div className="inline-flex items-center gap-3 p-3 sm:px-4 sm:py-2.5 rounded-2xl bg-white dark:bg-zinc-950 border border-border/80 shadow-xs max-w-full overflow-x-auto">
-                        <span className="text-[11px] font-mono font-bold text-text-muted shrink-0">Formule :</span>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                            src={question.formulaImageUrl || question.promptImageUrl}
-                            alt="Formule mathématique de l'énoncé"
-                            className="max-h-14 sm:max-h-16 w-auto object-contain dark:invert rounded"
-                        />
-                    </div>
-                )}
+                {question.promptImageUrl && !question.formulaImageUrl
+                    ? <CCTLSourceImage src={question.promptImageUrl} alt={question.prompt || 'Énoncé de la question'} />
+                    : <p className="text-base sm:text-lg font-medium text-text-primary leading-relaxed whitespace-pre-line select-text">{question.prompt}</p>}
+                {question.formulaImageUrl && <CCTLSourceImage src={question.formulaImageUrl} alt="Formule de l’énoncé" />}
 
                 {/* Code Snippet if present */}
-                {question.codeSnippet && (
+                {question.codeSnippet && !question.promptImageUrl && (
                     <CodeBlock
                         code={question.codeSnippet}
                         language={question.codeLanguage || 'javascript'}
@@ -340,7 +331,9 @@ export function CCTLQuestionCard({
                                                 {pair.id}
                                             </span>
                                             <div className="font-mono text-xs sm:text-sm font-semibold text-text-primary break-words leading-relaxed">
-                                                {pair.leftItem}
+                                                {pair.leftImageUrl
+                                                    ? <CCTLSourceImage src={pair.leftImageUrl} alt={pair.leftItem || `Élément ${pair.id}`} />
+                                                    : pair.leftItem}
                                             </div>
                                         </div>
 
@@ -430,15 +423,8 @@ export function CCTLQuestionCard({
 
                                     {/* Choice Text & Formula Image */}
                                     <div className="flex-1 text-sm leading-relaxed space-y-1">
-                                        {choice.imageUrl && !choice.text ? (
-                                            <div className="py-0.5 flex items-center">
-                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img
-                                                    src={choice.imageUrl}
-                                                    alt={`Formule proposition ${choice.id}`}
-                                                    className="max-h-12 sm:max-h-14 w-auto object-contain dark:invert rounded"
-                                                />
-                                            </div>
+                                        {choice.imageUrl ? (
+                                            <CCTLSourceImage src={choice.imageUrl} alt={choice.text || `Proposition ${choice.id}`} />
                                         ) : choice.text ? (
                                             <p className={`${isExpected ? 'text-emerald-800 dark:text-emerald-300 font-bold text-sm sm:text-base' : 'text-text-primary font-medium'}`}>
                                                 {choice.text}
@@ -503,15 +489,8 @@ export function CCTLQuestionCard({
                                     </div>
 
                                     <div className={`flex-1 text-sm leading-relaxed ${textStyle}`}>
-                                        {choice.imageUrl && !choice.text ? (
-                                            <div className="py-0.5 flex items-center">
-                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img
-                                                    src={choice.imageUrl}
-                                                    alt={`Formule proposition ${choice.id}`}
-                                                    className="max-h-12 sm:max-h-14 w-auto object-contain dark:invert rounded"
-                                                />
-                                            </div>
+                                        {choice.imageUrl ? (
+                                            <CCTLSourceImage src={choice.imageUrl} alt={choice.text || `Proposition ${choice.id}`} />
                                         ) : choice.text ? (
                                             choice.text
                                         ) : (
@@ -540,8 +519,14 @@ export function CCTLQuestionCard({
                 </div>
             )}
 
+            {(mode === 'review' || showCorrectionInPractice || reviewOnly) && (
+                question.explanationImageUrl
+                    ? <CCTLSourceImage src={question.explanationImageUrl} alt={question.explanation || 'Correction de la question'} />
+                    : question.explanation && <p className="text-sm whitespace-pre-line">{question.explanation}</p>
+            )}
+
             {/* Practice Actions Bar */}
-            {mode === 'practice' && (
+            {mode === 'practice' && !reviewOnly && (
                 <div className="space-y-3 pt-3 border-t border-border/40">
                     {/* Failure Coaching Alert when student answers incorrectly */}
                     {hasSubmittedPractice && !isPracticeFullyCorrect && (
