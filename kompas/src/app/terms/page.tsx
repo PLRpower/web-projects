@@ -130,6 +130,24 @@ export default function TermsPage() {
                                 Tout utilisateur peut résilier son compte et supprimer l&apos;intégralité de ses données à tout moment depuis ses paramètres de profil.
                             </p>
                         </section>
+
+                        {/* Section 7 */}
+                        <section className="space-y-3 pt-6 border-t border-border/60">
+                            <h2 className="text-xl sm:text-2xl font-normal font-serif text-text-primary">
+                                7. Éditeur &amp; Mentions Légales
+                            </h2>
+                            <p>
+                                La plateforme <strong>Kompas | CESI</strong> est éditée par :
+                            </p>
+                            <ul className="list-disc list-inside space-y-1.5 pl-2">
+                                <li><strong className="text-text-primary">Éditeur :</strong> Paul Thomas</li>
+                                <li><strong className="text-text-primary">Forme juridique :</strong> Entreprise Individuelle (EI)</li>
+                                <li><strong className="text-text-primary">Siège social :</strong> Strasbourg (67000), France</li>
+                                <li><strong className="text-text-primary">Immatriculation :</strong> 130 717 028 R.C.S. Strasbourg (SIREN : 130 717 028)</li>
+                                <li><strong className="text-text-primary">TVA :</strong> TVA non applicable, art. 293 B du CGI (franchise en base de TVA)</li>
+                                <li><strong className="text-text-primary">Contact :</strong> <span className="font-mono text-text-primary">privacy@cesi-kompas.fr</span></li>
+                            </ul>
+                        </section>
                     </div>
 
                     {/* Bottom Action */}

@@ -51,8 +51,13 @@ export default function PrivacyPage() {
                                 1. Responsable du Traitement
                             </h2>
                             <p>
-                                Le traitement des données est opéré par l&apos;équipe du projet étudiant <strong>Kompas | CESI</strong>, initiative collaborative d&apos;élèves-ingénieurs du groupe CESI.
+                                Le traitement des données est opéré par <strong>Paul Thomas</strong>, Entreprise Individuelle (EI), éditeur de la plateforme <strong>Kompas | CESI</strong> :
                             </p>
+                            <ul className="list-disc list-inside space-y-1 pl-2">
+                                <li><strong className="text-text-primary">Éditeur :</strong> Paul Thomas (Entreprise Individuelle)</li>
+                                <li><strong className="text-text-primary">Adresse :</strong> Strasbourg (67000), France</li>
+                                <li><strong className="text-text-primary">Immatriculation :</strong> 130 717 028 R.C.S. Strasbourg (SIREN : 130 717 028)</li>
+                            </ul>
                             <p>
                                 Pour toute demande relative à vos données personnelles ou pour exercer vos droits, vous pouvez nous contacter directement par email à l&apos;adresse : <span className="font-mono text-text-primary">privacy@cesi-kompas.fr</span> ou via les paramètres de votre compte étudiant.
                             </p>
