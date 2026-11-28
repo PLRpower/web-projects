@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /connexion
+Disallow: /protege
+Disallow: /logout
+Disallow: /telecharger
+
+Sitemap: https://cesi-drop.fr/sitemap.xml

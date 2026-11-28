@@ -1,6 +1,7 @@
 import router from '@adonisjs/core/services/router';
 import { middleware } from '#start/kernel';
 import uploadService from '#services/upload_service';
+import Category from '#models/category';
 import fs from 'node:fs';
 
 const MediaController = () => import('#controllers/media_controller');
@@ -83,4 +84,42 @@ router.get('/discord', async ({ response }) => {
 });
 router.get('/instagram', async ({ response }) => {
   response.redirect().toPath('https://www.instagram.com/studio.cesi/');
+});
+
+// Dynamic XML Sitemap (SEO)
+router.get('/sitemap.xml', async ({ response }) => {
+  const baseUrl = 'https://cesi-drop.fr';
+  const staticUrls = [
+    { loc: '/', changefreq: 'daily', priority: '1.0' },
+    { loc: '/publier', changefreq: 'monthly', priority: '0.6' },
+    { loc: '/mentions-legales', changefreq: 'yearly', priority: '0.3' },
+    { loc: '/confidentialite', changefreq: 'yearly', priority: '0.3' },
+    { loc: '/cgu', changefreq: 'yearly', priority: '0.3' },
+  ];
+
+  const categories = await Category.all();
+  const categoryUrls = categories.map((cat) => ({
+    loc: `/categorie/${cat.id}`,
+    changefreq: 'weekly',
+    priority: '0.8',
+  }));
+
+  const urls = [...staticUrls, ...categoryUrls]
+    .map(
+      (u) => `  <url>
+    <loc>${baseUrl}${u.loc}</loc>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`
+    )
+    .join('\n');
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
+
+  response.header('Content-Type', 'application/xml; charset=utf-8');
+  response.header('Cache-Control', 'public, max-age=3600, s-maxage=3600');
+  return response.send(xml);
 });

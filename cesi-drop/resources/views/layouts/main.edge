@@ -3,18 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{ title ? title + ' - CESI Drop\'' : 'CESI Drop\' - Les photos des évènements du CESI' }}</title>
-  <meta name="description" content="{{ description || 'Découvrez et téléchargez les photos des évènements du BDE CESI en haute qualité.' }}" />
-  
+  <title>{{ title ? title + ' - CESI Drop\' | Studio CESI' : 'CESI Drop\' - Photos des évènements CESI par Studio CESI' }}</title>
+  <meta name="description" content="{{ description || 'CESI Drop\' par Studio CESI : découvrez et téléchargez gratuitement les photos haute qualité des évènements étudiants et du BDE CESI.' }}" />
+  <link rel="canonical" href="https://cesi-drop.fr{{ request.url() }}" />
+
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="{{ title ? title + ' - CESI Drop\'' : 'CESI Drop\'' }}" />
-  <meta property="og:description" content="{{ description || 'Les photos instantanées des évènements du CESI.' }}" />
-  <meta property="og:image" content="{{ ogImage || '/thumbnail.png' }}" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:site_name" content="CESI Drop' - Studio CESI" />
+  <meta property="og:url" content="https://cesi-drop.fr{{ request.url() }}" />
+  <meta property="og:title" content="{{ title ? title + ' - CESI Drop\' | Studio CESI' : 'CESI Drop\' - Studio CESI' }}" />
+  <meta property="og:description" content="{{ description || 'CESI Drop\' par Studio CESI : les photos haute qualité des évènements du CESI.' }}" />
+  <meta property="og:image" content="{{ ogImage && ogImage.startsWith('http') ? ogImage : 'https://cesi-drop.fr' + (ogImage || '/thumbnail.png') }}" />
   <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "name": "CESI Drop'",
+          "alternateName": ["CESI Drop", "Studio CESI"],
+          "url": "https://cesi-drop.fr"
+        },
+        {
+          "@type": "Organization",
+          "name": "Studio CESI",
+          "url": "https://cesi-drop.fr",
+          "logo": "https://cesi-drop.fr/studio-cesi-logo.png",
+          "sameAs": [
+            "https://www.instagram.com/studio.cesi/",
+            "https://discord.gg/xUJ3AYv3xb"
+          ]
+        }
+      ]
+    }
+  </script>
 
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/webclip.svg" />
+
+  <script defer src="https://stats.pthomas.fr/script.js" data-website-id="c8e18ec0-6dfd-46a8-a498-eef59602c93a"></script>
 
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 
